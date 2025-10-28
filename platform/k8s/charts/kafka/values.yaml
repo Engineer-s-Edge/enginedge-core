@@ -1,0 +1,91 @@
+# Custom values for the Bitnami Kafka Helm chart
+# Updated for chart 32.x
+# Documentation: https://github.com/bitnami/charts/tree/main/bitnami/kafka
+
+# We only need one Kafka broker for a local environment
+controller:
+  replicaCount: 1
+  resources:
+    requests:
+      memory: "1.5Gi"
+      cpu: "500m"
+    limits:
+      memory: "3Gi"
+      cpu: "1"
+  defaultInitContainers:
+    prepareConfig:
+      resources:
+        requests:
+          cpu: "100m"
+          memory: "128Mi"
+        limits:
+          cpu: "200m"
+          memory: "256Mi"
+
+# Configure resource limits for the Kafka broker(s)
+resourcesPreset: "none"
+
+# Enable persistence for Kafka message logs
+logPersistence:
+  enabled: true
+  size: 8Gi
+
+# Configure Zookeeper, which is a dependency of the Kafka chart
+kraft:
+  enabled: true
+
+# Set Kafka configuration values with SASL authentication
+listeners:
+  client:
+    protocol: sasl_plaintext
+    authentication:
+      type: sasl
+  controller:
+    protocol: plaintext
+  internal:
+    protocol: sasl_plaintext
+
+# Enable SASL authentication
+auth:
+  enabled: true
+  clientProtocol: sasl_plaintext
+  interBrokerProtocol: sasl_plaintext
+  sasl:
+    mechanisms: [plain]
+    interBrokerMechanism: plain
+
+# Allow topics to be created automatically when a producer writes to them
+autoCreateTopicsEnable: true
+
+# Disable metrics exporters to save resources
+metrics:
+  jmx:
+    enabled: false
+
+# Additional configuration for stability
+extraEnvVars:
+  - name: KAFKA_HEAP_OPTS
+    value: "-Xmx2g -Xms1g"
+
+# Configure JVM options for better performance
+extraEnvVarsCM: ""
+
+# Use the chart's built-in configuration instead of overriding
+
+# Add startup delay to allow proper initialization
+startupDelay: 30
+
+# Configure health checks
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 60
+  periodSeconds: 30
+  timeoutSeconds: 10
+  failureThreshold: 3
+
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3

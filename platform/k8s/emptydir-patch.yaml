@@ -1,0 +1,15 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker-node
+spec:
+  template:
+    spec:
+      volumes:
+      - name: temp-volume
+        emptyDir: {}
+      containers:
+      - name: worker-node
+        volumeMounts:
+        - name: temp-volume
+          mountPath: /tmp 

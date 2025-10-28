@@ -1,0 +1,1 @@
+export { resourceLoader } from './resources';

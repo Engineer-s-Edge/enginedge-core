@@ -1,0 +1,249 @@
+# Hybrid dev docker-compose: spin up infra + optional app containers.
+# You can run core/worker nodes/frontend locally, while Kafka/Redis/Mongo/MinIO/Postgres run here.
+# Override defaults in .env
+
+name: enginedge-dev
+
+networks:
+  enginedge:
+    driver: bridge
+
+volumes:
+  mongo_data:
+  minio_data:
+  postgres_data:
+  wolfram_state:
+
+services:
+  # --- Databases / Storage ---
+  mongodb:
+    image: mongo:7
+    container_name: mongodb
+    ports:
+      - "${MONGODB_PORT:-27017}:27017"
+    networks: [enginedge]
+    volumes:
+      - mongo_data:/data/db
+
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    ports:
+      - "${MINIO_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+    networks: [enginedge]
+    volumes:
+      - minio_data:/data
+
+  postgres:
+    image: postgres:14
+    container_name: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-enginedge}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    networks: [enginedge]
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # --- Messaging / Cache ---
+  redis:
+    image: redis:7
+    container_name: scheduling-redis
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    networks: [enginedge]
+
+  kafka:
+    image: bitnami/kafka:3.7
+    container_name: kafka
+    environment:
+      KAFKA_ENABLE_KRAFT: "yes"
+      KAFKA_CFG_NODE_ID: 1
+      KAFKA_CFG_PROCESS_ROLES: broker,controller
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,EXTERNAL://localhost:${KAFKA_EXTERNAL_PORT:-9094}
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      ALLOW_PLAINTEXT_LISTENER: "yes"
+    ports:
+      - "${KAFKA_INTERNAL_PORT:-9092}:9092"   # optional (inside docker network)
+      - "${KAFKA_EXTERNAL_PORT:-9094}:9094"   # host access
+    networks: [enginedge]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+    ports:
+      - "${KAFKA_UI_PORT:-8085}:8080"
+    depends_on:
+      - kafka
+    networks: [enginedge]
+
+  # --- Optional app services (can run locally instead) ---
+  core:
+    build:
+      context: ..
+    container_name: core
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      MONGODB_URI: mongodb://mongodb:27017/enginedge-core
+      # Kafka/Redis/MinIO endpoints used by the app
+      KAFKA_BROKERS: kafka:9092
+      REDIS_URL: redis://scheduling-redis:6379/0
+      S3_ENDPOINT: http://minio:9000
+      S3_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-minioadmin}
+      S3_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
+      S3_FORCE_PATH_STYLE: "true"
+      WOLFRAM_LOCAL_URL: http://wolfram-kernel:5000
+      SCHEDULING_MODEL_URL: http://scheduling-model:8000
+    ports:
+      - "${CONTROL_PLANE_PORT:-3000}:3000"
+    depends_on:
+      - mongodb
+      - kafka
+      - redis
+      - minio
+    networks: [enginedge]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # --- Hexagonal Worker Nodes (optional - can run locally instead) ---
+  assistant-worker:
+    build:
+      context: ../../enginedge-workers/assistant-worker
+    container_name: assistant-worker
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      KAFKA_BROKERS: kafka:9092
+    ports:
+      - "${LLM_WORKER_PORT:-3001}:3001"
+    depends_on:
+      - kafka
+    networks: [enginedge]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  agent-tool-worker:
+    build:
+      context: ../../enginedge-workers/agent-tool-worker
+    container_name: agent-tool-worker
+    environment:
+      NODE_ENV: development
+      PORT: 3002
+      KAFKA_BROKERS: kafka:9092
+    ports:
+      - "${AGENT_TOOL_WORKER_PORT:-3002}:3002"
+    depends_on:
+      - kafka
+    networks: [enginedge]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  data-processing-worker:
+    build:
+      context: ../../enginedge-workers/data-processing-worker
+    container_name: data-processing-worker
+    environment:
+      NODE_ENV: development
+      PORT: 3003
+      KAFKA_BROKERS: kafka:9092
+    ports:
+      - "${DATA_PROCESSING_WORKER_PORT:-3003}:3003"
+    depends_on:
+      - kafka
+    networks: [enginedge]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  interview-worker:
+    build:
+      context: ../../enginedge-workers/interview-worker
+    container_name: interview-worker
+    environment:
+      NODE_ENV: development
+      PORT: 3004
+      KAFKA_BROKERS: kafka:9092
+    ports:
+      - "${INTERVIEW_WORKER_PORT:-3004}:3004"
+    depends_on:
+      - kafka
+    networks: [enginedge]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  latex-worker:
+    build:
+      context: ../../enginedge-workers/latex-worker
+    container_name: latex-worker
+    environment:
+      NODE_ENV: development
+      PORT: 3005
+      KAFKA_BROKERS: kafka:9092
+    ports:
+      - "${LATEX_WORKER_PORT:-3005}:3005"
+    depends_on:
+      - kafka
+    networks: [enginedge]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  rnle-worker:
+    build:
+      context: ../../enginedge-workers/rnle-worker
+    container_name: rnle-worker
+    environment:
+      NODE_ENV: development
+      PORT: 3006
+      KAFKA_BROKERS: kafka:9092
+    ports:
+      - "${RNLE_WORKER_PORT:-3006}:3006"
+    depends_on:
+      - kafka
+    networks: [enginedge]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  scheduling-model:
+    build:
+      context: ../../EnginEdge-monorepo/scheduling_model
+    container_name: scheduling-model
+    environment:
+      PORT: 8000
+      REDIS_URL: redis://scheduling-redis:6379/0
+    ports:
+      - "${SCHEDULING_MODEL_PORT:-8000}:8000"
+    depends_on:
+      - redis
+    networks: [enginedge]
+
+  wolfram-kernel:
+    build:
+      context: ../../EnginEdge-monorepo/local-kernel
+      args:
+        WOLFRAM_DOWNLOAD_URL: ${WOLFRAM_DOWNLOAD_URL:-}
+    container_name: wolfram-kernel
+    ports:
+      # App listens on 5000 internally; expose on host-configurable port
+      - "${WOLFRAM_KERNEL_PORT:-5001}:5000"
+    networks: [enginedge]
+    environment:
+      HOME: /home/appuser
+      WOLFRAM_USERBASE: /home/appuser/.WolframEngine
+    volumes:
+      - wolfram_state:/home/appuser/.WolframEngine
+      - wolfram_state:/home/appuser/.Wolfram

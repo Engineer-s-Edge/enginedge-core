@@ -1,0 +1,11 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: main-node
+spec:
+  template:
+    spec:
+      hostAliases:
+      - ip: "172.17.0.1"
+        hostnames:
+        - "host.docker.internal" 

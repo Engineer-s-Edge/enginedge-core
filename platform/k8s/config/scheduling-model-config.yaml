@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: scheduling-model-config
+  namespace: default
+data:
+  # The scheduling model uses Redis as a cache.
+  # The Bitnami Redis chart exposes its primary node at this service name.
+  REDIS_URL: "redis://redis-master:6379"

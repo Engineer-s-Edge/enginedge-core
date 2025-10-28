@@ -1,0 +1,154 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Build main-node (fast check)",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"run",
+				"-s",
+				"build"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		},
+		{
+			"label": "unit tests - critical memory/vector/splitter",
+			"type": "shell",
+			"command": "npm test --silent -- --runInBand --testPathPattern=\"(summary-memory|summary-buffer-memory|conversation-kg-memory|entity-memory|vectorstore.service|semantic-splitter|agent-memory-embedder).spec.ts\"",
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Run targeted Jest suites",
+			"type": "shell",
+			"command": "npm test --silent -- --runInBand --testPathPattern=\"(summary-memory|summary-buffer-memory|conversation-kg-memory|entity-memory|vectorstore.service|semantic-splitter|agent-memory-embedder).spec.ts\"",
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Run targeted unit tests",
+			"type": "shell",
+			"command": "npm test --silent -- -i -t \"SemanticTextSplitter|ConversationSummaryBufferMemory|ConversationSummaryMemory|ConversationKGMemory|AgentMemory.ensureEmbedder|AgentMemory.awaitInit|VectorStoreService\"",
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			]
+		},
+		{
+			"label": "Run unit tests in main-node",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"test",
+				"--silent"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Run only Groq provider tests",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"run",
+				"test",
+				"--",
+				"-i",
+				"--runInBand",
+				"--testPathPattern=core/infrastructure/agents/components/llm/providers/groq.spec.ts"
+			]
+		},
+		{
+			"label": "Run only Groq provider tests",
+			"type": "shell",
+			"command": "npm run test -- -i --runInBand --testPathPattern=core/infrastructure/agents/components/llm/providers/groq.spec.ts"
+		},
+		{
+			"label": "Groq spec (isolated)",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"run",
+				"test",
+				"--",
+				"-i",
+				"--runInBand",
+				"--testPathPattern=core/infrastructure/agents/components/llm/providers/groq.spec.ts"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Test only LoaderService spec",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"test",
+				"--",
+				"--runInBand",
+				"--testPathPattern=core/infrastructure/agents/components/loaders/loader.service.spec.ts"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$eslint-stylish"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run targeted jest for loader.service.spec.ts",
+			"type": "shell",
+			"command": "npx jest src/core/infrastructure/agents/components/loaders/loader.service.spec.ts --runInBand --coverage=false",
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		},
+		{
+			"label": "jest: targeted assistants services specs",
+			"type": "shell",
+			"command": "npm run test:single:path -- --testPathPattern src/features/assistants/services/agent-config-factory.service.spec.ts src/features/assistants/services/assistant-executor.service.spec.ts src/features/assistants/services/graph-agent-manager.service.spec.ts src/features/assistants/services/graph-builder.service.spec.ts --coverage=false --runInBand",
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			]
+		},
+		{
+			"label": "jest-habits-goals-services-specs",
+			"type": "shell",
+			"command": "npm run test:single:path -- --testPathPattern src/features/habits-goals/services/(goals|habits).service.spec.ts --coverage=false --runInBand",
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Run targeted jest for habits-goals services",
+			"type": "shell",
+			"command": "npm run test -- --runInBand --testPathPattern=src/features/habits-goals/services/(goals|habits).service.spec.ts --coverage=false",
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		}
+	]
+}

@@ -1,0 +1,78 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: rnle-worker
+  namespace: default
+  labels:
+    app: enginedge
+    component: rnle-worker
+spec:
+  type: ClusterIP
+  ports:
+  - port: 3006
+    targetPort: 3006
+    name: http
+  selector:
+    app: enginedge
+    component: rnle-worker
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rnle-worker
+  namespace: default
+  labels:
+    app: enginedge
+    component: rnle-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: enginedge
+      component: rnle-worker
+  template:
+    metadata:
+      labels:
+        app: enginedge
+        component: rnle-worker
+    spec:
+      containers:
+      - name: rnle-worker
+        image: rnle-worker:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 3006
+        envFrom:
+        - configMapRef:
+            name: worker-config
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "3006"
+        - name: KAFKA_BROKERS
+          valueFrom:
+            configMapKeyRef:
+              name: worker-config
+              key: KAFKA_BROKERS
+        - name: LOG_LEVEL
+          value: "info"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3006
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3006
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"

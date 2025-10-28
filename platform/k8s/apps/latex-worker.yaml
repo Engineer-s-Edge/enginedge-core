@@ -1,0 +1,84 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: latex-worker
+  namespace: default
+  labels:
+    app: enginedge
+    component: latex-worker
+spec:
+  type: ClusterIP
+  ports:
+  - port: 3005
+    targetPort: 3005
+    name: http
+  selector:
+    app: enginedge
+    component: latex-worker
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: latex-worker
+  namespace: default
+  labels:
+    app: enginedge
+    component: latex-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: enginedge
+      component: latex-worker
+  template:
+    metadata:
+      labels:
+        app: enginedge
+        component: latex-worker
+    spec:
+      containers:
+      - name: latex-worker
+        image: latex-worker:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 3005
+        envFrom:
+        - configMapRef:
+            name: worker-config
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "3005"
+        - name: KAFKA_BROKERS
+          valueFrom:
+            configMapKeyRef:
+              name: worker-config
+              key: KAFKA_BROKERS
+        - name: XELATEX_PATH
+          value: "/usr/bin/xelatex"
+        - name: TIMEOUT
+          value: "60000"
+        - name: MAX_MEMORY
+          value: "2Gi"
+        - name: LOG_LEVEL
+          value: "info"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3005
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3005
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "200m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"

@@ -1,0 +1,105 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: wolfram-kernel
+  namespace: default
+  labels:
+    app: enginedge
+    component: wolfram-kernel
+spec:
+  ports:
+  - port: 5000
+    targetPort: 5000
+  selector:
+    app: enginedge
+    component: wolfram-kernel
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wolfram-kernel
+  namespace: default
+  labels:
+    app: enginedge
+    component: wolfram-kernel
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: enginedge
+      component: wolfram-kernel
+  template:
+    metadata:
+      labels:
+        app: enginedge
+        component: wolfram-kernel
+    spec:
+      securityContext:
+        fsGroup: 1000
+        fsGroupChangePolicy: Always
+      volumes:
+      - name: wolfram-state
+        persistentVolumeClaim:
+          claimName: wolfram-state
+      containers:
+      - name: wolfram-kernel
+        image: wolfram-kernel:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 5000
+        env:
+        - name: HOME
+          value: /home/appuser
+        - name: WOLFRAM_USERBASE
+          value: /home/appuser/.WolframEngine
+        # Define resource limits for the Wolfram computation engine
+        resources:
+          limits:
+            cpu: "1"
+            memory: "1Gi"
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+        volumeMounts:
+        - name: wolfram-state
+          mountPath: /home/appuser/.WolframEngine
+        - name: wolfram-state
+          mountPath: /home/appuser/.Wolfram
+        # Probes: only mark Ready when /health returns 200
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 12
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 600
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 60
+        securityContext:
+          runAsUser: 1000
+          runAsGroup: 1000
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wolfram-state
+  namespace: default
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: standard

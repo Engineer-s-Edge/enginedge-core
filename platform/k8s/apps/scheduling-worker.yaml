@@ -1,0 +1,119 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: scheduling-worker
+  namespace: default
+  labels:
+    app: enginedge
+    component: scheduling-worker
+spec:
+  type: ClusterIP
+  ports:
+  - port: 3007
+    targetPort: 3007
+    protocol: TCP
+    name: http
+  selector:
+    app: enginedge
+    component: scheduling-worker
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scheduling-worker
+  namespace: default
+  labels:
+    app: enginedge
+    component: scheduling-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: enginedge
+      component: scheduling-worker
+  template:
+    metadata:
+      labels:
+        app: enginedge
+        component: scheduling-worker
+    spec:
+      containers:
+      - name: scheduling-worker
+        image: scheduling-worker:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 3007
+          name: http
+        env:
+        # ML Service URL
+        - name: ML_SERVICE_URL
+          value: "http://scheduling-model:8000"
+        
+        # MongoDB Connection
+        - name: MONGODB_URI
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: connection-string
+        
+        # Google Calendar OAuth
+        - name: GOOGLE_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: google-oauth-secret
+              key: client-id
+        - name: GOOGLE_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: google-oauth-secret
+              key: client-secret
+        - name: GOOGLE_REDIRECT_URI
+          value: "http://localhost:3007/calendar/auth/callback"
+        
+        # Google Service Account Credentials (for Calendar API)
+        - name: GOOGLE_APPLICATION_CREDENTIALS_JSON
+          valueFrom:
+            secretKeyRef:
+              name: google-secret
+              key: google-credentials.json
+        
+        # JWT Secret
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: jwt-secret
+              key: jwt-secret
+        
+        # Application Config
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "3007"
+        - name: LOG_LEVEL
+          value: "info"
+        
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "512Mi"
+          limits:
+            cpu: "1000m"
+            memory: "1Gi"
+        
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3007
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3007
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3

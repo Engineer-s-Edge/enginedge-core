@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- apps/main-node.yaml
+# - apps/worker-node.yaml
+- apps/interview-worker.yaml
+- apps/scheduling-worker.yaml
+- apps/scheduling-model.yaml
+- apps/mongodb.yaml
+- config/main-node-config.yaml
+# - config/worker-node-config.yaml
+- config/interview-worker-config.yaml
+- config/scheduling-model-config.yaml
+
+patches:
+- path: emptydir-patch.yaml
+- path: host-docker-internal.yaml
+
+namespace: default 

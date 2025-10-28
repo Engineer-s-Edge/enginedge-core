@@ -1,0 +1,17 @@
+Internal:
+[ ] Local DB (retrieve / query)             ADD PROTECTIONS
+[X] WolframOne (math)                       
+[ ] Sage (math)
+[ ] Retrieve files                          ONLY IN SANDBOX / Host Machine (req clients)
+[ ] OCR                                     WILL NEED TO MAKE REQUEST TO SEPERATE K8
+
+External:
+[X] Google Drive (pull files, scan directories)
+[X] Webcrawling (Tavily, Firecrawl) + Pull YT videos
+[X] Curl Websites (pull all links from site and curl those too to a max depth) + IFRAME
+[X] Google Calendar / [ ] Apple Calendar (pull events)
+[X] Notion?
+[ ] Pull from WaterlooWorksWizard Extension                         NEED TO BUILD WWW EXTENSION
+[X] Weather
+Retrieve from Todo List Apps ([X] todoist, [ ] MS todo, [ ] google tasks...)
+Retrieve from [ ] Slack, [ ] MS Teams?
