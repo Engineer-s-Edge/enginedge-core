@@ -15,14 +15,14 @@ Multiple likely causes of Kafka lag were identified: shared generic consumer gro
 - Consumer group usage (shared or generic `groupId`):
   - `enginedge-workers/worker-template/src/infrastructure/adapters/messaging/kafka-message-broker.adapter.ts` — `this.consumer = this.kafka.consumer({ groupId: 'worker-group' });`
   - `enginedge-workers/latex-worker/src/infrastructure/adapters/messaging/kafka-message-broker.adapter.ts` — uses `worker-group` pattern.
-  - Many workers show similar patterns (`rnle-worker`, `scheduling-worker`, `interview-worker`, `agent-tool-worker`, `worker-node`, `assistant-worker`) — grep hits show repeated use of `'worker-group'` or similar.
+  - Many workers show similar patterns (`resume-worker`, `scheduling-worker`, `interview-worker`, `agent-tool-worker`, `worker-node`, `assistant-worker`) — grep hits show repeated use of `'worker-group'` or similar.
 
 - Auto-topic creation and transactional producers:
   - `enginedge-core/src_old/_core/infrastructure/kafka/kafka-config.service.ts` — `allowAutoTopicCreation: true` appears in config.
   - `enginedge-workers/latex-worker/...` — producer config includes `allowAutoTopicCreation: true` and `transactionalId: `${clientId}-producer``.
 
 - Consumer processing pattern (sequential per-partition handlers):
-  - Multiple adapters use `consumer.run({ eachMessage: async ({ topic, partition, message }) => { ... } })` (examples: worker-template, scheduling-worker, rnle-worker, data-processing-worker).
+  - Multiple adapters use `consumer.run({ eachMessage: async ({ topic, partition, message }) => { ... } })` (examples: worker-template, scheduling-worker, resume-worker, data-processing-worker).
   - Handler code executes heavy work paths: document processing (`data-processing-worker`), ML/prediction/scheduling flows (`scheduling-worker` / main-node handlers), and external compute (Wolfram/local kernel via `enginedge-local-kernel/app.py`).
 
 - Heartbeat and timing settings (inconsistent / frequent):
@@ -67,7 +67,7 @@ Multiple likely causes of Kafka lag were identified: shared generic consumer gro
    - Command (example): `kafka-topics.sh --bootstrap-server <broker> --describe --topic commands`.
 
 2. Inspect consumer groups and per-partition lag:
-   - Run: `kafka-consumer-groups.sh --bootstrap-server <broker> --describe --group worker-group` and for other groups such as `assistant-worker-group`, `data-processing-worker-group`, `rnle-worker-group`.
+   - Run: `kafka-consumer-groups.sh --bootstrap-server <broker> --describe --group worker-group` and for other groups such as `assistant-worker-group`, `data-processing-worker-group`, `resume-worker-group`.
 
 3. Map `groupId` usage across code to determine intentional sharing vs misconfiguration:
    - Grep for `consumer({ groupId:` across the repo and review which services share the same id.

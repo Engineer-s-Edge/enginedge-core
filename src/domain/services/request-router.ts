@@ -38,7 +38,7 @@ export class RequestRouter {
       case RequestType.INTERVIEW_PROCESSING:
         return WorkerType.INTERVIEW;
       case RequestType.RESUME_ANALYSIS:
-        return WorkerType.RNLE;
+        return WorkerType.resume;
       case RequestType.LATEX_COMPILATION:
         return WorkerType.LATEX;
       case RequestType.DATA_PROCESSING:

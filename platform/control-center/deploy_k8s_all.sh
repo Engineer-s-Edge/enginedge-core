@@ -33,7 +33,7 @@ kubectl apply -f C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8
 kubectl apply -f C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/latex-worker.yaml
 kubectl apply -f C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/assistant-worker.yaml
 kubectl apply -f C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/news-ingestion-cronjob.yaml
-kubectl apply -f C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/rnle-worker.yaml
+kubectl apply -f C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/resume-worker.yaml
 kubectl apply -f C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/scheduling-model.yaml
 kubectl apply -f C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/wolfram-kernel.yaml
 

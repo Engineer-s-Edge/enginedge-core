@@ -59,7 +59,7 @@ K8S_SERVICE_GROUPS = {
             "config/core-config.yaml", "apps/core.yaml",
             "config/worker-config.yaml", "apps/assistant-worker.yaml", "apps/agent-tool-worker.yaml",
             "apps/data-processing-worker.yaml", "apps/interview-worker.yaml",
-            "apps/latex-worker.yaml", "apps/rnle-worker.yaml",
+            "apps/latex-worker.yaml", "apps/resume-worker.yaml",
             "apps/wolfram-kernel.yaml"
         ],
     },
@@ -767,7 +767,7 @@ def refresh_k8s_deployments(selected_groups: List[str]):
                 deployments_to_refresh.extend(["core"])
             if "Core Applications" in group:
                 deployments_to_refresh.extend(["agent-tool-worker", "data-processing-worker", "interview-worker", 
-                                               "latex-worker", "assistant-worker", "rnle-worker", "wolfram-kernel"])
+                                               "latex-worker", "assistant-worker", "resume-worker", "wolfram-kernel"])
             if "Scheduling App" in group:
                 deployments_to_refresh.append("scheduling-model")
         
@@ -804,7 +804,7 @@ def stop_k8s_deployments(selected_groups: List[str]):
                 deployments_to_stop.extend(["core"])
             if "Core Applications" in group:
                 deployments_to_stop.extend(["agent-tool-worker", "data-processing-worker", "interview-worker", 
-                                            "latex-worker", "assistant-worker", "rnle-worker", "wolfram-kernel"])
+                                            "latex-worker", "assistant-worker", "resume-worker", "wolfram-kernel"])
             if "Scheduling App" in group:
                 deployments_to_stop.append("scheduling-model")
         

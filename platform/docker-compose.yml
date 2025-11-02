@@ -202,16 +202,16 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
-  rnle-worker:
+  resume-worker:
     build:
-      context: ../../enginedge-workers/rnle-worker
-    container_name: rnle-worker
+      context: ../../enginedge-workers/resume-worker
+    container_name: resume-worker
     environment:
       NODE_ENV: development
       PORT: 3006
       KAFKA_BROKERS: kafka:9092
     ports:
-      - "${RNLE_WORKER_PORT:-3006}:3006"
+      - "${resume_WORKER_PORT:-3006}:3006"
     depends_on:
       - kafka
     networks: [enginedge]

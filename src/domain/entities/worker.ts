@@ -62,7 +62,7 @@ export enum WorkerType {
   LLM = 'llm',
   AGENT_TOOL = 'agent_tool',
   INTERVIEW = 'interview',
-  RNLE = 'rnle',
+  resume = 'resume',
   LATEX = 'latex',
   DATA_PROCESSING = 'data_processing',
   SCHEDULING = 'scheduling',

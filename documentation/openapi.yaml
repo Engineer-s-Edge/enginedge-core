@@ -13,7 +13,7 @@ info:
     - **Data Processing Worker** (Port 3003): Document processing and vector operations
     - **Interview Worker** (Port 3004): Interview processing and assessment
     - **LaTeX Worker** (Port 3005): Mathematical document generation
-    - **RNLE Worker** (Port 3006): Symbolic mathematics and computation
+    - **resume Worker** (Port 3006): Symbolic mathematics and computation
 
     ## Authentication
     All API requests require an `x-api-key` header with a valid API key.
@@ -568,7 +568,7 @@ components:
           example: 30
         workerType:
           type: string
-          enum: [llm, agent_tool, data_processing, interview, latex, rnle]
+          enum: [llm, agent_tool, data_processing, interview, latex, resume]
           description: Type of worker assigned to handle the request
 
     RequestStatusResponse:
@@ -677,7 +677,7 @@ components:
                 type: string
               type:
                 type: string
-                enum: [llm, agent_tool, data_processing, interview, latex, rnle]
+                enum: [llm, agent_tool, data_processing, interview, latex, resume]
               status:
                 type: string
                 enum: [healthy, degraded, unhealthy]

@@ -119,7 +119,7 @@ Thinking Board:
 
 
 
-Resume Nature Language Engine (RNLE) Components:
+Resume Nature Language Engine (resume) Components:
     Common Tools:
         - Latex Compiler (make new worker node)
         - Line counter (calculate how many lines the documet takes)
