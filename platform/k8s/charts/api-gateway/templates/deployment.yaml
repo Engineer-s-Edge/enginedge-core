@@ -28,6 +28,22 @@ spec:
           value: "production"
         - name: PORT
           value: "8080"
+        - name: IDENTITY_SERVICE_URL
+          value: "http://identity-worker:3000"
+        - name: ASSISTANT_WORKER_URL
+          value: "http://assistant-worker:3001"
+        - name: SCHEDULING_WORKER_URL
+          value: "http://scheduling-worker:3000"
+        - name: RESUME_WORKER_URL
+          value: "http://resume-worker:3006"
+        - name: INTERVIEW_WORKER_URL
+          value: "http://interview-worker:3004"
+        - name: DATA_WORKER_URL
+          value: "http://data-processing-worker:3003"
+        - name: LATEX_WORKER_URL
+          value: "http://latex-worker:3005"
+        - name: TOOLS_WORKER_URL
+          value: "http://agent-tool-worker:3002"
         livenessProbe:
           httpGet:
             path: /api/health

@@ -1,0 +1,14 @@
+image:
+  repository: identity-worker
+  tag: latest
+  pullPolicy: Never
+
+service:
+  type: ClusterIP
+  port: 3000
+
+mongodb:
+  uri: mongodb://mongodb:27017/identity-service
+
+resources: {}
+

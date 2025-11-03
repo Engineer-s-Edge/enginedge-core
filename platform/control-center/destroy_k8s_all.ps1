@@ -15,6 +15,7 @@ kubectl delete -f 'C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\
 kubectl delete -f 'C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/news-ingestion-cronjob.yaml' --ignore-not-found=true
 kubectl delete -f 'C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/llm-worker.yaml' --ignore-not-found=true
 if (helm status api-gateway --namespace default 2>$null) { helm delete api-gateway --namespace default }
+if (helm status identity-worker --namespace default 2>$null) { helm delete identity-worker --namespace default }
 kubectl delete -f 'C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/latex-worker.yaml' --ignore-not-found=true
 kubectl delete -f 'C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/interview-worker.yaml' --ignore-not-found=true
 kubectl delete -f 'C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/data-processing-worker.yaml' --ignore-not-found=true

@@ -239,6 +239,22 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
+  identity-worker:
+    build:
+      context: ../../enginedge-workers/identity-worker
+    container_name: identity-worker
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      MONGODB_URI: mongodb://mongodb:27017/identity-service
+    ports:
+      - "${IDENTITY_WORKER_PORT:-3000}:3000"
+    depends_on:
+      - mongodb
+    networks: [enginedge]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
   scheduling-model:
     build:
       context: ../../EnginEdge-monorepo/scheduling_model

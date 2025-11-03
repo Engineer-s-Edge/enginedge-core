@@ -5,6 +5,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { Registry, collectDefaultMetrics } from 'prom-client';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { setupWsProxy } from './ws/ws-proxy';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -36,6 +37,8 @@ async function bootstrap() {
 
   const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 8080;
   await app.listen({ port, host: '0.0.0.0' });
+  const httpServer = app.getHttpAdapter().getHttpServer();
+  setupWsProxy(httpServer);
 }
 
 bootstrap();

@@ -14,6 +14,12 @@ export class RateLimitInterceptor implements NestInterceptor {
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const req = context.switchToHttp().getRequest();
+    const accept = (req.headers['accept'] as string) || '';
+    const isSse = accept.includes('text/event-stream');
+    const isWs = (req.headers['upgrade'] as string)?.toLowerCase() === 'websocket';
+    if (isSse || isWs) {
+      return next.handle();
+    }
     const key = `${req.ip}:${req.method}:${req.route?.path || req.url}`;
 
     const now = Date.now();

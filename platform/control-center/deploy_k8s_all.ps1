@@ -22,6 +22,7 @@ helm install minio minio/minio -f 'C:\Users\chris\Engineering\EnginEdge\enginedg
 helm install postgres-metastore bitnami/postgresql -f 'C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\charts/postgres/values.yaml' --namespace default
 helm install redis bitnami/redis -f 'C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\charts/redis/values.yaml' --namespace default
 helm upgrade --install api-gateway 'C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\charts\api-gateway' --namespace default
+helm upgrade --install identity-worker 'C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\charts\identity-worker' --namespace default
 
 # --- Deploying Core Applications ---
 kubectl apply -f 'C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/agent-tool-worker.yaml'
