@@ -12,5 +12,3 @@ export class AssistantProxyController {
     return this.proxy.forward(this.base, path, req.method, req.body, req.headers, req.query);
   }
 }
-
-

@@ -1,5 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ExpertAgentFactory, ExpertAgentFactoryConfig } from '../expert-agent.factory';
+import {
+  ExpertAgentFactory,
+  ExpertAgentFactoryConfig,
+} from '../expert-agent.factory';
 
 describe('ExpertAgentFactory', () => {
   let factory: ExpertAgentFactory;
@@ -45,12 +48,16 @@ describe('ExpertAgentFactory', () => {
 
     it('should throw error if userId is missing', async () => {
       const invalidConfig = { ...mockConfig, userId: '' };
-      await expect(factory.createAgent(invalidConfig)).rejects.toThrow(/userId/i);
+      await expect(factory.createAgent(invalidConfig)).rejects.toThrow(
+        /userId/i,
+      );
     });
 
     it('should throw error if researchFocus is missing', async () => {
       const invalidConfig = { ...mockConfig, researchFocus: '' };
-      await expect(factory.createAgent(invalidConfig)).rejects.toThrow(/researchFocus/i);
+      await expect(factory.createAgent(invalidConfig)).rejects.toThrow(
+        /researchFocus/i,
+      );
     });
 
     it('should set default specialization if not provided', async () => {
@@ -77,7 +84,9 @@ describe('ExpertAgentFactory', () => {
   describe('agent.research', () => {
     it('should execute research operation', async () => {
       const agent = await factory.createAgent(mockConfig);
-      const result = await agent.research({ query: 'What is machine learning?' });
+      const result = await agent.research({
+        query: 'What is machine learning?',
+      });
 
       expect(result).toBeDefined();
       expect(result.query).toBe('What is machine learning?');
@@ -103,8 +112,14 @@ describe('ExpertAgentFactory', () => {
       const agent = await factory.createAgent(mockConfig);
       const result = await agent.research({ query: 'Test' });
 
-      expect(result.phases.map((p: any) => p.phase)).toEqual(['AIM', 'SHOOT', 'SKIN']);
-      expect(result.phases.every((p: any) => p.status === 'completed')).toBe(true);
+      expect(result.phases.map((p: any) => p.phase)).toEqual([
+        'AIM',
+        'SHOOT',
+        'SKIN',
+      ]);
+      expect(result.phases.every((p: any) => p.status === 'completed')).toBe(
+        true,
+      );
     });
   });
 
@@ -144,7 +159,9 @@ describe('ExpertAgentFactory', () => {
     });
 
     it('should throw error for non-existent agent', async () => {
-      await expect(factory.cleanup('non-existent')).rejects.toThrow(/not found|does not exist/i);
+      await expect(factory.cleanup('non-existent')).rejects.toThrow(
+        /not found|does not exist/i,
+      );
     });
 
     it('should cleanup without affecting others', async () => {

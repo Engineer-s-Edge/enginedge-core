@@ -70,9 +70,9 @@ export class HandleRequestUseCase {
       );
 
       return pendingResponse;
-
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
       const errorResponse = Response.error(request.id, {
         code: 'MESSAGE_PUBLISH_FAILED',
         message: 'Failed to send request to worker',

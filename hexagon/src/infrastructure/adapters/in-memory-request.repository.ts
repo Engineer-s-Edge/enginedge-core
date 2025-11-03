@@ -22,9 +22,10 @@ export class InMemoryRequestRepository implements IRequestRepository {
   }
 
   async findPending(): Promise<Request[]> {
-    return Array.from(this.requests.values()).filter(r =>
-      // In a real implementation, we'd check status
-      true // Placeholder
+    return Array.from(this.requests.values()).filter(
+      (r) =>
+        // In a real implementation, we'd check status
+        true, // Placeholder
     );
   }
 }

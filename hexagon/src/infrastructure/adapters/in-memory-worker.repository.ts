@@ -9,12 +9,12 @@ export class InMemoryWorkerRepository implements IWorkerRepository {
   }
 
   async findByType(type: string): Promise<Worker[]> {
-    return Array.from(this.workers.values()).filter(w => w.type === type);
+    return Array.from(this.workers.values()).filter((w) => w.type === type);
   }
 
   async findAvailable(): Promise<Worker[]> {
-    return Array.from(this.workers.values()).filter(w =>
-      w.isAvailable() && w.isHealthy()
+    return Array.from(this.workers.values()).filter(
+      (w) => w.isAvailable() && w.isHealthy(),
     );
   }
 

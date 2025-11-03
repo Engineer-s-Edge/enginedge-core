@@ -1,14 +1,14 @@
 /**
  * Meta-Learning Strategies Service
- * 
+ *
  * Application-layer service that defines strategies for autonomous learning.
- * 
+ *
  * Strategies:
  * - Topic prioritization: Which topics to research first
  * - Expert allocation: How many experts per topic
  * - Knowledge integration: How to merge new knowledge
  * - Escalation triggers: When to involve user
- * 
+ *
  * These strategies guide the Genius Agent's autonomous learning behavior.
  */
 
@@ -41,7 +41,7 @@ export interface EscalationStrategy {
 export class MetaLearningStrategies {
   /**
    * Calculate topic prioritization scores
-   * 
+   *
    * Factors:
    * - Research gap (how much is unknown)
    * - User interest (explicit or implicit)
@@ -103,7 +103,7 @@ export class MetaLearningStrategies {
 
   /**
    * Determine expert allocation based on topic complexity
-   * 
+   *
    * Strategy:
    * - L1-L2 (Simple): 1 expert
    * - L3-L4 (Medium): 2 experts (primary + validation)
@@ -138,13 +138,15 @@ export class MetaLearningStrategies {
 
   /**
    * Allocate experts based on confidence levels
-   * 
+   *
    * Strategy:
    * - High confidence (>0.8): 1 expert (monitor only)
    * - Medium confidence (0.5-0.8): 2 experts (validate)
    * - Low confidence (<0.5): 3+ experts (deep investigation)
    */
-  allocateExpertsByConfidence(currentConfidence: number): ExpertAllocationStrategy {
+  allocateExpertsByConfidence(
+    currentConfidence: number,
+  ): ExpertAllocationStrategy {
     if (currentConfidence > 0.8) {
       return {
         complexity: 1,
@@ -173,13 +175,15 @@ export class MetaLearningStrategies {
 
   /**
    * Determine knowledge integration strategy
-   * 
+   *
    * Modes:
    * - Append: Add new nodes/edges without modification
    * - Merge: Combine with existing knowledge where appropriate
    * - Replace: Prefer new research over old
    */
-  getIntegrationStrategy(config?: { preferNew?: boolean }): KnowledgeIntegrationStrategy {
+  getIntegrationStrategy(config?: {
+    preferNew?: boolean;
+  }): KnowledgeIntegrationStrategy {
     return {
       mode: 'merge',
       conflictResolution: config?.preferNew ? 'prefer-new' : 'auto-merge',
@@ -189,7 +193,7 @@ export class MetaLearningStrategies {
 
   /**
    * Determine escalation strategy
-   * 
+   *
    * Triggers escalation when:
    * - Confidence drops below threshold
    * - Conflicting information detected
@@ -238,7 +242,7 @@ export class MetaLearningStrategies {
 
   /**
    * Optimize batch size based on system load
-   * 
+   *
    * Adaptive batching:
    * - High load: reduce batch size
    * - Low load: increase batch size

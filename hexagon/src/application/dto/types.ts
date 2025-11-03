@@ -7,20 +7,35 @@
  * Used for agent config and memory config
  */
 export interface ConfigObject {
-  [key: string]: string | number | boolean | ConfigObject | (string | number | boolean | ConfigObject)[];
+  [key: string]:
+    | string
+    | number
+    | boolean
+    | ConfigObject
+    | (string | number | boolean | ConfigObject)[];
 }
 
 /**
  * Agent execution context
  */
 export interface ExecutionContext {
-  [key: string]: string | number | boolean | ExecutionContext | (string | number | boolean | ExecutionContext)[];
+  [key: string]:
+    | string
+    | number
+    | boolean
+    | ExecutionContext
+    | (string | number | boolean | ExecutionContext)[];
 }
 
 /**
  * Valid agent types
  */
-export type AgentTypeValue = 'react' | 'graph' | 'expert' | 'genius' | 'collective';
+export type AgentTypeValue =
+  | 'react'
+  | 'graph'
+  | 'expert'
+  | 'genius'
+  | 'collective';
 
 /**
  * Valid memory types

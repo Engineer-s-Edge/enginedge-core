@@ -1,12 +1,12 @@
 /**
  * Pattern Detector Service
- * 
+ *
  * Domain-layer service that analyzes research patterns to identify:
  * - Knowledge gaps (topics mentioned but not fully researched)
  * - Topic bridges (connections between related concepts)
  * - Learning priorities (which topics should be researched next)
  * - Confidence patterns (areas with low research quality)
- * 
+ *
  * Used by Genius Agent to guide autonomous learning and identify escalations.
  */
 
@@ -42,15 +42,12 @@ export interface DetectionResult {
 export class PatternDetector {
   /**
    * Analyze research reports to detect patterns
-   * 
+   *
    * @param reports Expert research reports
    * @param knowledgeGraph Current knowledge graph state
    * @returns Pattern analysis result
    */
-  analyzePatterns(
-    reports: any[],
-    _knowledgeGraph?: any,
-  ): DetectionResult {
+  analyzePatterns(reports: any[], _knowledgeGraph?: any): DetectionResult {
     const result: DetectionResult = {
       knowledgeGaps: [],
       bridges: [],
@@ -146,7 +143,8 @@ export class PatternDetector {
           bridges.push({
             topicA,
             topicB,
-            connectionStrength: intersection.size / Math.max(conceptsA.size, conceptsB.size),
+            connectionStrength:
+              intersection.size / Math.max(conceptsA.size, conceptsB.size),
             bridgingConcepts: Array.from(intersection),
           });
         }
@@ -224,22 +222,30 @@ export class PatternDetector {
 
     // Escalate if many knowledge gaps
     if (result.knowledgeGaps.length > 5) {
-      escalations.push('High number of knowledge gaps detected - consider broader research');
+      escalations.push(
+        'High number of knowledge gaps detected - consider broader research',
+      );
     }
 
     // Escalate if low average confidence
     const avgConfidence =
       result.confidencePatterns.length > 0
-        ? result.confidencePatterns.reduce((sum, p) => sum + p.averageConfidence, 0) /
-          result.confidencePatterns.length
+        ? result.confidencePatterns.reduce(
+            (sum, p) => sum + p.averageConfidence,
+            0,
+          ) / result.confidencePatterns.length
         : 0.7;
 
     if (avgConfidence < 0.5) {
-      escalations.push('Low overall research confidence - escalate for expert review');
+      escalations.push(
+        'Low overall research confidence - escalate for expert review',
+      );
     }
 
     // Escalate if conflicting information
-    const conflictingTopics = result.bridges.filter((b) => b.connectionStrength < 0.2).length;
+    const conflictingTopics = result.bridges.filter(
+      (b) => b.connectionStrength < 0.2,
+    ).length;
     if (conflictingTopics > 2) {
       escalations.push('Conflicting information detected across topics');
     }

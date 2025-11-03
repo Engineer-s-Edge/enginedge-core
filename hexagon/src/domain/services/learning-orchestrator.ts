@@ -1,8 +1,8 @@
 /**
  * Learning Orchestrator Service
- * 
+ *
  * Domain-layer service that orchestrates Genius Agent learning cycles.
- * 
+ *
  * Responsibilities:
  * - Coordinate expert pool for parallel research
  * - Select topics based on learning mode and priorities
@@ -10,7 +10,7 @@
  * - Validate expert work
  * - Integrate results into knowledge base
  * - Track learning metrics and patterns
- * 
+ *
  * This service implements the core learning intelligence:
  * - User-Directed mode: Execute on selected topics
  * - Autonomous mode: Auto-select high-priority, under-researched topics
@@ -69,7 +69,7 @@ export class LearningOrchestrator {
 
   /**
    * Orchestrate a complete learning cycle
-   * 
+   *
    * Workflow:
    * 1. Select topics based on learning mode
    * 2. Allocate experts by complexity
@@ -78,15 +78,13 @@ export class LearningOrchestrator {
    * 5. Integrate into knowledge base
    * 6. Update metrics and history
    */
-  async orchestrateLearningCycle(
-    config: {
-      mode: 'user-directed' | 'autonomous' | 'scheduled';
-      topicIds?: string[];
-      maxTopics?: number;
-      maxConcurrentExperts?: number;
-      autoValidate?: boolean;
-    },
-  ): Promise<LearningSessionResult> {
+  async orchestrateLearningCycle(config: {
+    mode: 'user-directed' | 'autonomous' | 'scheduled';
+    topicIds?: string[];
+    maxTopics?: number;
+    maxConcurrentExperts?: number;
+    autoValidate?: boolean;
+  }): Promise<LearningSessionResult> {
     const sessionId = `lsess_${Date.now()}`;
     const startTime = new Date();
 
@@ -94,7 +92,10 @@ export class LearningOrchestrator {
     const selectedTopics = await this.selectTopics(config);
 
     // Phase 2: Expert Allocation
-    const allocations = this.allocateExperts(selectedTopics, config.maxConcurrentExperts || 1);
+    const allocations = this.allocateExperts(
+      selectedTopics,
+      config.maxConcurrentExperts || 1,
+    );
 
     // Phase 3: Parallel Research (would be coordinated via expert pool)
     const expertReports = await this.executeResearch(allocations);
@@ -109,7 +110,10 @@ export class LearningOrchestrator {
 
     // Phase 6: Metrics Update
     const endTime = new Date();
-    const metrics = this.buildMetrics(expertReports, endTime.getTime() - startTime.getTime());
+    const metrics = this.buildMetrics(
+      expertReports,
+      endTime.getTime() - startTime.getTime(),
+    );
 
     const result: LearningSessionResult = {
       sessionId,
@@ -140,13 +144,15 @@ export class LearningOrchestrator {
   private async selectTopics(config: any): Promise<LearningTopicSelection[]> {
     // User-Directed: use provided IDs
     if (config.mode === 'user-directed' && config.topicIds?.length) {
-      return config.topicIds.slice(0, config.maxTopics || 5).map((id: string) => ({
-        topicId: id,
-        topicName: `Topic ${id}`,
-        complexity: 3 as const,
-        priority: 10,
-        researchGap: 0.5,
-      }));
+      return config.topicIds
+        .slice(0, config.maxTopics || 5)
+        .map((id: string) => ({
+          topicId: id,
+          topicName: `Topic ${id}`,
+          complexity: 3 as const,
+          priority: 10,
+          researchGap: 0.5,
+        }));
     }
 
     // Autonomous: auto-select by priority and research gaps
@@ -170,7 +176,7 @@ export class LearningOrchestrator {
 
   /**
    * Allocate experts based on topic complexity
-   * 
+   *
    * Strategy:
    * - Simple topics (L1-L2): 1 expert
    * - Medium topics (L3-L4): 2 experts
@@ -206,7 +212,9 @@ export class LearningOrchestrator {
   /**
    * Execute research across allocated experts
    */
-  private async executeResearch(_allocations: ExpertAllocation[]): Promise<any[]> {
+  private async executeResearch(
+    _allocations: ExpertAllocation[],
+  ): Promise<any[]> {
     // In production, this coordinates with ExpertPoolManager
     // For now, return mock reports
     return [
@@ -245,11 +253,20 @@ export class LearningOrchestrator {
   /**
    * Build session metrics from expert reports
    */
-  private buildMetrics(reports: any[], durationMs: number): LearningSessionMetrics {
+  private buildMetrics(
+    reports: any[],
+    durationMs: number,
+  ): LearningSessionMetrics {
     const completed = reports.filter((r) => r.status === 'completed').length;
-    const totalSources = reports.reduce((sum, r) => sum + (r.sourcesFound || 0), 0);
+    const totalSources = reports.reduce(
+      (sum, r) => sum + (r.sourcesFound || 0),
+      0,
+    );
     const avgConfidence =
-      reports.length > 0 ? reports.reduce((sum, r) => sum + (r.confidence || 0.7), 0) / reports.length : 0.7;
+      reports.length > 0
+        ? reports.reduce((sum, r) => sum + (r.confidence || 0.7), 0) /
+          reports.length
+        : 0.7;
 
     return {
       topicsAttempted: reports.length,
@@ -269,12 +286,15 @@ export class LearningOrchestrator {
     this.metrics.totalSessionsCompleted++;
     this.metrics.totalTopicsResearched += result.metrics.topicsAttempted;
     this.metrics.totalExpertsSpawned += result.expertReports.length;
-    this.metrics.successRate = (this.metrics.successRate + result.metrics.successRate) / 2;
+    this.metrics.successRate =
+      (this.metrics.successRate + result.metrics.successRate) / 2;
 
     const totalDuration =
-      this.metrics.averageSessionDuration * (this.metrics.totalSessionsCompleted - 1) +
+      this.metrics.averageSessionDuration *
+        (this.metrics.totalSessionsCompleted - 1) +
       result.metrics.executionTimeMs;
-    this.metrics.averageSessionDuration = totalDuration / this.metrics.totalSessionsCompleted;
+    this.metrics.averageSessionDuration =
+      totalDuration / this.metrics.totalSessionsCompleted;
   }
 
   /**

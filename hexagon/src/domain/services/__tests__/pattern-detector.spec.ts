@@ -153,7 +153,11 @@ describe('PatternDetector', () => {
         },
         {
           topic: 'Statistics',
-          findings: ['algorithms matter', 'data analysis', 'optimization methods'],
+          findings: [
+            'algorithms matter',
+            'data analysis',
+            'optimization methods',
+          ],
           sources: [],
           confidence: 0.75,
         },
@@ -284,7 +288,9 @@ describe('PatternDetector', () => {
 
       const patterns = await detector.analyzeConfidence(reports);
 
-      expect(patterns[0].confidenceScore).toBeGreaterThan(patterns[1].confidenceScore);
+      expect(patterns[0].confidenceScore).toBeGreaterThan(
+        patterns[1].confidenceScore,
+      );
     });
   });
 
@@ -347,7 +353,9 @@ describe('PatternDetector', () => {
 
       expect(escalations).toBeDefined();
       expect(Array.isArray(escalations)).toBe(true);
-      const riskEscalation = escalations.find((e: any) => e.reason === 'low_confidence');
+      const riskEscalation = escalations.find(
+        (e: any) => e.reason === 'low_confidence',
+      );
       expect(riskEscalation).toBeDefined();
     });
 
@@ -362,7 +370,9 @@ describe('PatternDetector', () => {
 
       const escalations = await detector.generateEscalations(patterns);
 
-      expect(escalations.filter((e: any) => e.topic === 'Solid').length).toBe(0);
+      expect(escalations.filter((e: any) => e.topic === 'Solid').length).toBe(
+        0,
+      );
     });
 
     it('should provide escalation recommendations', async () => {
@@ -420,7 +430,9 @@ describe('PatternDetector', () => {
 
       const recommendations = await detector.recommendNextTopics(gaps, []);
 
-      const highPriority = recommendations.find((r: any) => r.topic === 'Priority1');
+      const highPriority = recommendations.find(
+        (r: any) => r.topic === 'Priority1',
+      );
       expect(highPriority).toBeDefined();
       if (highPriority) {
         expect(highPriority.recommendationStrength).toBeGreaterThan(0.5);
@@ -443,7 +455,9 @@ describe('PatternDetector', () => {
 
       const recommendations = await detector.recommendNextTopics(gaps, bridges);
 
-      const mlRec = recommendations.find((r: any) => r.topic === 'Machine Learning');
+      const mlRec = recommendations.find(
+        (r: any) => r.topic === 'Machine Learning',
+      );
       expect(mlRec).toBeDefined();
     });
   });

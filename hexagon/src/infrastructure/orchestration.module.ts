@@ -51,8 +51,21 @@ import { InMemoryResponseRepository } from './adapters/in-memory-response.reposi
         requestRepo: any,
         responseRepo: any,
         router: RequestRouter,
-      ) => new HandleRequestUseCase(workerRepo, messagePub, requestRepo, responseRepo, router),
-      inject: ['IWorkerRepository', 'IMessagePublisher', 'IRequestRepository', 'IResponseRepository', RequestRouter],
+      ) =>
+        new HandleRequestUseCase(
+          workerRepo,
+          messagePub,
+          requestRepo,
+          responseRepo,
+          router,
+        ),
+      inject: [
+        'IWorkerRepository',
+        'IMessagePublisher',
+        'IRequestRepository',
+        'IResponseRepository',
+        RequestRouter,
+      ],
     },
 
     // Worker Management Service

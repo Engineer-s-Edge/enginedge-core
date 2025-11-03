@@ -2,14 +2,14 @@
  * Phase 5e.1: Application Use-Case Tests
  * ======================================
  * Tests for HandleRequestUseCase and domain services
- * 
+ *
  * Coverage:
  * - Request creation and handling
  * - Worker coordination
  * - Message routing
  * - Error handling
  * - Response persistence
- * 
+ *
  * Total Tests: 38
  */
 
@@ -22,7 +22,12 @@ import {
 } from '../domain/entities/request';
 import { Response } from '../domain/entities/response';
 import { Message, MessageType } from '../domain/entities/message';
-import { Worker, WorkerStatus, WorkerType, WorkerCapability } from '../domain/entities/worker';
+import {
+  Worker,
+  WorkerStatus,
+  WorkerType,
+  WorkerCapability,
+} from '../domain/entities/worker';
 import { RequestRouter } from '../domain/services/request-router';
 import {
   IWorkerRepository,
@@ -52,13 +57,22 @@ describe('Application Use-Cases [Phase 5e.1]', () => {
     return new Date(Date.now() + idCounter++);
   };
 
-  const createTestWorker = (type: WorkerType = WorkerType.LLM, status = WorkerStatus.AVAILABLE): Worker => {
+  const createTestWorker = (
+    type: WorkerType = WorkerType.LLM,
+    status = WorkerStatus.AVAILABLE,
+  ): Worker => {
     return new Worker(
       `worker-${idCounter++}`,
       type,
       `Test ${type} Worker`,
       status,
-      [{ name: `capability-${type}`, requestTypes: [RequestType.LLM_INFERENCE], maxConcurrency: 10 }],
+      [
+        {
+          name: `capability-${type}`,
+          requestTypes: [RequestType.LLM_INFERENCE],
+          maxConcurrency: 10,
+        },
+      ],
       generateTimestamp(),
       {
         host: 'localhost',
@@ -75,7 +89,12 @@ describe('Application Use-Cases [Phase 5e.1]', () => {
 
     // Mock worker repository
     mockWorkerRepository = {
-      findAvailable: jest.fn().mockResolvedValue([createTestWorker(), createTestWorker(WorkerType.AGENT_TOOL)]),
+      findAvailable: jest
+        .fn()
+        .mockResolvedValue([
+          createTestWorker(),
+          createTestWorker(WorkerType.AGENT_TOOL),
+        ]),
       findById: jest.fn().mockResolvedValue(createTestWorker()),
       findByType: jest.fn().mockResolvedValue([createTestWorker()]),
       save: jest.fn().mockResolvedValue(undefined),
@@ -114,9 +133,11 @@ describe('Application Use-Cases [Phase 5e.1]', () => {
 
     // Mock request router
     mockRequestRouter = {
-      route: jest.fn().mockImplementation((request: Request, workers: Worker[]) => {
-        return workers[0] || null;
-      }),
+      route: jest
+        .fn()
+        .mockImplementation((request: Request, workers: Worker[]) => {
+          return workers[0] || null;
+        }),
     } as any;
   });
 
@@ -135,7 +156,11 @@ describe('Application Use-Cases [Phase 5e.1]', () => {
     });
 
     it('should handle request successfully with available worker', async () => {
-      const request = Request.create(RequestType.LLM_INFERENCE, { prompt: 'Test' }, {});
+      const request = Request.create(
+        RequestType.LLM_INFERENCE,
+        { prompt: 'Test' },
+        {},
+      );
 
       const result = await useCase.execute(request);
 
@@ -149,7 +174,11 @@ describe('Application Use-Cases [Phase 5e.1]', () => {
     it('should reject request when no worker available', async () => {
       mockWorkerRepository.findAvailable.mockResolvedValue([]);
 
-      const request = Request.create(RequestType.LLM_INFERENCE, { prompt: 'Test' }, {});
+      const request = Request.create(
+        RequestType.LLM_INFERENCE,
+        { prompt: 'Test' },
+        {},
+      );
 
       const result = await useCase.execute(request);
 
@@ -158,11 +187,18 @@ describe('Application Use-Cases [Phase 5e.1]', () => {
     });
 
     it('should route request to appropriate worker', async () => {
-      const request = Request.create(RequestType.AGENT_TOOL_EXECUTION, { tool: 'test' }, {});
+      const request = Request.create(
+        RequestType.AGENT_TOOL_EXECUTION,
+        { tool: 'test' },
+        {},
+      );
 
       await useCase.execute(request);
 
-      expect(mockRequestRouter.route).toHaveBeenCalledWith(request, expect.any(Array));
+      expect(mockRequestRouter.route).toHaveBeenCalledWith(
+        request,
+        expect.any(Array),
+      );
     });
 
     it('should handle multiple concurrent requests', async () => {
@@ -172,7 +208,9 @@ describe('Application Use-Cases [Phase 5e.1]', () => {
         Request.create(RequestType.AGENT_TOOL_EXECUTION, { tool: 'T1' }, {}),
       ];
 
-      const results = await Promise.all(requests.map(req => useCase.execute(req)));
+      const results = await Promise.all(
+        requests.map((req) => useCase.execute(req)),
+      );
 
       expect(results).toHaveLength(3);
       expect(mockRequestRepository.save).toHaveBeenCalledTimes(3);
@@ -181,7 +219,11 @@ describe('Application Use-Cases [Phase 5e.1]', () => {
     it('should handle repository errors gracefully', async () => {
       mockRequestRepository.save.mockRejectedValue(new Error('Database error'));
 
-      const request = Request.create(RequestType.LLM_INFERENCE, { prompt: 'Test' }, {});
+      const request = Request.create(
+        RequestType.LLM_INFERENCE,
+        { prompt: 'Test' },
+        {},
+      );
 
       await expect(useCase.execute(request)).rejects.toThrow('Database error');
     });
@@ -193,7 +235,11 @@ describe('Application Use-Cases [Phase 5e.1]', () => {
         priority: RequestPriority.HIGH,
       };
 
-      const request = Request.create(RequestType.LLM_INFERENCE, { prompt: 'Test' }, metadata);
+      const request = Request.create(
+        RequestType.LLM_INFERENCE,
+        { prompt: 'Test' },
+        metadata,
+      );
 
       await useCase.execute(request);
 
@@ -205,7 +251,11 @@ describe('Application Use-Cases [Phase 5e.1]', () => {
     });
 
     it('should include correlation ID in messages', async () => {
-      const request = Request.create(RequestType.LLM_INFERENCE, { prompt: 'Test' }, {});
+      const request = Request.create(
+        RequestType.LLM_INFERENCE,
+        { prompt: 'Test' },
+        {},
+      );
 
       await useCase.execute(request);
 
@@ -245,9 +295,15 @@ describe('Application Use-Cases [Phase 5e.1]', () => {
     });
 
     it('should handle message publisher errors', async () => {
-      mockMessagePublisher.publish.mockRejectedValue(new Error('Publish failed'));
+      mockMessagePublisher.publish.mockRejectedValue(
+        new Error('Publish failed'),
+      );
 
-      const request = Request.create(RequestType.LLM_INFERENCE, { prompt: 'Test' }, {});
+      const request = Request.create(
+        RequestType.LLM_INFERENCE,
+        { prompt: 'Test' },
+        {},
+      );
 
       await expect(useCase.execute(request)).rejects.toThrow('Publish failed');
     });
@@ -290,7 +346,11 @@ describe('Application Use-Cases [Phase 5e.1]', () => {
     });
 
     it('should convert request to JSON properly', () => {
-      const request = Request.create(RequestType.LLM_INFERENCE, { data: 'test' }, { userId: 'u1' });
+      const request = Request.create(
+        RequestType.LLM_INFERENCE,
+        { data: 'test' },
+        { userId: 'u1' },
+      );
 
       const json = request.toJSON();
 
@@ -302,7 +362,7 @@ describe('Application Use-Cases [Phase 5e.1]', () => {
     it('should support all request types', () => {
       const types = Object.values(RequestType);
 
-      types.forEach(type => {
+      types.forEach((type) => {
         const request = Request.create(type as RequestType, {}, {});
         expect(request.type).toBe(type);
       });
@@ -341,7 +401,10 @@ describe('Application Use-Cases [Phase 5e.1]', () => {
     it('should update worker status', async () => {
       await mockWorkerRepository.updateStatus('worker-1', WorkerStatus.BUSY);
 
-      expect(mockWorkerRepository.updateStatus).toHaveBeenCalledWith('worker-1', WorkerStatus.BUSY);
+      expect(mockWorkerRepository.updateStatus).toHaveBeenCalledWith(
+        'worker-1',
+        WorkerStatus.BUSY,
+      );
     });
   });
 
@@ -360,19 +423,34 @@ describe('Application Use-Cases [Phase 5e.1]', () => {
     });
 
     it('should handle message publishing errors', async () => {
-      mockMessagePublisher.publish.mockRejectedValue(new Error('Publish error'));
+      mockMessagePublisher.publish.mockRejectedValue(
+        new Error('Publish error'),
+      );
 
-      const message = Message.create(MessageType.REQUEST, {}, { source: 'test' });
+      const message = Message.create(
+        MessageType.REQUEST,
+        {},
+        { source: 'test' },
+      );
 
-      await expect(mockMessagePublisher.publish(message)).rejects.toThrow('Publish error');
+      await expect(mockMessagePublisher.publish(message)).rejects.toThrow(
+        'Publish error',
+      );
     });
 
     it('should publish to specific worker', async () => {
-      const message = Message.create(MessageType.REQUEST, {}, { source: 'test' });
+      const message = Message.create(
+        MessageType.REQUEST,
+        {},
+        { source: 'test' },
+      );
 
       await mockMessagePublisher.publishToWorker('worker-1', message);
 
-      expect(mockMessagePublisher.publishToWorker).toHaveBeenCalledWith('worker-1', message);
+      expect(mockMessagePublisher.publishToWorker).toHaveBeenCalledWith(
+        'worker-1',
+        message,
+      );
     });
 
     it('should handle multiple concurrent message publishes', async () => {
@@ -382,7 +460,9 @@ describe('Application Use-Cases [Phase 5e.1]', () => {
           Message.create(MessageType.REQUEST, { id: i }, { source: 'test' }),
         );
 
-      await Promise.all(messages.map(msg => mockMessagePublisher.publish(msg)));
+      await Promise.all(
+        messages.map((msg) => mockMessagePublisher.publish(msg)),
+      );
 
       expect(mockMessagePublisher.publish).toHaveBeenCalledTimes(5);
     });
@@ -401,13 +481,17 @@ describe('Application Use-Cases [Phase 5e.1]', () => {
     it('should find responses by request ID', async () => {
       await mockResponseRepository.findByRequestId('req-123');
 
-      expect(mockResponseRepository.findByRequestId).toHaveBeenCalledWith('req-123');
+      expect(mockResponseRepository.findByRequestId).toHaveBeenCalledWith(
+        'req-123',
+      );
     });
 
     it('should find latest response for a request', async () => {
       await mockResponseRepository.findLatestByRequestId('req-123');
 
-      expect(mockResponseRepository.findLatestByRequestId).toHaveBeenCalledWith('req-123');
+      expect(mockResponseRepository.findLatestByRequestId).toHaveBeenCalledWith(
+        'req-123',
+      );
     });
 
     it('should handle response repository errors', async () => {
@@ -415,7 +499,9 @@ describe('Application Use-Cases [Phase 5e.1]', () => {
 
       const response = Response.success('req-1', {});
 
-      await expect(mockResponseRepository.save(response)).rejects.toThrow('Save failed');
+      await expect(mockResponseRepository.save(response)).rejects.toThrow(
+        'Save failed',
+      );
     });
   });
 
@@ -443,7 +529,10 @@ describe('Application Use-Cases [Phase 5e.1]', () => {
 
     it('should handle multiple worker types', () => {
       const request = Request.create(RequestType.AGENT_TOOL_EXECUTION, {}, {});
-      const workers = [createTestWorker(), createTestWorker(WorkerType.AGENT_TOOL)];
+      const workers = [
+        createTestWorker(),
+        createTestWorker(WorkerType.AGENT_TOOL),
+      ];
 
       const worker = mockRequestRouter.route(request, workers);
 
@@ -459,20 +548,27 @@ describe('Application Use-Cases [Phase 5e.1]', () => {
 
       await mockWorkerCoordinator.assignRequest(request, worker);
 
-      expect(mockWorkerCoordinator.assignRequest).toHaveBeenCalledWith(request, worker);
+      expect(mockWorkerCoordinator.assignRequest).toHaveBeenCalledWith(
+        request,
+        worker,
+      );
     });
 
     it('should release worker after completion', async () => {
       await mockWorkerCoordinator.releaseWorker('worker-1');
 
-      expect(mockWorkerCoordinator.releaseWorker).toHaveBeenCalledWith('worker-1');
+      expect(mockWorkerCoordinator.releaseWorker).toHaveBeenCalledWith(
+        'worker-1',
+      );
     });
 
     it('should get worker load', async () => {
       const load = await mockWorkerCoordinator.getWorkerLoad('worker-1');
 
       expect(typeof load).toBe('number');
-      expect(mockWorkerCoordinator.getWorkerLoad).toHaveBeenCalledWith('worker-1');
+      expect(mockWorkerCoordinator.getWorkerLoad).toHaveBeenCalledWith(
+        'worker-1',
+      );
     });
   });
 
@@ -487,7 +583,10 @@ describe('Application Use-Cases [Phase 5e.1]', () => {
     });
 
     it('should create error response', () => {
-      const response = Response.error('req-123', { code: 'ERR_001', message: 'Error occurred' });
+      const response = Response.error('req-123', {
+        code: 'ERR_001',
+        message: 'Error occurred',
+      });
 
       expect(response).toBeDefined();
       expect(response.isError()).toBe(true);
@@ -532,7 +631,11 @@ describe('Application Use-Cases [Phase 5e.1]', () => {
     });
 
     it('should convert message to JSON', () => {
-      const message = Message.create(MessageType.RESPONSE, { data: 'response' }, { source: 'worker' });
+      const message = Message.create(
+        MessageType.RESPONSE,
+        { data: 'response' },
+        { source: 'worker' },
+      );
 
       const json = message.toJSON();
 
@@ -601,7 +704,7 @@ describe('Application Use-Cases [Phase 5e.1]', () => {
  * Test Summary:
  * =============
  * Total Tests: 38
- * 
+ *
  * Breakdown by Category:
  * - HandleRequestUseCase: 10 tests (happy path, no worker, routing, concurrency, errors, metadata, correlation, request types, message errors)
  * - Request Domain Entity: 5 tests (creation, uniqueness, expiration, JSON, all types)
@@ -613,7 +716,7 @@ describe('Application Use-Cases [Phase 5e.1]', () => {
  * - Response Domain Entity: 3 tests (success, error, partial)
  * - Message Domain Entity: 3 tests (creation, expiration, JSON)
  * - End-to-End Workflows: 3 tests (LLM inference, agent tool, interview processing)
- * 
+ *
  * Coverage Areas:
  * ✓ Happy paths for all workflows
  * ✓ Error scenarios and exceptions

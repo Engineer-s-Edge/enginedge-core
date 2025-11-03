@@ -7,7 +7,11 @@ export class Request {
     public readonly timestamp: Date,
   ) {}
 
-  static create(type: RequestType, payload: any, metadata: RequestMetadata): Request {
+  static create(
+    type: RequestType,
+    payload: any,
+    metadata: RequestMetadata,
+  ): Request {
     return new Request(
       crypto.randomUUID(),
       type,

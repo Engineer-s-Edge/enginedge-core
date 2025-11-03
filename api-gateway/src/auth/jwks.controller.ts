@@ -10,5 +10,3 @@ export class JwksController {
     return data;
   }
 }
-
-

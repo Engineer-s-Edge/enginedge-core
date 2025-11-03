@@ -192,7 +192,9 @@ describe('LearningOrchestrator', () => {
       const allocation = await orchestrator.allocateExperts(topics);
 
       expect(allocation.allocations[0].specializations).toContain('primary');
-      expect(allocation.allocations[0].specializations.length).toBeGreaterThanOrEqual(1);
+      expect(
+        allocation.allocations[0].specializations.length,
+      ).toBeGreaterThanOrEqual(1);
     });
 
     it('should handle mixed complexity levels', async () => {
@@ -356,9 +358,7 @@ describe('LearningOrchestrator', () => {
       const config = {
         mode: 'autonomous' as const,
         userId: 'user-456',
-        priorGaps: [
-          { topic: 'GANs', severity: 'high' },
-        ],
+        priorGaps: [{ topic: 'GANs', severity: 'high' }],
       };
 
       const result = await orchestrator.orchestrateLearningCycle(config);
@@ -378,9 +378,11 @@ describe('LearningOrchestrator', () => {
 
       const result = await orchestrator.orchestrateLearningCycle(config);
 
-      expect(result.selectedTopics.some((t: any) => t.topic === 'Reinforcement Learning')).toBe(
-        true,
-      );
+      expect(
+        result.selectedTopics.some(
+          (t: any) => t.topic === 'Reinforcement Learning',
+        ),
+      ).toBe(true);
     });
 
     it('autonomous mode selects from gaps', async () => {

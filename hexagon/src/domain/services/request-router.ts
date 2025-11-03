@@ -16,10 +16,11 @@ export class RequestRouter {
   }
 
   private findCandidates(request: Request, workers: Worker[]): Worker[] {
-    return workers.filter(worker =>
-      worker.isAvailable() &&
-      worker.isHealthy() &&
-      worker.canHandle(request.type)
+    return workers.filter(
+      (worker) =>
+        worker.isAvailable() &&
+        worker.isHealthy() &&
+        worker.canHandle(request.type),
     );
   }
 

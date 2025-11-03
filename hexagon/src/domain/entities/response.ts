@@ -9,7 +9,11 @@ export class Response {
     public readonly error?: ResponseError,
   ) {}
 
-  static success(requestId: string, data: any, metadata: ResponseMetadata = {}): Response {
+  static success(
+    requestId: string,
+    data: any,
+    metadata: ResponseMetadata = {},
+  ): Response {
     return new Response(
       crypto.randomUUID(),
       requestId,
@@ -20,7 +24,11 @@ export class Response {
     );
   }
 
-  static error(requestId: string, error: ResponseError, metadata: ResponseMetadata = {}): Response {
+  static error(
+    requestId: string,
+    error: ResponseError,
+    metadata: ResponseMetadata = {},
+  ): Response {
     return new Response(
       crypto.randomUUID(),
       requestId,
@@ -32,7 +40,11 @@ export class Response {
     );
   }
 
-  static partial(requestId: string, data: any, metadata: ResponseMetadata = {}): Response {
+  static partial(
+    requestId: string,
+    data: any,
+    metadata: ResponseMetadata = {},
+  ): Response {
     return new Response(
       crypto.randomUUID(),
       requestId,

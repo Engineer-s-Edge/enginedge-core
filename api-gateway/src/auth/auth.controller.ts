@@ -34,5 +34,3 @@ export class AuthController {
     return this.identity.revoke(body.refreshToken);
   }
 }
-
-

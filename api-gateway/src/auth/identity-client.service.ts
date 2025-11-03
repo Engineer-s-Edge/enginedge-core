@@ -16,14 +16,16 @@ export class IdentityClientService {
   }
 
   async refresh(refreshToken: string) {
-    const { data } = await axios.post(`${this.baseUrl}/internal/auth/token/refresh`, { refreshToken });
+    const { data } = await axios.post(`${this.baseUrl}/internal/auth/token/refresh`, {
+      refreshToken,
+    });
     return data;
   }
 
   async revoke(refreshToken: string) {
-    const { data } = await axios.post(`${this.baseUrl}/internal/auth/token/revoke`, { refreshToken });
+    const { data } = await axios.post(`${this.baseUrl}/internal/auth/token/revoke`, {
+      refreshToken,
+    });
     return data;
   }
 }
-
-

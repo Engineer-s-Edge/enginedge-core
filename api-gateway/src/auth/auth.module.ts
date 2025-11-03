@@ -8,5 +8,3 @@ import { IdentityClientService } from './identity-client.service';
   providers: [IdentityClientService],
 })
 export class AuthModule {}
-
-

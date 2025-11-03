@@ -12,7 +12,7 @@ export class ConsoleMessagePublisher implements IMessagePublisher {
   async publishToWorker(workerId: string, message: Message): Promise<void> {
     console.log(`Publishing message to worker ${workerId}:`, message.toJSON());
     // Simulate async operation
-    await new Promise(resolve => setTimeout(resolve, 10));
+    await new Promise((resolve) => setTimeout(resolve, 10));
   }
 
   subscribeToResponses(handler: (message: Message) => void): void {
@@ -21,6 +21,6 @@ export class ConsoleMessagePublisher implements IMessagePublisher {
 
   // Method to simulate receiving a response (for testing)
   simulateResponse(message: Message): void {
-    this.responseHandlers.forEach(handler => handler(message));
+    this.responseHandlers.forEach((handler) => handler(message));
   }
 }

@@ -12,8 +12,14 @@ export class OrchestrationController {
   ) {}
 
   @Post('request')
-  async handleRequest(@Body() body: { type: RequestType; payload: any; metadata?: any }) {
-    const request = Request.create(body.type, body.payload, body.metadata || {});
+  async handleRequest(
+    @Body() body: { type: RequestType; payload: any; metadata?: any },
+  ) {
+    const request = Request.create(
+      body.type,
+      body.payload,
+      body.metadata || {},
+    );
 
     const response = await this.handleRequestUseCase.execute(request);
 
@@ -28,7 +34,7 @@ export class OrchestrationController {
   @Post('workers')
   async getAvailableWorkers() {
     const workers = await this.workerManagementService.getAvailableWorkers();
-    return workers.map(w => ({
+    return workers.map((w) => ({
       id: w.id,
       type: w.type,
       name: w.name,

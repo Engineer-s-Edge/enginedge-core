@@ -1,4 +1,10 @@
-import { CallHandler, ExecutionContext, Injectable, NestInterceptor, TooManyRequestsException } from '@nestjs/common';
+import {
+  CallHandler,
+  ExecutionContext,
+  Injectable,
+  NestInterceptor,
+  TooManyRequestsException,
+} from '@nestjs/common';
 import { Observable } from 'rxjs';
 
 interface TokenBucket {
@@ -36,5 +42,3 @@ export class RateLimitInterceptor implements NestInterceptor {
     return next.handle();
   }
 }
-
-

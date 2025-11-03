@@ -10,21 +10,24 @@ import { setupWsProxy } from './ws/ws-proxy';
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
-    new FastifyAdapter({ trustProxy: true }),
+    new FastifyAdapter({ trustProxy: true })
   );
 
   app.setGlobalPrefix('api');
   app.enableShutdownHooks();
   app.useGlobalPipes(
-    new ValidationPipe({ whitelist: true, transform: true, forbidUnknownValues: true }),
+    new ValidationPipe({ whitelist: true, transform: true, forbidUnknownValues: true })
   );
 
   const registry = new Registry();
   collectDefaultMetrics({ register: registry });
-  app.getHttpAdapter().getInstance().get('/metrics', async (_req, reply) => {
-    reply.header('Content-Type', registry.contentType);
-    return reply.send(await registry.metrics());
-  });
+  app
+    .getHttpAdapter()
+    .getInstance()
+    .get('/metrics', async (_req, reply) => {
+      reply.header('Content-Type', registry.contentType);
+      return reply.send(await registry.metrics());
+    });
 
   const config = new DocumentBuilder()
     .setTitle('EnginEdge API Gateway')
@@ -42,5 +45,3 @@ async function bootstrap() {
 }
 
 bootstrap();
-
-

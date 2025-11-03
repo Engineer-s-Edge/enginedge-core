@@ -9,7 +9,12 @@ export class Worker {
     public readonly config: WorkerConfig,
   ) {}
 
-  static create(type: WorkerType, name: string, capabilities: WorkerCapability[], config: WorkerConfig): Worker {
+  static create(
+    type: WorkerType,
+    name: string,
+    capabilities: WorkerCapability[],
+    config: WorkerConfig,
+  ): Worker {
     return new Worker(
       crypto.randomUUID(),
       type,
@@ -22,7 +27,10 @@ export class Worker {
   }
 
   isAvailable(): boolean {
-    return this.status === WorkerStatus.IDLE || this.status === WorkerStatus.AVAILABLE;
+    return (
+      this.status === WorkerStatus.IDLE ||
+      this.status === WorkerStatus.AVAILABLE
+    );
   }
 
   isHealthy(heartbeatTimeoutMs: number = 30000): boolean {
@@ -54,7 +62,9 @@ export class Worker {
   }
 
   canHandle(requestType: string): boolean {
-    return this.capabilities.some(cap => cap.requestTypes.includes(requestType));
+    return this.capabilities.some((cap) =>
+      cap.requestTypes.includes(requestType),
+    );
   }
 }
 

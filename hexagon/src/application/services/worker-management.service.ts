@@ -8,7 +8,10 @@ export class WorkerManagementService {
     await this.workerRepository.save(worker);
   }
 
-  async updateWorkerStatus(workerId: string, status: WorkerStatus): Promise<void> {
+  async updateWorkerStatus(
+    workerId: string,
+    status: WorkerStatus,
+  ): Promise<void> {
     await this.workerRepository.updateStatus(workerId, status);
   }
 

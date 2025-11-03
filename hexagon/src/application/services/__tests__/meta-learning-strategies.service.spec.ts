@@ -94,10 +94,10 @@ describe('MetaLearningStrategies', () => {
         },
       ];
 
-      const simplePriorities = await strategies.calculateTopicPriorities(simple);
-      const complexPriorities = await strategies.calculateTopicPriorities(
-        complex,
-      );
+      const simplePriorities =
+        await strategies.calculateTopicPriorities(simple);
+      const complexPriorities =
+        await strategies.calculateTopicPriorities(complex);
 
       // More complex should score higher (more resource allocation)
       expect(complexPriorities[0].priorityScore).toBeGreaterThan(
@@ -192,9 +192,7 @@ describe('MetaLearningStrategies', () => {
       const confident = await strategies.allocateExpertsByConfidence(0.85);
       const uncertain = await strategies.allocateExpertsByConfidence(0.3);
 
-      expect(uncertain.expertCount).toBeGreaterThan(
-        confident.expertCount,
-      );
+      expect(uncertain.expertCount).toBeGreaterThan(confident.expertCount);
     });
 
     it('should have lower allocation for very high confidence', async () => {
@@ -206,7 +204,8 @@ describe('MetaLearningStrategies', () => {
 
   describe('getIntegrationStrategy', () => {
     it('should return integration strategy configuration', async () => {
-      const strategy = await strategies.getIntegrationStrategy('high_confidence');
+      const strategy =
+        await strategies.getIntegrationStrategy('high_confidence');
 
       expect(strategy).toBeDefined();
       expect(strategy.method).toMatch(/append|merge|replace/i);
@@ -215,25 +214,22 @@ describe('MetaLearningStrategies', () => {
     });
 
     it('should use append for high confidence', async () => {
-      const strategy = await strategies.getIntegrationStrategy(
-        'high_confidence',
-      );
+      const strategy =
+        await strategies.getIntegrationStrategy('high_confidence');
 
       expect(strategy.method).toMatch(/append|add/i);
     });
 
     it('should use merge for medium confidence', async () => {
-      const strategy = await strategies.getIntegrationStrategy(
-        'medium_confidence',
-      );
+      const strategy =
+        await strategies.getIntegrationStrategy('medium_confidence');
 
       expect(strategy.method).toMatch(/merge/i);
     });
 
     it('should use replace for low confidence corrections', async () => {
-      const strategy = await strategies.getIntegrationStrategy(
-        'correction_needed',
-      );
+      const strategy =
+        await strategies.getIntegrationStrategy('correction_needed');
 
       expect(strategy.method).toMatch(/replace|update/i);
     });
@@ -503,8 +499,12 @@ describe('MetaLearningStrategies', () => {
 
       const priorities = await strategies.calculateTopicPriorities(topics);
 
-      const userPriority = priorities.find((p: any) => p.topic === 'UserChoice');
-      const autoPriority = priorities.find((p: any) => p.topic === 'AutoSelect');
+      const userPriority = priorities.find(
+        (p: any) => p.topic === 'UserChoice',
+      );
+      const autoPriority = priorities.find(
+        (p: any) => p.topic === 'AutoSelect',
+      );
 
       // Both should score reasonably
       expect(userPriority!.priorityScore).toBeGreaterThan(5);
@@ -540,13 +540,13 @@ describe('MetaLearningStrategies', () => {
 
   describe('Error handling', () => {
     it('should handle invalid complexity levels', async () => {
-      await expect(
-        strategies.allocateExpertsByComplexity(0),
-      ).rejects.toThrow(/complexity.*1.*6/i);
+      await expect(strategies.allocateExpertsByComplexity(0)).rejects.toThrow(
+        /complexity.*1.*6/i,
+      );
 
-      await expect(
-        strategies.allocateExpertsByComplexity(7),
-      ).rejects.toThrow(/complexity.*1.*6/i);
+      await expect(strategies.allocateExpertsByComplexity(7)).rejects.toThrow(
+        /complexity.*1.*6/i,
+      );
     });
 
     it('should handle invalid confidence values', async () => {
@@ -554,9 +554,9 @@ describe('MetaLearningStrategies', () => {
         strategies.allocateExpertsByConfidence(-0.1),
       ).rejects.toThrow(/confidence.*0.*1/i);
 
-      await expect(
-        strategies.allocateExpertsByConfidence(1.1),
-      ).rejects.toThrow(/confidence.*0.*1/i);
+      await expect(strategies.allocateExpertsByConfidence(1.1)).rejects.toThrow(
+        /confidence.*0.*1/i,
+      );
     });
 
     it('should validate escalation input ranges', async () => {
@@ -592,7 +592,8 @@ describe('MetaLearningStrategies', () => {
       expect(allocation.expertCount).toBeGreaterThanOrEqual(3);
 
       // 3. Get integration strategy for results
-      const integration = await strategies.getIntegrationStrategy('high_confidence');
+      const integration =
+        await strategies.getIntegrationStrategy('high_confidence');
       expect(integration.method).toBeDefined();
 
       // 4. Check if escalation needed

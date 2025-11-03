@@ -1,13 +1,13 @@
 /**
  * Expert Agent Factory
- * 
+ *
  * Application-layer service that creates fully configured ExpertAgent instances.
- * 
+ *
  * Responsible for:
  * - Dependency resolution and injection
  * - Configuration assembly
  * - Instance caching and lifecycle management
- * 
+ *
  * This factory bridges the domain Expert Agent with infrastructure dependencies.
  */
 
@@ -40,16 +40,18 @@ export class ExpertAgentFactory {
 
   /**
    * Create a new Expert Agent instance
-   * 
+   *
    * @param config Expert agent configuration
    * @returns Configured expert agent instance
    */
-  async createAgent(config: ExpertAgentFactoryConfig): Promise<ExpertAgentInstance> {
+  async createAgent(
+    config: ExpertAgentFactoryConfig,
+  ): Promise<ExpertAgentInstance> {
     const agentId = `ea_${Date.now()}_${Math.random().toString(36).substring(7)}`;
 
     // In production, this would instantiate the full ExpertAgent from infrastructure
     // with all dependencies injected (Toolkit, Memory, LLM, etc.)
-    
+
     const agent: ExpertAgentInstance = {
       id: agentId,
       userId: config.userId,
@@ -119,7 +121,9 @@ export class ExpertAgentFactory {
    * Cleanup all agents
    */
   async cleanupAll(): Promise<void> {
-    const promises = Array.from(this.activeAgents.keys()).map((id) => this.cleanup(id));
+    const promises = Array.from(this.activeAgents.keys()).map((id) =>
+      this.cleanup(id),
+    );
     await Promise.all(promises);
   }
 

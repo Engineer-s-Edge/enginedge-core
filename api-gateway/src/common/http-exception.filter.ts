@@ -8,7 +8,9 @@ export class HttpErrorFilter implements ExceptionFilter {
     const request = ctx.getRequest();
 
     const isHttp = exception instanceof HttpException;
-    const status = isHttp ? (exception as HttpException).getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
+    const status = isHttp
+      ? (exception as HttpException).getStatus()
+      : HttpStatus.INTERNAL_SERVER_ERROR;
     const message = isHttp ? (exception as HttpException).message : 'Internal Server Error';
 
     const payload = {
@@ -23,5 +25,3 @@ export class HttpErrorFilter implements ExceptionFilter {
     reply.status(status).send(payload);
   }
 }
-
-

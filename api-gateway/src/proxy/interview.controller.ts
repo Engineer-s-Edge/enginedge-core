@@ -11,5 +11,3 @@ export class InterviewProxyController {
     return this.proxy.forward(this.base, path, req.method, req.body, req.headers, req.query);
   }
 }
-
-

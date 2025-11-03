@@ -26,5 +26,3 @@ import { ToolsProxyController } from './proxy/tools.controller';
   providers: [ProxyService],
 })
 export class AppModule {}
-
-
