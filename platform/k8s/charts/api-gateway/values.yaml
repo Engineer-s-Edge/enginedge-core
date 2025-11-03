@@ -8,5 +8,8 @@ service:
   port: 8080
   nodePort: 30010
 
+imagePullSecrets:
+  - name: ghcr-pull-secret
+
 resources: {}
 

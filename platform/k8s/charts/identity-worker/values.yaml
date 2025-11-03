@@ -7,6 +7,9 @@ service:
   type: ClusterIP
   port: 3000
 
+imagePullSecrets:
+  - name: ghcr-pull-secret
+
 mongodb:
   uri: mongodb://mongodb:27017/identity-service
 

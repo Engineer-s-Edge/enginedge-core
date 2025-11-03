@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: identity-worker
+  name: {{ .Values.component }}
   labels:
     app: enginedge
-    component: identity-worker
+    component: {{ .Values.component }}
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: enginedge
-      component: identity-worker
+      component: {{ .Values.component }}
   template:
     metadata:
       labels:
         app: enginedge
-        component: identity-worker
+        component: {{ .Values.component }}
     spec:
 {{- if .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -24,31 +24,25 @@ spec:
 {{- end }}
 {{- end }}
       containers:
-      - name: identity-worker
+      - name: {{ .Values.component }}
         image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
-        - containerPort: 3000
+        - containerPort: {{ .Values.port }}
         env:
-        - name: NODE_ENV
-          value: "production"
-        - name: PORT
-          value: "3000"
-        - name: MONGODB_URI
-          valueFrom:
-            secretKeyRef:
-              name: mongodb-secret
-              key: mongodb-uri
+{{- range .Values.env }}
+        - name: {{ .name }}
+          value: "{{ .value }}"
+{{- end }}
         livenessProbe:
           httpGet:
             path: /health
-            port: 3000
+            port: {{ .Values.port }}
           initialDelaySeconds: 20
           periodSeconds: 10
         readinessProbe:
           httpGet:
             path: /health
-            port: 3000
+            port: {{ .Values.port }}
           initialDelaySeconds: 5
           periodSeconds: 5
-

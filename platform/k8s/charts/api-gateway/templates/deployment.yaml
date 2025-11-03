@@ -17,6 +17,12 @@ spec:
         app: enginedge
         component: api-gateway
     spec:
+{{- if .Values.imagePullSecrets }}
+      imagePullSecrets:
+{{- range .Values.imagePullSecrets }}
+      - name: {{ .name }}
+{{- end }}
+{{- end }}
       containers:
       - name: api-gateway
         image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
