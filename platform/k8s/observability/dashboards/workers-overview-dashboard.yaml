@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: workers-overview-dashboard
+  namespace: observability
+  labels:
+    grafana_dashboard: "1"
+data:
+  workers-overview.json: |
+    {
+      "annotations": {"list": []},
+      "panels": [
+        {"type": "timeseries", "title": "Worker HTTP Rate", "targets": [{"expr": "sum by(job)(rate(http_requests_total{job=~\"assistant-worker|resume-worker|interview-worker|data-processing-worker|latex-worker|agent-tool-worker|scheduling-worker\"}[5m]))"}]},
+        {"type": "timeseries", "title": "Worker 5xx Rate", "targets": [{"expr": "sum by(job)(rate(http_requests_total{job=~\"assistant-worker|resume-worker|interview-worker|data-processing-worker|latex-worker|agent-tool-worker|scheduling-worker\",status=~\"5..\"}[5m]))"}]}
+      ],
+      "schemaVersion": 37,
+      "title": "Workers Overview",
+      "uid": "workers-overview"
+    }

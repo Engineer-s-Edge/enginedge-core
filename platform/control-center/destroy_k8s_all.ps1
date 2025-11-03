@@ -28,6 +28,10 @@ if (helm status kafka --namespace default 2>$null) { helm delete kafka --namespa
 if (helm status minio --namespace default 2>$null) { helm delete minio --namespace default }
 if (helm status postgres-metastore --namespace default 2>$null) { helm delete postgres-metastore --namespace default }
 if (helm status redis --namespace default 2>$null) { helm delete redis --namespace default }
+if (helm status kube-prometheus-stack --namespace observability 2>$null) { helm delete kube-prometheus-stack --namespace observability }
+
+# --- Deleting Observability Manifests ---
+kubectl delete -f 'C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\observability\servicemonitors\' --ignore-not-found=true
 
 # --- Deleting Secrets ---
 if (Test-Path 'C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\secrets/postgres-secret.yaml') { kubectl delete -f 'C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\secrets/postgres-secret.yaml' --ignore-not-found=true }

@@ -30,6 +30,10 @@ helm status kafka --namespace default >/dev/null 2>&1 && helm delete kafka --nam
 helm status minio --namespace default >/dev/null 2>&1 && helm delete minio --namespace default || true
 helm status postgres-metastore --namespace default >/dev/null 2>&1 && helm delete postgres-metastore --namespace default || true
 helm status redis --namespace default >/dev/null 2>&1 && helm delete redis --namespace default || true
+helm status kube-prometheus-stack --namespace observability >/dev/null 2>&1 && helm delete kube-prometheus-stack --namespace observability || true
+
+# --- Deleting Observability Manifests ---
+kubectl delete -f C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\observability\servicemonitors\ --ignore-not-found=true
 
 # --- Deleting Secrets ---
 [ -f C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\secrets/postgres-secret.yaml ] && kubectl delete -f C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\secrets/postgres-secret.yaml --ignore-not-found=true || true

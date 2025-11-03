@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-gateway-dashboard
+  namespace: observability
+  labels:
+    grafana_dashboard: "1"
+data:
+  api-gateway.json: |
+    {
+      "annotations": {"list": []},
+      "panels": [
+        {
+          "type": "timeseries",
+          "title": "HTTP Request Rate",
+          "targets": [
+            {"expr": "sum(rate(http_requests_total{job=\"api-gateway\"}[5m]))", "legendFormat": "req/s"}
+          ]
+        },
+        {
+          "type": "timeseries",
+          "title": "HTTP 5xx Rate",
+          "targets": [
+            {"expr": "sum(rate(http_requests_total{job=\"api-gateway\",status=~\"5..\"}[5m]))", "legendFormat": "5xx/s"}
+          ]
+        }
+      ],
+      "schemaVersion": 37,
+      "title": "API Gateway",
+      "uid": "api-gateway"
+    }

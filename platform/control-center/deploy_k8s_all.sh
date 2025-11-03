@@ -18,7 +18,15 @@ kubectl apply -f C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8
 # --- Installing Helm Charts for 3rd party services ---
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm repo add minio https://charts.min.io/
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
+
+# Observability namespace and stack
+kubectl get ns observability >/dev/null 2>&1 || kubectl create ns observability
+helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
+  -f C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\observability\helm-values.yaml \
+  --namespace observability
+kubectl apply -f C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\observability\servicemonitors\
 
 helm install kafka bitnami/kafka -f C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\charts/kafka/values.yaml --namespace default
 helm install minio minio/minio -f C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\charts/minio/values.yaml --namespace default
