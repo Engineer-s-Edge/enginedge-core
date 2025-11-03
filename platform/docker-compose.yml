@@ -210,8 +210,29 @@ services:
       NODE_ENV: development
       PORT: 3006
       KAFKA_BROKERS: kafka:9092
+      MONGODB_URI: mongodb://mongodb:27017/resume-worker
+      REDIS_URL: redis://scheduling-redis:6379/1
+      RESUME_NLP_SERVICE_URL: http://resume-nlp-service:8001
     ports:
-      - "${resume_WORKER_PORT:-3006}:3006"
+      - "${RESUME_WORKER_PORT:-3006}:3006"
+    depends_on:
+      - kafka
+      - mongodb
+      - redis
+      - resume-nlp-service
+    networks: [enginedge]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  resume-nlp-service:
+    build:
+      context: ../../enginedge-workers/resume-nlp-service
+    container_name: resume-nlp-service
+    environment:
+      PORT: 8001
+      KAFKA_BROKERS: kafka:9092
+    ports:
+      - "${RESUME_NLP_SERVICE_PORT:-8001}:8001"
     depends_on:
       - kafka
     networks: [enginedge]

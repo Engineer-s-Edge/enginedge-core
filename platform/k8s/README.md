@@ -1,141 +1,335 @@
-# EnginEdge Kubernetes Migration
+# EnginEdge Platform - Kubernetes Manifests
 
-This directory contains the Kubernetes manifests and Helm configurations required to deploy the EnginEdge application stack.
+## Overview
+
+This directory contains Kubernetes manifests for deploying the EnginEdge platform and all workers.
+
+## Structure
+
+```
+k8s/
+├── README.md                                    # This file
+├── resume-worker-deployment.yaml                # Resume Worker deployment, service, HPA
+├── resume-nlp-service-deployment.yaml           # Resume NLP Service deployment, service, HPA
+├── resume-services-configmap.yaml               # ConfigMaps for resume services
+├── resume-services-secrets.yaml                 # Secrets for resume services
+└── resume-services-servicemonitor.yaml          # Prometheus ServiceMonitors
+```
 
 ## Prerequisites
 
-*   A running Kubernetes cluster (e.g., `kind`, `minikube`, or a cloud provider).
-*   `kubectl` configured to connect to your cluster.
-*   `helm` v3 installed.
+- Kubernetes cluster (1.24+)
+- kubectl configured
+- Namespace `enginedge` created
+- Core infrastructure deployed (MongoDB, Kafka, Redis)
 
-## Deployment Steps
+## Deployment Order
 
-The deployment is broken down into steps. It is recommended to follow them in order.
-
-### Step 1: Deploy the Stateful Backend
-
-This step deploys PostgreSQL and MinIO, which are required by other services.
-
-**1. Add the required Helm repositories:**
-
-First, add the Bitnami and MinIO Helm repositories. You only need to do this once.
+### 1. Create Namespace (if not exists)
 
 ```bash
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm repo add minio https://charts.min.io/
-helm repo update
+kubectl create namespace enginedge
 ```
 
-**2. Apply the Kubernetes Secrets:**
+### 2. Deploy Core Infrastructure First
 
-These secrets contain the passwords for your services.
+Deploy in this order:
+1. MongoDB
+2. Redis
+3. Kafka
+4. MinIO (if using S3-compatible storage)
+
+### 3. Deploy Resume Services
 
 ```bash
-kubectl apply -f secrets/postgres-secret.yaml
-kubectl apply -f secrets/minio-secret.yaml
+# Apply ConfigMaps
+kubectl apply -f resume-services-configmap.yaml
+
+# Apply Secrets (edit first!)
+kubectl apply -f resume-services-secrets.yaml
+
+# Deploy Resume NLP Service (needs to be ready for resume-worker)
+kubectl apply -f resume-nlp-service-deployment.yaml
+
+# Wait for NLP service to be ready
+kubectl wait --for=condition=ready pod -l app=resume-nlp-service -n enginedge --timeout=120s
+
+# Deploy Resume Worker
+kubectl apply -f resume-worker-deployment.yaml
+
+# Apply ServiceMonitors (if using Prometheus Operator)
+kubectl apply -f resume-services-servicemonitor.yaml
 ```
 
-**3. Install the Helm Charts:**
-
-Now, install PostgreSQL and MinIO using the custom values files provided.
-
-*   **PostgreSQL (for Hive Metastore):**
-    ```bash
-    helm install postgres-metastore bitnami/postgresql \
-      --namespace default \
-      -f charts/postgres/values.yaml
-    ```
-
-*   **MinIO (for Object Storage):**
-    ```bash
-    helm install minio minio/minio \
-      --namespace default \
-      -f charts/minio/values.yaml
-    ```
-
-After running these commands, PostgreSQL and MinIO will be deployed in your cluster, ready for the other application services.
-
-### Step 2: Deploy Kafka
-
-This step deploys the Kafka message broker, which is used for communication between the `main-node` and `worker-nodes`.
+### 4. Verify Deployment
 
 ```bash
-helm install kafka bitnami/kafka \
-  --namespace default \
-  -f charts/kafka/values.yaml
+# Check pods
+kubectl get pods -n enginedge -l app=resume-worker
+kubectl get pods -n enginedge -l app=resume-nlp-service
+
+# Check services
+kubectl get svc -n enginedge | grep resume
+
+# Check HPA
+kubectl get hpa -n enginedge | grep resume
+
+# Check logs
+kubectl logs -f deployment/resume-worker -n enginedge
+kubectl logs -f deployment/resume-nlp-service -n enginedge
 ```
 
-### Step 3: Deploy Redis Cache
+## Configuration
 
-This step deploys a Redis cache used by the `scheduling-model` service.
+### Resume Worker Environment Variables
+
+Edit `resume-services-configmap.yaml` and `resume-worker-deployment.yaml`:
+
+- `NODE_ENV` - Environment (production, development)
+- `PORT` - Service port (default: 3006)
+- `MONGODB_URI` - MongoDB connection string
+- `KAFKA_BROKERS` - Kafka broker addresses
+- `REDIS_URL` - Redis connection string
+- `RESUME_NLP_SERVICE_URL` - NLP service URL
+
+### Resume NLP Service Environment Variables
+
+Edit `resume-services-configmap.yaml` and `resume-nlp-service-deployment.yaml`:
+
+- `PORT` - Service port (default: 8001)
+- `WORKERS` - Number of uvicorn workers (default: 4)
+- `KAFKA_BROKERS` - Kafka broker addresses
+- `SPACY_MODEL` - spaCy model name (default: en_core_web_sm)
+
+### Secrets
+
+**IMPORTANT**: Edit `resume-services-secrets.yaml` before deploying:
 
 ```bash
-helm install redis bitnami/redis \
-  --namespace default \
-  -f charts/redis/values.yaml
+# Generate secure secrets
+openssl rand -base64 32  # For JWT_SECRET
+openssl rand -base64 32  # For ENCRYPTION_KEY
+
+# Edit secrets file
+vi resume-services-secrets.yaml
 ```
 
-### Step 4: Deploy Core Application Services
+## Scaling
 
-This step deploys the custom applications that make up the EnginEdge platform. It's best to apply the `ConfigMap` files first, followed by the application manifests.
+### Manual Scaling
 
 ```bash
-# Apply the configuration files
-kubectl apply -f config/main-node-config.yaml
-kubectl apply -f config/worker-node-config.yaml
-kubectl apply -f config/scheduling-model-config.yaml
-kubectl apply -f config/news-ingestion-config.yaml
+# Scale resume-worker
+kubectl scale deployment resume-worker --replicas=5 -n enginedge
 
-# Apply the application manifests
-kubectl apply -f apps/wolfram-kernel.yaml
-kubectl apply -f apps/scheduling-model.yaml
-kubectl apply -f apps/worker-node.yaml
-kubectl apply -f apps/main-node.yaml
+# Scale resume-nlp-service
+kubectl scale deployment resume-nlp-service --replicas=8 -n enginedge
 ```
 
-### Step 5: Deploy the News Ingestion CronJob
+### Auto-scaling (HPA)
 
-This step deploys a `CronJob` that periodically runs the Python script to ingest news articles into MinIO.
+HPA is configured automatically:
 
-**1. Build the Docker Image:**
+**Resume Worker:**
+- Min: 3 replicas
+- Max: 10 replicas
+- Target CPU: 70%
+- Target Memory: 80%
 
-First, you need to build the Docker image for the job script. If you are using `kind`, you can build the image directly into the cluster's node, which avoids needing a separate image registry.
+**Resume NLP Service:**
+- Min: 4 replicas
+- Max: 20 replicas
+- Target CPU: 75%
+- Target Memory: 85%
 
 ```bash
-# Build the image from the 'scripts/jobs' directory
-docker build -t news-ingestion-job:latest ./scripts/jobs
+# Check HPA status
+kubectl get hpa -n enginedge
 
-# (For kind users) Load the image into your kind cluster
-kind load docker-image news-ingestion-job:latest
+# Describe HPA
+kubectl describe hpa resume-worker-hpa -n enginedge
+kubectl describe hpa resume-nlp-service-hpa -n enginedge
 ```
 
-**2. Apply the CronJob Manifest:**
+## Monitoring
 
-Now, apply the `CronJob` manifest to your cluster.
+### ServiceMonitors (Prometheus Operator)
+
+If using Prometheus Operator, ServiceMonitors are included:
 
 ```bash
-kubectl apply -f apps/news-ingestion-cronjob.yaml
+# Apply ServiceMonitors
+kubectl apply -f resume-services-servicemonitor.yaml
+
+# Check ServiceMonitors
+kubectl get servicemonitor -n enginedge | grep resume
 ```
 
-The `CronJob` is now active and will run every two hours to ingest new articles. After this step, all components of the application will have been deployed.
+### Manual Prometheus Configuration
 
----
+If not using Prometheus Operator, add to `prometheus.yml`:
+
+```yaml
+scrape_configs:
+  - job_name: 'resume-worker'
+    kubernetes_sd_configs:
+      - role: endpoints
+        namespaces:
+          names:
+          - enginedge
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_service_label_app]
+        action: keep
+        regex: resume-worker
+    metrics_path: '/metrics'
+
+  - job_name: 'resume-nlp-service'
+    kubernetes_sd_configs:
+      - role: endpoints
+        namespaces:
+          names:
+          - enginedge
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_service_label_app]
+        action: keep
+        regex: resume-nlp-service
+    metrics_path: '/metrics'
+```
 
 ## Troubleshooting
 
-### "Unable to connect to the server... connection refused" Error
+### Resume Worker Issues
 
-If you see an error like this when running the "Check Cluster Status" command in the control center:
-```
-Unable to connect to the server: dial tcp 127.0.0.1:65439: connectex: No connection could be made because the target machine actively refused it.
-```
-
-**This is expected if your Kubernetes cluster is not running.**
-
-The `control-center.py` script uses `kubectl` to communicate with your Kubernetes cluster. This error is the standard message from `kubectl` when it cannot find a running Kubernetes API server at the configured address.
-
-**Solution:** Before you can use the Kubernetes management features of the control center (`Deploy`, `Destroy`, `Status`), you must start your local `kind` cluster. The command to do this is typically:
 ```bash
-kind create cluster --config kind-config.yaml
+# Check logs
+kubectl logs -f deployment/resume-worker -n enginedge
+
+# Check events
+kubectl get events -n enginedge --field-selector involvedObject.name=resume-worker
+
+# Describe pod
+kubectl describe pod -l app=resume-worker -n enginedge
+
+# Get into container
+kubectl exec -it deployment/resume-worker -n enginedge -- /bin/sh
 ```
-Once your cluster is running, the "Check Cluster Status" command will succeed.
+
+### Resume NLP Service Issues
+
+```bash
+# Check logs
+kubectl logs -f deployment/resume-nlp-service -n enginedge
+
+# Check if spaCy model loaded
+kubectl logs deployment/resume-nlp-service -n enginedge | grep "spaCy"
+
+# Check events
+kubectl get events -n enginedge --field-selector involvedObject.name=resume-nlp-service
+
+# Get into container
+kubectl exec -it deployment/resume-nlp-service -n enginedge -- /bin/sh
+```
+
+### Common Issues
+
+**Issue: Resume NLP Service fails to start**
+```bash
+# Check if spaCy model is installed
+kubectl logs deployment/resume-nlp-service -n enginedge | grep "model"
+
+# Rebuild Docker image with spaCy model
+cd enginedge-workers/resume-nlp-service
+docker build -t resume-nlp-service:latest .
+```
+
+**Issue: Resume Worker can't connect to NLP service**
+```bash
+# Check service exists
+kubectl get svc resume-nlp-service -n enginedge
+
+# Test connectivity from resume-worker
+kubectl exec -it deployment/resume-worker -n enginedge -- curl http://resume-nlp-service:8001/health
+```
+
+**Issue: High memory usage**
+```bash
+# Check resource usage
+kubectl top pods -n enginedge -l app=resume-nlp-service
+
+# Increase memory limits in deployment
+kubectl edit deployment resume-nlp-service -n enginedge
+```
+
+## Updates and Rollbacks
+
+### Update Deployment
+
+```bash
+# Update image
+kubectl set image deployment/resume-worker resume-worker=resume-worker:v1.1.0 -n enginedge
+
+# Or apply updated YAML
+kubectl apply -f resume-worker-deployment.yaml
+
+# Check rollout status
+kubectl rollout status deployment/resume-worker -n enginedge
+```
+
+### Rollback
+
+```bash
+# View rollout history
+kubectl rollout history deployment/resume-worker -n enginedge
+
+# Rollback to previous version
+kubectl rollout undo deployment/resume-worker -n enginedge
+
+# Rollback to specific revision
+kubectl rollout undo deployment/resume-worker --to-revision=2 -n enginedge
+```
+
+## Resource Requirements
+
+### Resume Worker
+- **Requests**: 512Mi memory, 500m CPU
+- **Limits**: 2Gi memory, 2000m CPU
+- **Replicas**: 3-10 (auto-scaling)
+
+### Resume NLP Service
+- **Requests**: 1Gi memory, 1000m CPU
+- **Limits**: 4Gi memory, 4000m CPU
+- **Replicas**: 4-20 (auto-scaling)
+
+### Total Cluster Requirements
+
+For default configuration (3 resume-worker + 4 resume-nlp-service):
+- **Minimum**: ~6Gi memory, 6 CPU cores
+- **Recommended**: ~12Gi memory, 12 CPU cores (with headroom)
+
+## Production Checklist
+
+- [ ] Secrets properly configured (not using defaults)
+- [ ] Resource limits adjusted for workload
+- [ ] MongoDB indexes created
+- [ ] Kafka topics created
+- [ ] Monitoring configured (Prometheus/Grafana)
+- [ ] Alerts configured
+- [ ] Backup strategy in place
+- [ ] Logging configured (ELK/Loki)
+- [ ] Network policies configured (if using)
+- [ ] Ingress configured for external access
+- [ ] SSL/TLS certificates configured
+- [ ] Health checks verified
+- [ ] Auto-scaling tested
+
+## Additional Resources
+
+- [Resume Worker Documentation](../../enginedge-workers/resume-worker/documentation/)
+- [Resume NLP Service Documentation](../../enginedge-workers/resume-nlp-service/)
+- [Platform Docker Compose](../docker-compose.yml)
+- [Deployment Guide](../../enginedge-workers/resume-worker/documentation/DEPLOYMENT.md)
+
+---
+
+**Last Updated**: November 3, 2025  
+**Version**: 1.0.0
