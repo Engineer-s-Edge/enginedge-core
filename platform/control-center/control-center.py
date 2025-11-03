@@ -54,7 +54,7 @@ K8S_SERVICE_GROUPS = {
     },
     "Core Applications": {
         "description": "The main control plane and hexagonal worker services (main-node/control-plane, assistant-worker, agent-tool-worker, etc.)",
-        "helm_releases": [],
+        "helm_releases": ["api-gateway"],
         "manifests": [
             "config/core-config.yaml", "apps/control-plane.yaml", "apps/main-node.yaml",
             "config/worker-config.yaml", "apps/llm-worker.yaml", "apps/agent-tool-worker.yaml",
