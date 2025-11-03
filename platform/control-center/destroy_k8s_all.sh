@@ -15,11 +15,12 @@ kubectl delete -f C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k
 kubectl delete -f C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/scheduling-model.yaml --ignore-not-found=true
 kubectl delete -f C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/resume-worker.yaml --ignore-not-found=true
 kubectl delete -f C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/news-ingestion-cronjob.yaml --ignore-not-found=true
-kubectl delete -f C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/assistant-worker.yaml --ignore-not-found=true
+kubectl delete -f C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/llm-worker.yaml --ignore-not-found=true
 kubectl delete -f C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/latex-worker.yaml --ignore-not-found=true
 kubectl delete -f C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/interview-worker.yaml --ignore-not-found=true
 kubectl delete -f C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/data-processing-worker.yaml --ignore-not-found=true
-kubectl delete -f C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/core.yaml --ignore-not-found=true
+kubectl delete -f C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/control-plane.yaml --ignore-not-found=true
+kubectl delete -f C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/main-node.yaml --ignore-not-found=true
 kubectl delete -f C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/agent-tool-worker.yaml --ignore-not-found=true
 
 # --- Deleting Helm Releases ---

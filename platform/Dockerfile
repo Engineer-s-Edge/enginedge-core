@@ -19,13 +19,13 @@ RUN apk add --no-cache \
 WORKDIR /usr/src/app
 
 # Copy package files
-COPY package*.json ./
+COPY hexagon/package*.json ./
 
 # Install dependencies
 RUN npm install
 
 # Copy application source
-COPY . .
+COPY hexagon/. .
 
 # Build application
 RUN npm run build

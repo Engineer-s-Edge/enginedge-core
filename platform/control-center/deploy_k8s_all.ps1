@@ -24,11 +24,12 @@ helm install redis bitnami/redis -f 'C:\Users\chris\Engineering\EnginEdge\engine
 
 # --- Deploying Core Applications ---
 kubectl apply -f 'C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/agent-tool-worker.yaml'
-kubectl apply -f 'C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/core.yaml'
+kubectl apply -f 'C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/control-plane.yaml'
+kubectl apply -f 'C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/main-node.yaml'
 kubectl apply -f 'C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/data-processing-worker.yaml'
 kubectl apply -f 'C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/interview-worker.yaml'
 kubectl apply -f 'C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/latex-worker.yaml'
-kubectl apply -f 'C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/assistant-worker.yaml'
+kubectl apply -f 'C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/llm-worker.yaml'
 kubectl apply -f 'C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/news-ingestion-cronjob.yaml'
 kubectl apply -f 'C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/resume-worker.yaml'
 kubectl apply -f 'C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/scheduling-model.yaml'

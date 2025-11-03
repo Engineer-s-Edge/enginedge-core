@@ -53,11 +53,11 @@ K8S_SERVICE_GROUPS = {
         "manifests": ["apps/zookeeper.yaml", "apps/kafka.yaml"],
     },
     "Core Applications": {
-        "description": "The main control plane and hexagonal worker services (core, assistant-worker, agent-tool-worker, etc.).",
+        "description": "The main control plane and hexagonal worker services (main-node/control-plane, assistant-worker, agent-tool-worker, etc.)",
         "helm_releases": [],
         "manifests": [
-            "config/core-config.yaml", "apps/core.yaml",
-            "config/worker-config.yaml", "apps/assistant-worker.yaml", "apps/agent-tool-worker.yaml",
+            "config/core-config.yaml", "apps/control-plane.yaml", "apps/main-node.yaml",
+            "config/worker-config.yaml", "apps/llm-worker.yaml", "apps/agent-tool-worker.yaml",
             "apps/data-processing-worker.yaml", "apps/interview-worker.yaml",
             "apps/latex-worker.yaml", "apps/resume-worker.yaml",
             "apps/wolfram-kernel.yaml"
