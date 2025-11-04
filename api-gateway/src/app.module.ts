@@ -10,6 +10,8 @@ import { InterviewProxyController } from './proxy/interview.controller';
 import { DataProxyController } from './proxy/data.controller';
 import { LatexProxyController } from './proxy/latex.controller';
 import { ToolsProxyController } from './proxy/tools.controller';
+import { DatalakeProxyController } from './proxy/datalake.controller';
+import { RolesGuard } from './auth/roles.guard';
 
 @Module({
   imports: [HealthModule, AuthModule, RateLimitModule],
@@ -22,7 +24,8 @@ import { ToolsProxyController } from './proxy/tools.controller';
     DataProxyController,
     LatexProxyController,
     ToolsProxyController,
+    DatalakeProxyController,
   ],
-  providers: [ProxyService],
+  providers: [ProxyService, RolesGuard],
 })
 export class AppModule {}

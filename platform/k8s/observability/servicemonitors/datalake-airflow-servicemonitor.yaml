@@ -1,0 +1,21 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: datalake-airflow
+  namespace: enginedge
+  labels:
+    app: enginedge
+    component: datalake
+    service: airflow
+spec:
+  selector:
+    matchLabels:
+      app: enginedge
+      component: datalake
+      service: airflow
+  endpoints:
+    - port: http
+      path: /health
+      interval: 30s
+      scrapeTimeout: 10s
+      scheme: http

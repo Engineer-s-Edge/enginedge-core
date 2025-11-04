@@ -1,0 +1,21 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: datalake-trino
+  namespace: enginedge
+  labels:
+    app: enginedge
+    component: datalake
+    service: trino
+spec:
+  selector:
+    matchLabels:
+      app: enginedge
+      component: datalake
+      service: trino
+  endpoints:
+    - port: http
+      path: /v1/metrics
+      interval: 30s
+      scrapeTimeout: 10s
+      scheme: http
