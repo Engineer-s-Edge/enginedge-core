@@ -53,10 +53,10 @@ K8S_SERVICE_GROUPS = {
         "manifests": ["apps/zookeeper.yaml", "apps/kafka.yaml"],
     },
     "Core Applications": {
-        "description": "The main control plane and hexagonal worker services (main-node/control-plane, assistant-worker, agent-tool-worker, etc.)",
+        "description": "The main hexagon orchestrator and hexagonal worker services (hexagon, assistant-worker, agent-tool-worker, etc.)",
         "helm_releases": ["api-gateway", "identity-worker"],
         "manifests": [
-            "config/core-config.yaml", "apps/control-plane.yaml", "apps/main-node.yaml",
+            "config/core-config.yaml", "apps/control-plane.yaml",
             "config/worker-config.yaml", "apps/llm-worker.yaml", "apps/agent-tool-worker.yaml",
             "apps/data-processing-worker.yaml", "apps/interview-worker.yaml",
             "apps/latex-worker.yaml", "apps/resume-worker.yaml",
@@ -292,7 +292,8 @@ def _candidate_build_dirs_for_image(image_name: str) -> List[str]:
     ]
     # Special mappings
     special = {
-        "core": "platform",
+        "core": "hexagon",  # Legacy reference, now points to hexagon
+        "hexagon": "hexagon",
         "scheduling-model-api": "scheduling_model",
         # News ingestion job lives under scripts/jobs with its Dockerfile
         "news-ingestion-job": "scripts/jobs",
@@ -325,12 +326,12 @@ def _candidate_build_dirs_for_image(image_name: str) -> List[str]:
 
 
 def _find_build_context_for_image(image_name: str) -> Optional[str]:
-    # Special case: core Dockerfile is at platform/Dockerfile but needs to be built from REPO_ROOT
-    if image_name.startswith("core"):
-        platform_dockerfile = os.path.join(REPO_ROOT, "platform", "Dockerfile")
-        if os.path.isfile(platform_dockerfile):
-            # Return REPO_ROOT as the build context so that package.json is available
-            return REPO_ROOT
+    # Special case: hexagon Dockerfile is at hexagon/Dockerfile
+    if image_name.startswith("hexagon") or image_name.startswith("core"):
+        hexagon_dockerfile = os.path.join(REPO_ROOT, "hexagon", "Dockerfile")
+        if os.path.isfile(hexagon_dockerfile):
+            # Return hexagon directory as the build context
+            return os.path.join(REPO_ROOT, "hexagon")
     
     # Default: search for Dockerfile in candidate directories
     for cand in _candidate_build_dirs_for_image(image_name):
@@ -390,9 +391,10 @@ def _build_and_load_kind_images(selected_groups: List[str]):
             CONSOLE.print(f"[yellow]No Dockerfile found for image '{image}'. Skipping build.[/yellow]")
             continue
         build_cmd = ["docker", "build", "-t", tag]
-        # Special handling for core (Dockerfile is in platform/Dockerfile)
-        if image.startswith("core") and ctx == REPO_ROOT:
-            build_cmd.extend(["-f", os.path.join(ctx, "platform", "Dockerfile")])
+        # Special handling for hexagon (Dockerfile is in hexagon/Dockerfile)
+        if (image.startswith("hexagon") or image.startswith("core")) and os.path.basename(ctx) == "hexagon":
+            # Dockerfile is already in the context, no need for -f flag
+            pass
         # Special handling for wolfram-kernel
         elif os.path.basename(ctx) == "local-kernel":
             # If image already exists locally, skip rebuild and just load into kind
@@ -764,10 +766,10 @@ def refresh_k8s_deployments(selected_groups: List[str]):
         # Get all deployment names from manifests
         for group in selected_groups:
             if "Stateful Backend" in group:
-                deployments_to_refresh.extend(["core"])
+                deployments_to_refresh.extend(["hexagon"])
             if "Core Applications" in group:
                 deployments_to_refresh.extend(["agent-tool-worker", "data-processing-worker", "interview-worker", 
-                                               "latex-worker", "assistant-worker", "resume-worker", "wolfram-kernel"])
+                                               "latex-worker", "assistant-worker", "resume-worker", "wolfram-kernel", "hexagon"])
             if "Scheduling App" in group:
                 deployments_to_refresh.append("scheduling-model")
         
@@ -801,7 +803,7 @@ def stop_k8s_deployments(selected_groups: List[str]):
         # Map groups to deployments
         for group in selected_groups:
             if "Stateful Backend" in group:
-                deployments_to_stop.extend(["core"])
+                deployments_to_stop.extend(["hexagon"])
             if "Core Applications" in group:
                 deployments_to_stop.extend(["agent-tool-worker", "data-processing-worker", "interview-worker", 
                                             "latex-worker", "assistant-worker", "resume-worker", "wolfram-kernel"])
@@ -939,7 +941,7 @@ def manage_dev_hybrid_environment():
     compose_groups: Dict[str, List[str]] = {
         "Stateful Backend": ["postgres", "minio"],
         "Messaging": ["kafka", "kafka-ui", "redis"],
-        "Core Applications": ["mongodb", "main-node", "worker-node", "wolfram-kernel"],
+        "Core Applications": ["mongodb", "hexagon", "wolfram-kernel"],
         "Scheduling App": ["scheduling-model"],
         # CronJobs typically aren't in compose; skip News Ingestion Job or add here if containerized
     }
@@ -950,7 +952,7 @@ def manage_dev_hybrid_environment():
             choices=[
                 Choice("up_all", "Up: Infra + All App Containers"),
                 Choice("up_infra", "Up: Infra only (run apps locally)"),
-                Choice("up_all_except_main", "Up: All except main-node"),
+                Choice("up_all_except_hexagon", "Up: All except hexagon"),
                 Choice("up_select", "Up: Choose services"),
                 Choice("wolfram_activate", "Wolfram: open activation shell"),
                 Choice("down", "Down: stop all"),
@@ -976,15 +978,15 @@ def manage_dev_hybrid_environment():
                 subprocess.run(cmd, check=True)
                 CONSOLE.print("[green]Infra services are up. You can run app services locally now.[/green]")
                 _show_local_dev_hints()
-            elif action == "up_all_except_main":
-                # Bring up everything except main-node (so apps run inside compose but you can develop main locally)
+            elif action == "up_all_except_hexagon":
+                # Bring up everything except hexagon (so hexagon runs locally but other services in containers)
                 all_services = [
                     "mongodb", "minio", "postgres", "redis", "kafka", "kafka-ui",
-                    "scheduling-model", "wolfram-kernel", "worker-node"
+                    "scheduling-model", "wolfram-kernel"
                 ]
                 cmd = _compose_cmd(["up", "-d", "--build"] + all_services)
                 subprocess.run(cmd, check=True)
-                CONSOLE.print("[green]Infra + app services (except main-node) are up.[/green]")
+                CONSOLE.print("[green]Infra + app services (except hexagon) are up.[/green]")
                 _show_local_dev_hints()
             elif action == "wolfram_activate":
                 # Ensure wolfram-kernel is running
@@ -1022,7 +1024,7 @@ def manage_dev_hybrid_environment():
 
                 svc_list = [
                     "mongodb", "minio", "postgres", "redis", "kafka", "kafka-ui",
-                    "scheduling-model", "wolfram-kernel", "main-node", "worker-node",
+                    "scheduling-model", "wolfram-kernel", "hexagon",
                 ]
                 # Deduplicate and keep known ordering
                 preselected = [s for s in svc_list if s in set(preselected)]
@@ -1046,7 +1048,7 @@ def manage_dev_hybrid_environment():
                 # Interactive: let user pick a service to tail
                 svc_list = [
                     "mongodb", "minio", "postgres", "redis", "kafka", "kafka-ui",
-                    "scheduling-model", "wolfram-kernel", "main-node", "worker-node",
+                    "scheduling-model", "wolfram-kernel", "hexagon",
                 ]
                 service = inquirer.select(message="Select service:", choices=svc_list).execute()
                 if service:
@@ -1063,8 +1065,8 @@ def _show_local_dev_hints():
     text = Text()
     text.append("Run local services in separate terminals:\n", style="bold")
     text.append("- Frontend: cd frontend && npm run dev (port 9090)\n")
-    text.append("- Main API: cd main-node && copy .env.example -> .env then npm run start:dev\n")
-    text.append("- Worker:   cd worker-node && npm run start:dev\n")
+    text.append("- Hexagon:  cd hexagon && copy .env.example -> .env then npm run start:dev\n")
+    text.append("- Workers:  Individual workers can run locally or in containers\n")
     text.append("\nCompose endpoints:\n", style="bold")
     text.append("- MongoDB: mongodb://localhost:27017\n")
     text.append("- Kafka broker: localhost:9094 (external)\n")

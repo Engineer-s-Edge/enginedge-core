@@ -102,30 +102,44 @@ services:
     networks: [enginedge]
 
   # --- Optional app services (can run locally instead) ---
-  core:
+  hexagon:
     build:
-      context: ..
-    container_name: core
+      context: ../hexagon
+      dockerfile: Dockerfile
+    container_name: hexagon
     environment:
       NODE_ENV: development
       PORT: 3000
-      MONGODB_URI: mongodb://mongodb:27017/enginedge-core
-      # Kafka/Redis/MinIO endpoints used by the app
-      KAFKA_BROKERS: kafka:9092
+      MONGODB_URI: mongodb://mongodb:27017/enginedge-hexagon
       REDIS_URL: redis://enginedge-redis:6379/0
-      S3_ENDPOINT: http://minio:9000
-      S3_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-minioadmin}
-      S3_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
-      S3_FORCE_PATH_STYLE: "true"
-      WOLFRAM_LOCAL_URL: http://wolfram-kernel:5000
-      SCHEDULING_MODEL_URL: http://scheduling-model:8000
+      REDIS_KEY_PREFIX: hexagon:
+      KAFKA_BROKERS: kafka:9092
+      KAFKA_CLIENT_ID: enginedge-hexagon
+      KAFKA_GROUP_ID: hexagon-orchestrator
+      # Worker URLs
+      ASSISTANT_WORKER_URL: http://assistant-worker:3001
+      TOOLS_WORKER_URL: http://agent-tool-worker:3002
+      DATA_WORKER_URL: http://data-processing-worker:3003
+      INTERVIEW_WORKER_URL: http://interview-worker:3004
+      LATEX_WORKER_URL: http://latex-worker:3005
+      RESUME_WORKER_URL: http://resume-worker:3006
+      SCHEDULING_WORKER_URL: http://scheduling-worker:3000
+      IDENTITY_SERVICE_URL: http://identity-worker:3000
+      NEWS_WORKER_URL: http://news-worker:3007
+      # Worker discovery
+      WORKER_DISCOVERY_MODE: static
+      WORKER_HEALTH_CHECK_INTERVAL: 30000
+      WORKER_REQUEST_TIMEOUT: 60000
+      # Workflow configuration
+      WORKFLOW_MAX_DURATION: 300000
+      WORKFLOW_RETRY_ATTEMPTS: 3
+      WORKFLOW_RETRY_DELAY: 5000
     ports:
       - "${CONTROL_PLANE_PORT:-3000}:3000"
     depends_on:
       - mongodb
       - kafka
       - redis
-      - minio
     networks: [enginedge]
     extra_hosts:
       - "host.docker.internal:host-gateway"

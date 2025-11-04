@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: core
+  name: hexagon
   namespace: default
   labels:
     app: enginedge
-    component: core
+    component: hexagon
 spec:
   type: NodePort
   ports:
@@ -15,34 +15,34 @@ spec:
     name: http
   selector:
     app: enginedge
-    component: core
+    component: hexagon
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: core
+  name: hexagon
   namespace: default
   labels:
     app: enginedge
-    component: core
+    component: hexagon
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: enginedge
-      component: core
+      component: hexagon
   template:
     metadata:
       labels:
         app: enginedge
-        component: core
+        component: hexagon
     spec:
       volumes:
       - name: app-logs
         emptyDir: {}
       containers:
-      - name: core
-        image: core:latest
+      - name: hexagon
+        image: hexagon:latest
         imagePullPolicy: Never
         ports:
         - containerPort: 3000
@@ -56,41 +56,46 @@ spec:
             configMapKeyRef:
               name: core-config
               key: MONGODB_URI
-        - name: KAFKA_BROKERS
-          valueFrom:
-            configMapKeyRef:
-              name: core-config
-              key: KAFKA_BROKERS
         - name: REDIS_URL
           valueFrom:
             configMapKeyRef:
               name: core-config
               key: REDIS_URL
-        - name: S3_ENDPOINT
+        - name: REDIS_KEY_PREFIX
+          value: "hexagon:"
+        - name: KAFKA_BROKERS
           valueFrom:
             configMapKeyRef:
               name: core-config
-              key: S3_ENDPOINT
-        - name: S3_ACCESS_KEY_ID
-          valueFrom:
-            secretKeyRef:
-              name: minio-secret
-              key: access-key
-        - name: S3_SECRET_ACCESS_KEY
-          valueFrom:
-            secretKeyRef:
-              name: minio-secret
-              key: secret-key
-        - name: WOLFRAM_LOCAL_URL
-          valueFrom:
-            configMapKeyRef:
-              name: core-config
-              key: WOLFRAM_LOCAL_URL
-        - name: SCHEDULING_MODEL_URL
-          valueFrom:
-            configMapKeyRef:
-              name: core-config
-              key: SCHEDULING_MODEL_URL
+              key: KAFKA_BROKERS
+        - name: KAFKA_CLIENT_ID
+          value: "enginedge-hexagon"
+        - name: KAFKA_GROUP_ID
+          value: "hexagon-orchestrator"
+        - name: WORKER_DISCOVERY_MODE
+          value: "kubernetes"
+        - name: WORKER_HEALTH_CHECK_INTERVAL
+          value: "30000"
+        - name: WORKER_REQUEST_TIMEOUT
+          value: "60000"
+        - name: ASSISTANT_WORKER_URL
+          value: "http://assistant-worker:3001"
+        - name: TOOLS_WORKER_URL
+          value: "http://agent-tool-worker:3002"
+        - name: DATA_WORKER_URL
+          value: "http://data-processing-worker:3003"
+        - name: INTERVIEW_WORKER_URL
+          value: "http://interview-worker:3004"
+        - name: LATEX_WORKER_URL
+          value: "http://latex-worker:3005"
+        - name: RESUME_WORKER_URL
+          value: "http://resume-worker:3006"
+        - name: SCHEDULING_WORKER_URL
+          value: "http://scheduling-worker:3000"
+        - name: IDENTITY_SERVICE_URL
+          value: "http://identity-worker:3000"
+        - name: NEWS_WORKER_URL
+          value: "http://news-worker:3007"
         livenessProbe:
           httpGet:
             path: /api/health
@@ -105,11 +110,11 @@ spec:
           periodSeconds: 5
         resources:
           requests:
-            memory: "256Mi"
-            cpu: "100m"
-          limits:
             memory: "512Mi"
-            cpu: "500m"
+            cpu: "200m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
         volumeMounts:
         - name: app-logs
           mountPath: /app/logs
