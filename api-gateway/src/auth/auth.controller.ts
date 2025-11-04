@@ -1,5 +1,6 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, UseGuards, UnauthorizedException } from '@nestjs/common';
 import { IdentityClientService } from './identity-client.service';
+import { JwtAuthGuard } from './jwt.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -17,9 +18,14 @@ export class AuthController {
   }
 
   @Get('profile')
+  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
-  profile() {
-    return { status: 'ok' };
+  async profile(@Req() req: any) {
+    const userId = req.user?.sub || req.user?.userId;
+    if (!userId) {
+      throw new UnauthorizedException('User ID not found in token');
+    }
+    return this.identity.profile(userId);
   }
 
   @Post('token/refresh')

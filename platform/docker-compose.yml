@@ -12,6 +12,7 @@ volumes:
   mongo_data:
   minio_data:
   postgres_data:
+  redis_data:
   wolfram_state:
 
 services:
@@ -55,10 +56,18 @@ services:
   # --- Messaging / Cache ---
   redis:
     image: redis:7
-    container_name: scheduling-redis
+    container_name: enginedge-redis
     ports:
       - "${REDIS_PORT:-6379}:6379"
     networks: [enginedge]
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
 
   kafka:
     image: bitnami/kafka:3.7
@@ -103,7 +112,7 @@ services:
       MONGODB_URI: mongodb://mongodb:27017/enginedge-core
       # Kafka/Redis/MinIO endpoints used by the app
       KAFKA_BROKERS: kafka:9092
-      REDIS_URL: redis://scheduling-redis:6379/0
+      REDIS_URL: redis://enginedge-redis:6379/0
       S3_ENDPOINT: http://minio:9000
       S3_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-minioadmin}
       S3_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
@@ -130,10 +139,13 @@ services:
       NODE_ENV: development
       PORT: 3001
       KAFKA_BROKERS: kafka:9092
+      REDIS_URL: redis://enginedge-redis:6379/2
+      REDIS_KEY_PREFIX: assistant:
     ports:
       - "${LLM_WORKER_PORT:-3001}:3001"
     depends_on:
       - kafka
+      - redis
     networks: [enginedge]
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -146,10 +158,13 @@ services:
       NODE_ENV: development
       PORT: 3002
       KAFKA_BROKERS: kafka:9092
+      REDIS_URL: redis://enginedge-redis:6379/3
+      REDIS_KEY_PREFIX: agent-tool:
     ports:
       - "${AGENT_TOOL_WORKER_PORT:-3002}:3002"
     depends_on:
       - kafka
+      - redis
     networks: [enginedge]
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -162,10 +177,13 @@ services:
       NODE_ENV: development
       PORT: 3003
       KAFKA_BROKERS: kafka:9092
+      REDIS_URL: redis://enginedge-redis:6379/4
+      REDIS_KEY_PREFIX: data-processing:
     ports:
       - "${DATA_PROCESSING_WORKER_PORT:-3003}:3003"
     depends_on:
       - kafka
+      - redis
     networks: [enginedge]
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -178,10 +196,13 @@ services:
       NODE_ENV: development
       PORT: 3004
       KAFKA_BROKERS: kafka:9092
+      REDIS_URL: redis://enginedge-redis:6379/5
+      REDIS_KEY_PREFIX: interview:
     ports:
       - "${INTERVIEW_WORKER_PORT:-3004}:3004"
     depends_on:
       - kafka
+      - redis
     networks: [enginedge]
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -194,10 +215,13 @@ services:
       NODE_ENV: development
       PORT: 3005
       KAFKA_BROKERS: kafka:9092
+      REDIS_URL: redis://enginedge-redis:6379/6
+      REDIS_KEY_PREFIX: latex:
     ports:
       - "${LATEX_WORKER_PORT:-3005}:3005"
     depends_on:
       - kafka
+      - redis
     networks: [enginedge]
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -211,7 +235,8 @@ services:
       PORT: 3006
       KAFKA_BROKERS: kafka:9092
       MONGODB_URI: mongodb://mongodb:27017/resume-worker
-      REDIS_URL: redis://scheduling-redis:6379/1
+      REDIS_URL: redis://enginedge-redis:6379/7
+      REDIS_KEY_PREFIX: resume:
       RESUME_NLP_SERVICE_URL: http://resume-nlp-service:8001
     ports:
       - "${RESUME_WORKER_PORT:-3006}:3006"
@@ -247,10 +272,32 @@ services:
       NODE_ENV: development
       PORT: 3000
       MONGODB_URI: mongodb://mongodb:27017/identity-service
+      REDIS_URL: redis://enginedge-redis:6379/8
+      REDIS_KEY_PREFIX: identity:
     ports:
       - "${IDENTITY_WORKER_PORT:-3000}:3000"
     depends_on:
       - mongodb
+      - redis
+    networks: [enginedge]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  news-worker:
+    build:
+      context: ../../enginedge-workers/news-worker
+    container_name: news-worker
+    environment:
+      NODE_ENV: development
+      PORT: 3007
+      KAFKA_BROKERS: kafka:9092
+      REDIS_URL: redis://enginedge-redis:6379/9
+      REDIS_KEY_PREFIX: news:
+    ports:
+      - "${NEWS_WORKER_PORT:-3007}:3007"
+    depends_on:
+      - kafka
+      - redis
     networks: [enginedge]
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -261,7 +308,7 @@ services:
     container_name: scheduling-model
     environment:
       PORT: 8000
-      REDIS_URL: redis://scheduling-redis:6379/0
+      REDIS_URL: redis://enginedge-redis:6379/0
     ports:
       - "${SCHEDULING_MODEL_PORT:-8000}:8000"
     depends_on:
