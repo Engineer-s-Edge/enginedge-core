@@ -1,4 +1,9 @@
-import { Injectable, OnModuleInit, OnModuleDestroy, Inject } from '@nestjs/common';
+import {
+  Injectable,
+  OnModuleInit,
+  OnModuleDestroy,
+  Inject,
+} from '@nestjs/common';
 import { Registry, Counter, Gauge, Histogram } from 'prom-client';
 import { KubernetesObservabilityService } from '@application/services/kubernetes-observability.service';
 import { ConfigService } from '@nestjs/config';
@@ -8,21 +13,23 @@ import { ConfigService } from '@nestjs/config';
  * Tracks pod health, status, and worker type metrics
  */
 @Injectable()
-export class KubernetesObservabilityMetricsService implements OnModuleInit, OnModuleDestroy {
+export class KubernetesObservabilityMetricsService
+  implements OnModuleInit, OnModuleDestroy
+{
   private readonly registry: Registry;
-  
+
   // Metrics for pod health
   private readonly podHealthStatus: Gauge<string>;
   private readonly podPhaseStatus: Gauge<string>;
   private readonly podReadyStatus: Gauge<string>;
-  
+
   // Metrics for worker type aggregation
   private readonly workerTypeTotalPods: Gauge<string>;
   private readonly workerTypeReadyPods: Gauge<string>;
   private readonly workerTypeHealthyPods: Gauge<string>;
   private readonly workerTypeUnhealthyPods: Gauge<string>;
   private readonly workerTypeHealthStatus: Gauge<string>;
-  
+
   // Metrics for observability operations
   private readonly observabilityOperationsTotal: Counter<string>;
   private readonly observabilityOperationsDuration: Histogram<string>;
@@ -146,7 +153,10 @@ export class KubernetesObservabilityMetricsService implements OnModuleInit, OnMo
     // Schedule periodic updates
     this.updateInterval = setInterval(() => {
       this.updateMetrics().catch((error) => {
-        console.error('Failed to update Kubernetes observability metrics:', error);
+        console.error(
+          'Failed to update Kubernetes observability metrics:',
+          error,
+        );
       });
     }, interval);
   }
@@ -155,7 +165,10 @@ export class KubernetesObservabilityMetricsService implements OnModuleInit, OnMo
    * Update all metrics by querying Kubernetes API
    */
   private async updateMetrics(): Promise<void> {
-    const namespace = this.configService.get<string>('KUBERNETES_NAMESPACE', 'default');
+    const namespace = this.configService.get<string>(
+      'KUBERNETES_NAMESPACE',
+      'default',
+    );
 
     for (const workerType of this.workerTypes) {
       try {
@@ -165,9 +178,18 @@ export class KubernetesObservabilityMetricsService implements OnModuleInit, OnMo
         );
 
         // Update worker type aggregated metrics
-        this.workerTypeTotalPods.set({ worker_type: workerType, namespace }, health.totalPods);
-        this.workerTypeReadyPods.set({ worker_type: workerType, namespace }, health.readyPods);
-        this.workerTypeHealthyPods.set({ worker_type: workerType, namespace }, health.healthyPods);
+        this.workerTypeTotalPods.set(
+          { worker_type: workerType, namespace },
+          health.totalPods,
+        );
+        this.workerTypeReadyPods.set(
+          { worker_type: workerType, namespace },
+          health.readyPods,
+        );
+        this.workerTypeHealthyPods.set(
+          { worker_type: workerType, namespace },
+          health.healthyPods,
+        );
         this.workerTypeUnhealthyPods.set(
           { worker_type: workerType, namespace },
           health.unhealthyPods,
@@ -175,7 +197,11 @@ export class KubernetesObservabilityMetricsService implements OnModuleInit, OnMo
 
         // Update worker type health status (1 = healthy, 0.5 = degraded, 0 = unhealthy)
         const statusValue =
-          health.status === 'healthy' ? 1 : health.status === 'degraded' ? 0.5 : 0;
+          health.status === 'healthy'
+            ? 1
+            : health.status === 'degraded'
+              ? 0.5
+              : 0;
         this.workerTypeHealthStatus.set(
           { worker_type: workerType, namespace, status: health.status },
           statusValue,
@@ -187,17 +213,31 @@ export class KubernetesObservabilityMetricsService implements OnModuleInit, OnMo
           const isReady = pod.ready ? 1 : 0;
 
           this.podHealthStatus.set(
-            { pod_name: pod.name, namespace: pod.namespace, worker_type: workerType },
+            {
+              pod_name: pod.name,
+              namespace: pod.namespace,
+              worker_type: workerType,
+            },
             isHealthy,
           );
 
           this.podReadyStatus.set(
-            { pod_name: pod.name, namespace: pod.namespace, worker_type: workerType },
+            {
+              pod_name: pod.name,
+              namespace: pod.namespace,
+              worker_type: workerType,
+            },
             isReady,
           );
 
           // Set phase metric (1 for current phase, 0 for others)
-          const phases = ['Pending', 'Running', 'Succeeded', 'Failed', 'Unknown'];
+          const phases = [
+            'Pending',
+            'Running',
+            'Succeeded',
+            'Failed',
+            'Unknown',
+          ];
           for (const phase of phases) {
             this.podPhaseStatus.set(
               {
@@ -255,4 +295,3 @@ export class KubernetesObservabilityMetricsService implements OnModuleInit, OnMo
     }
   }
 }
-

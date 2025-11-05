@@ -4,7 +4,8 @@ import { jwtVerify, createLocalJWKSet } from 'jose';
 import axios from 'axios';
 
 async function getJwks() {
-  const baseUrl = process.env.IDENTITY_SERVICE_URL || 'http://identity-worker:3000';
+  const baseUrl =
+    process.env.IDENTITY_SERVICE_URL || 'http://identity-worker:3000';
   const { data } = await axios.get(`${baseUrl}/.well-known/jwks.json`);
   return createLocalJWKSet(data);
 }
@@ -32,23 +33,32 @@ export async function setupWsProxy(server: any) {
     const routes = [
       {
         prefixes: ['/api/assistants', '/assistants'],
-        base: process.env.ASSISTANT_WORKER_URL || 'http://assistant-worker:3001',
+        base:
+          process.env.ASSISTANT_WORKER_URL || 'http://assistant-worker:3001',
       },
       {
         prefixes: ['/api/interview', '/interview'],
-        base: process.env.INTERVIEW_WORKER_URL || 'http://interview-worker:3004',
+        base:
+          process.env.INTERVIEW_WORKER_URL || 'http://interview-worker:3004',
       },
       {
         prefixes: ['/api/data', '/data'],
-        base: process.env.DATA_WORKER_URL || 'http://data-processing-worker:3003',
+        base:
+          process.env.DATA_WORKER_URL || 'http://data-processing-worker:3003',
       },
       {
         prefixes: ['/api/resume', '/resume'],
         base: process.env.RESUME_WORKER_URL || 'http://resume-worker:3006',
       },
       {
-        prefixes: ['/api/scheduling', '/scheduling', '/api/calendar', '/calendar'],
-        base: process.env.SCHEDULING_WORKER_URL || 'http://scheduling-worker:3000',
+        prefixes: [
+          '/api/scheduling',
+          '/scheduling',
+          '/api/calendar',
+          '/calendar',
+        ],
+        base:
+          process.env.SCHEDULING_WORKER_URL || 'http://scheduling-worker:3000',
       },
       {
         prefixes: ['/api/latex', '/latex'],
@@ -78,15 +88,17 @@ export async function setupWsProxy(server: any) {
     wss.handleUpgrade(req, socket as any, head, (wsClient: WebSocket) => {
       const base = match.base.replace(/^http:\/\//, '');
       const targetUrl = `ws://${base}${url.replace(/^\/api/, '')}`;
-      const wsTarget = new WebSocket(targetUrl, { headers: pickHeaders(req.headers) });
+      const wsTarget = new WebSocket(targetUrl, {
+        headers: pickHeaders(req.headers),
+      });
 
       wsClient.on(
         'message',
-        (data) => wsTarget.readyState === WebSocket.OPEN && wsTarget.send(data)
+        (data) => wsTarget.readyState === WebSocket.OPEN && wsTarget.send(data),
       );
       wsTarget.on(
         'message',
-        (data) => wsClient.readyState === WebSocket.OPEN && wsClient.send(data)
+        (data) => wsClient.readyState === WebSocket.OPEN && wsClient.send(data),
       );
       wsTarget.on('close', () => wsClient.close());
       wsClient.on('close', () => wsTarget.close());
@@ -95,4 +107,3 @@ export async function setupWsProxy(server: any) {
     });
   });
 }
-

@@ -28,7 +28,9 @@ export class ResultAggregationService {
     }
   }
 
-  private aggregateResumeBuild(results: Record<string, unknown>): Record<string, unknown> {
+  private aggregateResumeBuild(
+    results: Record<string, unknown>,
+  ): Record<string, unknown> {
     const resume = results['resume'] || {};
     const assistant = results['assistant'] || {};
     const latex = results['latex'] || {};
@@ -41,7 +43,9 @@ export class ResultAggregationService {
     };
   }
 
-  private aggregateExpertResearch(results: Record<string, unknown>): Record<string, unknown> {
+  private aggregateExpertResearch(
+    results: Record<string, unknown>,
+  ): Record<string, unknown> {
     const agentTool = results['agent-tool'] || {};
     const dataProcessing = results['data-processing'] || {};
     const assistant = results['assistant'] || {};
@@ -54,4 +58,3 @@ export class ResultAggregationService {
     };
   }
 }
-

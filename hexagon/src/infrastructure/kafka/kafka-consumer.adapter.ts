@@ -1,10 +1,17 @@
-import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleInit,
+  OnModuleDestroy,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Kafka, Consumer, EachMessagePayload } from 'kafkajs';
 import { IKafkaConsumer } from '@application/ports/kafka-consumer.port';
 
 @Injectable()
-export class KafkaConsumerAdapter implements IKafkaConsumer, OnModuleInit, OnModuleDestroy {
+export class KafkaConsumerAdapter
+  implements IKafkaConsumer, OnModuleInit, OnModuleDestroy
+{
   private readonly logger = new Logger(KafkaConsumerAdapter.name);
   private kafka: Kafka;
   private consumer: Consumer;
@@ -13,9 +20,17 @@ export class KafkaConsumerAdapter implements IKafkaConsumer, OnModuleInit, OnMod
   private consumerRunning = false;
 
   constructor(private readonly configService: ConfigService) {
-    const brokers = (this.configService.get<string>('KAFKA_BROKERS') || 'localhost:9092').split(',');
-    const clientId = this.configService.get<string>('KAFKA_CLIENT_ID', 'enginedge-hexagon');
-    const groupId = this.configService.get<string>('KAFKA_GROUP_ID', 'hexagon-orchestrator');
+    const brokers = (
+      this.configService.get<string>('KAFKA_BROKERS') || 'localhost:9092'
+    ).split(',');
+    const clientId = this.configService.get<string>(
+      'KAFKA_CLIENT_ID',
+      'enginedge-hexagon',
+    );
+    const groupId = this.configService.get<string>(
+      'KAFKA_GROUP_ID',
+      'hexagon-orchestrator',
+    );
 
     this.kafka = new Kafka({
       clientId,
@@ -52,7 +67,10 @@ export class KafkaConsumerAdapter implements IKafkaConsumer, OnModuleInit, OnMod
     }
   }
 
-  async subscribe(topic: string, handler: (message: any) => Promise<void>): Promise<void> {
+  async subscribe(
+    topic: string,
+    handler: (message: any) => Promise<void>,
+  ): Promise<void> {
     if (this.subscriptions.has(topic)) {
       this.logger.warn(`Already subscribed to topic: ${topic}`);
       return;
@@ -73,7 +91,10 @@ export class KafkaConsumerAdapter implements IKafkaConsumer, OnModuleInit, OnMod
                 const message = JSON.parse(payload.message.value.toString());
                 await handler(message);
               } catch (error) {
-                this.logger.error(`Error processing message from topic ${payload.topic}`, error);
+                this.logger.error(
+                  `Error processing message from topic ${payload.topic}`,
+                  error,
+                );
               }
             }
           },
@@ -89,4 +110,3 @@ export class KafkaConsumerAdapter implements IKafkaConsumer, OnModuleInit, OnMod
 
   private consumerRunning = false;
 }
-

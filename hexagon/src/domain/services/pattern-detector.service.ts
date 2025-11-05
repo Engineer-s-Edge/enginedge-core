@@ -59,4 +59,3 @@ export class PatternDetector {
     return workerIndicators.some((indicator) => data[indicator]);
   }
 }
-

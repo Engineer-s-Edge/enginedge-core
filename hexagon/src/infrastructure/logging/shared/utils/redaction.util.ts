@@ -36,5 +36,3 @@ export function deepRedact(value: any): any {
 export function shouldRedact(key: string): boolean {
   return REDACT_KEYS.has(key.toLowerCase());
 }
-
-

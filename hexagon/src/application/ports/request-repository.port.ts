@@ -8,7 +8,6 @@ export interface IRequestRepository {
     id: string,
     status: string,
     result?: unknown,
-    error?: string
+    error?: string,
   ): Promise<void>;
 }
-

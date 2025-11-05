@@ -23,7 +23,7 @@ export class OAuthController {
     @Param('provider') provider: string,
     @Query('code') code: string,
     @Query('state') state?: string,
-    @Res() res?: Response,
+    @Res() res?: Response
   ) {
     const result = await this.identity.oauthCallback(provider, code, state);
     // If result contains redirect URL, redirect to it
@@ -39,4 +39,3 @@ export class OAuthController {
     return this.identity.oauthUnlink(provider, userId);
   }
 }
-

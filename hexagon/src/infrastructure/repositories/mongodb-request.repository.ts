@@ -25,7 +25,7 @@ interface RequestDocument {
 export class MongoDbRequestRepository implements IRequestRepository {
   constructor(
     @InjectModel('OrchestrationRequest')
-    private readonly requestModel: Model<RequestDocument>
+    private readonly requestModel: Model<RequestDocument>,
   ) {}
 
   async save(request: OrchestrationRequest): Promise<void> {
@@ -78,7 +78,7 @@ export class MongoDbRequestRepository implements IRequestRepository {
     id: string,
     status: string,
     result?: unknown,
-    error?: string
+    error?: string,
   ): Promise<void> {
     const update: any = { status, updatedAt: new Date() };
     if (result !== undefined) update.result = result;
@@ -94,7 +94,7 @@ export class MongoDbRequestRepository implements IRequestRepository {
       doc.id,
       doc.userId,
       doc.workflow as any,
-      doc.data
+      doc.data,
     );
     request.status = doc.status as any;
     request.createdAt = doc.createdAt;
@@ -111,7 +111,7 @@ export class MongoDbRequestRepository implements IRequestRepository {
         w.workerId,
         w.workerType,
         w.requestId,
-        w.maxRetries
+        w.maxRetries,
       );
       assignment.status = w.status;
       assignment.response = w.response;
@@ -125,4 +125,3 @@ export class MongoDbRequestRepository implements IRequestRepository {
     return request;
   }
 }
-

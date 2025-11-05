@@ -9,7 +9,7 @@ export class ProxyService {
     method: Method,
     body: any,
     headers: any,
-    query: any
+    query: any,
   ) {
     const url = `${baseUrl.replace(/\/$/, '')}/${path.replace(/^\//, '')}`;
     const { data } = await axios.request({
@@ -35,4 +35,3 @@ export class ProxyService {
     return picked;
   }
 }
-

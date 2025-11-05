@@ -1,4 +1,14 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, UseGuards, UnauthorizedException } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Req,
+  UseGuards,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { IdentityClientService } from './identity-client.service';
 import { JwtAuthGuard } from './jwt.guard';
 
@@ -40,4 +50,3 @@ export class AuthController {
     return this.identity.revoke(body.refreshToken);
   }
 }
-

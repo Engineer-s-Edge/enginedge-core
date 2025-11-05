@@ -42,7 +42,7 @@ describe('OrchestrationController', () => {
         'req-1',
         'user-1',
         WorkflowType.RESUME_BUILD,
-        { test: 'data' }
+        { test: 'data' },
       );
       mockRequest.correlationId = 'corr-1';
 
@@ -58,7 +58,7 @@ describe('OrchestrationController', () => {
           workflow: 'resume-build',
           data: { test: 'data' },
         },
-        req
+        req,
       );
 
       expect(result).toHaveProperty('requestId', 'req-1');
@@ -69,7 +69,7 @@ describe('OrchestrationController', () => {
           userId: 'user-1',
           workflow: 'resume-build',
           data: { test: 'data' },
-        })
+        }),
       );
     });
   });
@@ -80,7 +80,7 @@ describe('OrchestrationController', () => {
         'req-1',
         'user-1',
         WorkflowType.RESUME_BUILD,
-        { test: 'data' }
+        { test: 'data' },
       );
 
       requestRepository.findById.mockResolvedValue(mockRequest);
@@ -100,4 +100,3 @@ describe('OrchestrationController', () => {
     });
   });
 });
-

@@ -28,4 +28,3 @@ export function getErrorInfo(e: unknown): { message: string; stack?: string } {
     return { message: String(e) };
   }
 }
-

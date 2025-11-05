@@ -18,18 +18,26 @@ export class RequestContextService {
     return this.storage.run(store, callback);
   }
 
-  async runWithAsync<T>(store: RequestContextStore, callback: () => Promise<T>): Promise<T> {
+  async runWithAsync<T>(
+    store: RequestContextStore,
+    callback: () => Promise<T>,
+  ): Promise<T> {
     return this.storage.run(store, callback);
   }
 
-  set<K extends keyof RequestContextStore>(key: K, value: RequestContextStore[K]): void {
+  set<K extends keyof RequestContextStore>(
+    key: K,
+    value: RequestContextStore[K],
+  ): void {
     const store = this.storage.getStore();
     if (store) {
       store[key] = value as any;
     }
   }
 
-  get<K extends keyof RequestContextStore>(key: K): RequestContextStore[K] | undefined {
+  get<K extends keyof RequestContextStore>(
+    key: K,
+  ): RequestContextStore[K] | undefined {
     const store = this.storage.getStore();
     return store ? (store[key] as any) : undefined;
   }
@@ -58,5 +66,3 @@ export class RequestContextService {
     return this.get('workerType');
   }
 }
-
-

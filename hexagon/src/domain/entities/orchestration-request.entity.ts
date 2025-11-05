@@ -20,7 +20,7 @@ export class OrchestrationRequest {
     id: string,
     userId: string,
     workflow: WorkflowType,
-    data: Record<string, unknown>
+    data: Record<string, unknown>,
   ) {
     this.id = id;
     this.userId = userId;
@@ -32,7 +32,11 @@ export class OrchestrationRequest {
     this.updatedAt = new Date();
   }
 
-  updateStatus(status: RequestStatus | string, result?: unknown, error?: string): void {
+  updateStatus(
+    status: RequestStatus | string,
+    result?: unknown,
+    error?: string,
+  ): void {
     this.status = status as RequestStatus;
     this.updatedAt = new Date();
     if (result !== undefined) {
@@ -41,7 +45,12 @@ export class OrchestrationRequest {
     if (error) {
       this.error = error;
     }
-    if (status === RequestStatus.COMPLETED || status === RequestStatus.FAILED || status === 'completed' || status === 'failed') {
+    if (
+      status === RequestStatus.COMPLETED ||
+      status === RequestStatus.FAILED ||
+      status === 'completed' ||
+      status === 'failed'
+    ) {
       this.completedAt = new Date();
     }
   }
@@ -61,8 +70,7 @@ export class OrchestrationRequest {
   allWorkersComplete(): boolean {
     if (this.workers.length === 0) return false;
     return this.workers.every(
-      (w) => w.status === 'completed' || w.status === 'failed'
+      (w) => w.status === 'completed' || w.status === 'failed',
     );
   }
 }
-

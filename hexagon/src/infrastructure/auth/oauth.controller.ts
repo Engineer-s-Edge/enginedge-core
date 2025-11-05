@@ -35,8 +35,10 @@ export class OAuthController {
 
   @Delete(':provider/unlink')
   @HttpCode(HttpStatus.OK)
-  async unlink(@Param('provider') provider: string, @Query('userId') userId: string) {
+  async unlink(
+    @Param('provider') provider: string,
+    @Query('userId') userId: string,
+  ) {
     return this.identity.oauthUnlink(provider, userId);
   }
 }
-

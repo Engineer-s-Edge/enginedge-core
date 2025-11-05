@@ -5,7 +5,12 @@
  * Uses a concurrent worker pool (75% of CPU cores) for processing.
  */
 
-import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  OnModuleInit,
+  OnModuleDestroy,
+  Logger,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { IKafkaConsumer } from '@application/ports/kafka-consumer.port';
 import { WinstonLoggerAdapter } from './shared/winston-logger.adapter';
@@ -34,7 +39,9 @@ export class KafkaLogConsumerService implements OnModuleInit, OnModuleDestroy {
     // Use 75% of CPU cores, minimum 1
     const cpuCount = os.cpus().length;
     this.workerPoolSize = Math.max(1, Math.floor(cpuCount * 0.75));
-    this.logger.log(`Initializing log consumer with ${this.workerPoolSize} workers (${cpuCount} CPU cores available)`);
+    this.logger.log(
+      `Initializing log consumer with ${this.workerPoolSize} workers (${cpuCount} CPU cores available)`,
+    );
   }
 
   async onModuleInit() {
@@ -55,9 +62,12 @@ export class KafkaLogConsumerService implements OnModuleInit, OnModuleDestroy {
 
     // Subscribe to all worker log topics
     // In production, you might want to discover topics dynamically
-    const workerTypes = this.configService.get<string>('LOG_WORKER_TYPES', 
-      'assistant-worker,agent-tool-worker,data-processing-worker,identity-worker,interview-worker,latex-worker,news-worker,resume-worker,scheduling-worker'
-    ).split(',');
+    const workerTypes = this.configService
+      .get<string>(
+        'LOG_WORKER_TYPES',
+        'assistant-worker,agent-tool-worker,data-processing-worker,identity-worker,interview-worker,latex-worker,news-worker,resume-worker,scheduling-worker',
+      )
+      .split(',');
 
     for (const workerType of workerTypes) {
       const topic = `enginedge.logs.worker.${workerType.trim()}`;
@@ -74,10 +84,10 @@ export class KafkaLogConsumerService implements OnModuleInit, OnModuleDestroy {
 
   private async stopConsuming() {
     this.running = false;
-    
+
     // Wait for all workers to finish
     await Promise.all(this.workers);
-    
+
     this.logger.log('Log consumer stopped');
   }
 
@@ -86,18 +96,20 @@ export class KafkaLogConsumerService implements OnModuleInit, OnModuleDestroy {
 
     while (this.running) {
       const item = this.processingQueue.shift();
-      
+
       if (item) {
         try {
           await this.writeLogToWinston(item.log);
           item.resolve();
         } catch (error) {
           this.logger.error(`Worker ${workerId} failed to process log`, error);
-          item.reject(error instanceof Error ? error : new Error(String(error)));
+          item.reject(
+            error instanceof Error ? error : new Error(String(error)),
+          );
         }
       } else {
         // No items in queue, wait a bit
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
       }
     }
 
@@ -162,4 +174,3 @@ export class KafkaLogConsumerService implements OnModuleInit, OnModuleDestroy {
     }
   }
 }
-

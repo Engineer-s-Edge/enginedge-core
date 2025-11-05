@@ -28,7 +28,7 @@ export interface LogContext {
             format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss.SSS' }),
             format.errors({ stack: true }),
             format.splat(),
-            format.json()
+            format.json(),
           ),
           defaultMeta: {
             service: 'hexagon',
@@ -36,15 +36,20 @@ export interface LogContext {
           },
           transports: [
             new transports.Console({
-              format: nodeEnv === 'development'
-                ? format.combine(
-                    format.colorize(),
-                    format.printf(({ timestamp, level, message, ...meta }) => {
-                      const metaStr = Object.keys(meta).length ? JSON.stringify(meta, null, 2) : '';
-                      return `${timestamp} [${level}]: ${message} ${metaStr}`;
-                    })
-                  )
-                : format.json(),
+              format:
+                nodeEnv === 'development'
+                  ? format.combine(
+                      format.colorize(),
+                      format.printf(
+                        ({ timestamp, level, message, ...meta }) => {
+                          const metaStr = Object.keys(meta).length
+                            ? JSON.stringify(meta, null, 2)
+                            : '';
+                          return `${timestamp} [${level}]: ${message} ${metaStr}`;
+                        },
+                      ),
+                    )
+                  : format.json(),
             }),
           ],
         });
@@ -59,7 +64,10 @@ export interface LogContext {
 export class LoggerModule {}
 
 export class HexagonLogger {
-  constructor(private readonly logger: Logger, private context: LogContext = {}) {}
+  constructor(
+    private readonly logger: Logger,
+    private context: LogContext = {},
+  ) {}
 
   setContext(context: LogContext): void {
     this.context = { ...this.context, ...context };
@@ -69,7 +77,8 @@ export class HexagonLogger {
     return {
       ...this.context,
       ...meta,
-      correlationId: meta?.correlationId || this.context.correlationId || uuidv4(),
+      correlationId:
+        meta?.correlationId || this.context.correlationId || uuidv4(),
     };
   }
 
@@ -103,4 +112,3 @@ export class HexagonLogger {
     this.logger.info(message, this.enrichMeta(meta));
   }
 }
-

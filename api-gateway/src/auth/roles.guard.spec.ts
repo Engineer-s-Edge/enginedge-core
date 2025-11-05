@@ -75,9 +75,9 @@ describe('RolesGuard', () => {
 
   it('should handle multiple roles correctly', () => {
     jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(['admin']);
-    const context = createMockContext({ 
-      userId: '123', 
-      roles: ['user', 'admin', 'moderator'] 
+    const context = createMockContext({
+      userId: '123',
+      roles: ['user', 'admin', 'moderator'],
     });
 
     expect(guard.canActivate(context)).toBe(true);

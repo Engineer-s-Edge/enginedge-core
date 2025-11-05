@@ -1,4 +1,14 @@
-import { Controller, Get, Param, Patch, Post, Delete, Query, UseGuards, Body } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Delete,
+  Query,
+  UseGuards,
+  Body,
+} from '@nestjs/common';
 import { HttpCode, HttpStatus } from '@nestjs/common';
 import { IdentityClientService } from './identity-client.service';
 import { JwtAuthGuard } from './jwt.guard';
@@ -45,4 +55,3 @@ export class UsersController {
     return this.identity.deleteUser(id);
   }
 }
-

@@ -21,11 +21,19 @@ export class RequestContextService {
     return store ? (store[key] as any) : undefined;
   }
 
-  getStore(): RequestContextStore | undefined { return this.storage.getStore(); }
-  getRequestId(): string | undefined { return this.get('requestId'); }
-  getCorrelationId(): string | undefined { return this.get('correlationId'); }
-  getUserId(): string | undefined { return this.get('userId'); }
-  getServiceName(): string | undefined { return this.get('serviceName'); }
+  getStore(): RequestContextStore | undefined {
+    return this.storage.getStore();
+  }
+  getRequestId(): string | undefined {
+    return this.get('requestId');
+  }
+  getCorrelationId(): string | undefined {
+    return this.get('correlationId');
+  }
+  getUserId(): string | undefined {
+    return this.get('userId');
+  }
+  getServiceName(): string | undefined {
+    return this.get('serviceName');
+  }
 }
-
-

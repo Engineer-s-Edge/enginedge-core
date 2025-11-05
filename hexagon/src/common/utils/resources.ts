@@ -226,4 +226,3 @@ export class ResourceLoader {
 
 // Export a singleton instance for easy use
 export const resourceLoader = ResourceLoader.getInstance();
-

@@ -15,7 +15,9 @@ export interface InfraWorker {
 }
 
 @Injectable()
-export class KubernetesWorkerRegistryAdapter implements IWorkerRegistry, OnModuleInit {
+export class KubernetesWorkerRegistryAdapter
+  implements IWorkerRegistry, OnModuleInit
+{
   private readonly logger = new Logger(KubernetesWorkerRegistryAdapter.name);
   private k8sApi: CoreV1Api | null = null;
   private workers = new Map<string, InfraWorker[]>();
@@ -32,14 +34,19 @@ export class KubernetesWorkerRegistryAdapter implements IWorkerRegistry, OnModul
   ];
 
   constructor(private readonly configService: ConfigService) {
-    const discoveryMode = this.configService.get<string>('WORKER_DISCOVERY_MODE', 'kubernetes');
+    const discoveryMode = this.configService.get<string>(
+      'WORKER_DISCOVERY_MODE',
+      'kubernetes',
+    );
     if (discoveryMode === 'kubernetes') {
       try {
         const kc = new KubeConfig();
         kc.loadFromDefault();
         this.k8sApi = kc.makeApiClient(CoreV1Api);
       } catch (error) {
-        this.logger.warn('Kubernetes client not available, using static worker configuration');
+        this.logger.warn(
+          'Kubernetes client not available, using static worker configuration',
+        );
         this.k8sApi = null;
       }
     }
@@ -59,7 +66,7 @@ export class KubernetesWorkerRegistryAdapter implements IWorkerRegistry, OnModul
             undefined,
             undefined,
             undefined,
-            `app=${workerType}`
+            `app=${workerType}`,
           );
           const workers: InfraWorker[] = [];
           for (const service of services.body.items) {
@@ -88,7 +95,8 @@ export class KubernetesWorkerRegistryAdapter implements IWorkerRegistry, OnModul
     const staticWorkers: InfraWorker[] = [];
     this.workerTypes.forEach((type) => {
       const envKey = `${type.toUpperCase().replace(/-/g, '_')}_URL`;
-      const endpoint = this.configService.get<string>(envKey) || `http://${type}:3000`;
+      const endpoint =
+        this.configService.get<string>(envKey) || `http://${type}:3000`;
       staticWorkers.push({
         id: `${type}-static`,
         type,
@@ -102,22 +110,22 @@ export class KubernetesWorkerRegistryAdapter implements IWorkerRegistry, OnModul
   async getWorkers(type: string): Promise<Worker[]> {
     // Try to get workers by type directly
     let infraWorkers = this.workers.get(type) || [];
-    
+
     // If not found, try matching worker type patterns
     if (infraWorkers.length === 0) {
       for (const [key, workers] of this.workers.entries()) {
-        if (key.includes(type) || workers.some(w => w.type.includes(type))) {
+        if (key.includes(type) || workers.some((w) => w.type.includes(type))) {
           infraWorkers = workers;
           break;
         }
       }
     }
-    
+
     // If still not found, try static workers
     if (infraWorkers.length === 0) {
       infraWorkers = this.workers.get('static') || [];
     }
-    
+
     return infraWorkers.map((w) => this.mapToDomainWorker(w));
   }
 
@@ -129,7 +137,10 @@ export class KubernetesWorkerRegistryAdapter implements IWorkerRegistry, OnModul
     return all;
   }
 
-  async updateWorkerHealth(workerId: string, status: 'healthy' | 'unhealthy'): Promise<void> {
+  async updateWorkerHealth(
+    workerId: string,
+    status: 'healthy' | 'unhealthy',
+  ): Promise<void> {
     for (const workers of this.workers.values()) {
       const worker = workers.find((w) => w.id === workerId);
       if (worker) {
@@ -144,7 +155,7 @@ export class KubernetesWorkerRegistryAdapter implements IWorkerRegistry, OnModul
       infraWorker.id,
       infraWorker.type as any,
       infraWorker.endpoint,
-      []
+      [],
     );
     worker.updateHealth(infraWorker.status as any);
     if (infraWorker.lastHealthCheck) {
@@ -156,4 +167,3 @@ export class KubernetesWorkerRegistryAdapter implements IWorkerRegistry, OnModul
     return worker;
   }
 }
-

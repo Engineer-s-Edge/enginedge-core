@@ -1,11 +1,18 @@
-import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleInit,
+  OnModuleDestroy,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Kafka, Producer } from 'kafkajs';
 import { IKafkaProducer } from '@application/ports/kafka-producer.port';
 import { RequestContextService } from '../logging/shared/request-context.service';
 
 @Injectable()
-export class KafkaProducerAdapter implements IKafkaProducer, OnModuleInit, OnModuleDestroy {
+export class KafkaProducerAdapter
+  implements IKafkaProducer, OnModuleInit, OnModuleDestroy
+{
   private readonly logger = new Logger(KafkaProducerAdapter.name);
   private kafka: Kafka;
   private producer: Producer;
@@ -15,8 +22,13 @@ export class KafkaProducerAdapter implements IKafkaProducer, OnModuleInit, OnMod
     private readonly configService: ConfigService,
     private readonly requestContext?: RequestContextService,
   ) {
-    const brokers = (this.configService.get<string>('KAFKA_BROKERS') || 'localhost:9092').split(',');
-    const clientId = this.configService.get<string>('KAFKA_CLIENT_ID', 'enginedge-hexagon');
+    const brokers = (
+      this.configService.get<string>('KAFKA_BROKERS') || 'localhost:9092'
+    ).split(',');
+    const clientId = this.configService.get<string>(
+      'KAFKA_CLIENT_ID',
+      'enginedge-hexagon',
+    );
 
     this.kafka = new Kafka({
       clientId,
@@ -68,7 +80,10 @@ export class KafkaProducerAdapter implements IKafkaProducer, OnModuleInit, OnMod
               'x-request-id': (ctx.requestId as any) || '',
               'x-correlation-id': (ctx.correlationId as any) || '',
               'x-user-id': (ctx.userId as any) || '',
-              'x-service-name': (ctx.serviceName as any) || (process.env.SERVICE_NAME || 'hexagon'),
+              'x-service-name':
+                (ctx.serviceName as any) ||
+                process.env.SERVICE_NAME ||
+                'hexagon',
             },
           },
         ],
@@ -80,4 +95,3 @@ export class KafkaProducerAdapter implements IKafkaProducer, OnModuleInit, OnMod
     }
   }
 }
-

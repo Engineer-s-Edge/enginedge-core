@@ -15,7 +15,7 @@ describe('RequestRouter', () => {
         'req-1',
         'user-1',
         WorkflowType.RESUME_BUILD,
-        { experiences: [], jobDescription: 'test' }
+        { experiences: [], jobDescription: 'test' },
       );
 
       const assignments = router.route(request);
@@ -31,7 +31,7 @@ describe('RequestRouter', () => {
         'req-2',
         'user-1',
         WorkflowType.EXPERT_RESEARCH,
-        { query: 'test query' }
+        { query: 'test query' },
       );
 
       const assignments = router.route(request);
@@ -47,7 +47,7 @@ describe('RequestRouter', () => {
         'req-3',
         'user-1',
         WorkflowType.SINGLE_WORKER,
-        { prompt: 'test prompt' }
+        { prompt: 'test prompt' },
       );
 
       const assignments = router.route(request);
@@ -57,4 +57,3 @@ describe('RequestRouter', () => {
     });
   });
 });
-

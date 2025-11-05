@@ -41,13 +41,26 @@ export class KubernetesObservabilityController {
         tail,
       );
       const duration = Date.now() - startTime;
-      this.metricsService.recordOperation('getPodLogs', workerType, duration, true);
+      this.metricsService.recordOperation(
+        'getPodLogs',
+        workerType,
+        duration,
+        true,
+      );
       return { podName, logs };
     } catch (error: unknown) {
       const e = error instanceof Error ? error : new Error(String(error));
       const duration = Date.now() - startTime;
-      this.metricsService.recordOperation('getPodLogs', workerType, duration, false);
-      this.logger.error(`Failed to get logs for pod ${podName}: ${e.message}`, e.stack);
+      this.metricsService.recordOperation(
+        'getPodLogs',
+        workerType,
+        duration,
+        false,
+      );
+      this.logger.error(
+        `Failed to get logs for pod ${podName}: ${e.message}`,
+        e.stack,
+      );
       throw new HttpException(
         `Failed to get logs: ${e.message}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -67,15 +80,31 @@ export class KubernetesObservabilityController {
   ) {
     const startTime = Date.now();
     try {
-      const status = await this.observabilityService.getPodStatus(podName, namespace);
+      const status = await this.observabilityService.getPodStatus(
+        podName,
+        namespace,
+      );
       const duration = Date.now() - startTime;
-      this.metricsService.recordOperation('getPodStatus', workerType, duration, true);
+      this.metricsService.recordOperation(
+        'getPodStatus',
+        workerType,
+        duration,
+        true,
+      );
       return status;
     } catch (error: unknown) {
       const e = error instanceof Error ? error : new Error(String(error));
       const duration = Date.now() - startTime;
-      this.metricsService.recordOperation('getPodStatus', workerType, duration, false);
-      this.logger.error(`Failed to get status for pod ${podName}: ${e.message}`, e.stack);
+      this.metricsService.recordOperation(
+        'getPodStatus',
+        workerType,
+        duration,
+        false,
+      );
+      this.logger.error(
+        `Failed to get status for pod ${podName}: ${e.message}`,
+        e.stack,
+      );
       throw new HttpException(
         `Failed to get status: ${e.message}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -103,13 +132,26 @@ export class KubernetesObservabilityController {
         limitNum,
       );
       const duration = Date.now() - startTime;
-      this.metricsService.recordOperation('getPodEvents', workerType, duration, true);
+      this.metricsService.recordOperation(
+        'getPodEvents',
+        workerType,
+        duration,
+        true,
+      );
       return { podName, events };
     } catch (error: unknown) {
       const e = error instanceof Error ? error : new Error(String(error));
       const duration = Date.now() - startTime;
-      this.metricsService.recordOperation('getPodEvents', workerType, duration, false);
-      this.logger.error(`Failed to get events for pod ${podName}: ${e.message}`, e.stack);
+      this.metricsService.recordOperation(
+        'getPodEvents',
+        workerType,
+        duration,
+        false,
+      );
+      this.logger.error(
+        `Failed to get events for pod ${podName}: ${e.message}`,
+        e.stack,
+      );
       throw new HttpException(
         `Failed to get events: ${e.message}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -129,21 +171,38 @@ export class KubernetesObservabilityController {
   ) {
     const startTime = Date.now();
     try {
-      const metrics = await this.observabilityService.getPodMetrics(podName, namespace);
+      const metrics = await this.observabilityService.getPodMetrics(
+        podName,
+        namespace,
+      );
       const duration = Date.now() - startTime;
-      this.metricsService.recordOperation('getPodMetrics', workerType, duration, true);
+      this.metricsService.recordOperation(
+        'getPodMetrics',
+        workerType,
+        duration,
+        true,
+      );
       if (!metrics) {
         return {
           podName,
-          message: 'Metrics not available (metrics-server may not be installed)',
+          message:
+            'Metrics not available (metrics-server may not be installed)',
         };
       }
       return metrics;
     } catch (error: unknown) {
       const e = error instanceof Error ? error : new Error(String(error));
       const duration = Date.now() - startTime;
-      this.metricsService.recordOperation('getPodMetrics', workerType, duration, false);
-      this.logger.error(`Failed to get metrics for pod ${podName}: ${e.message}`, e.stack);
+      this.metricsService.recordOperation(
+        'getPodMetrics',
+        workerType,
+        duration,
+        false,
+      );
+      this.logger.error(
+        `Failed to get metrics for pod ${podName}: ${e.message}`,
+        e.stack,
+      );
       throw new HttpException(
         `Failed to get metrics: ${e.message}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -162,15 +221,31 @@ export class KubernetesObservabilityController {
   ) {
     const startTime = Date.now();
     try {
-      const pods = await this.observabilityService.getPodsByWorkerType(workerType, namespace);
+      const pods = await this.observabilityService.getPodsByWorkerType(
+        workerType,
+        namespace,
+      );
       const duration = Date.now() - startTime;
-      this.metricsService.recordOperation('getPodsByWorkerType', workerType, duration, true);
+      this.metricsService.recordOperation(
+        'getPodsByWorkerType',
+        workerType,
+        duration,
+        true,
+      );
       return { workerType, pods };
     } catch (error: unknown) {
       const e = error instanceof Error ? error : new Error(String(error));
       const duration = Date.now() - startTime;
-      this.metricsService.recordOperation('getPodsByWorkerType', workerType, duration, false);
-      this.logger.error(`Failed to get pods for worker type ${workerType}: ${e.message}`, e.stack);
+      this.metricsService.recordOperation(
+        'getPodsByWorkerType',
+        workerType,
+        duration,
+        false,
+      );
+      this.logger.error(
+        `Failed to get pods for worker type ${workerType}: ${e.message}`,
+        e.stack,
+      );
       throw new HttpException(
         `Failed to get pods: ${e.message}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -194,13 +269,26 @@ export class KubernetesObservabilityController {
         namespace,
       );
       const duration = Date.now() - startTime;
-      this.metricsService.recordOperation('getWorkerTypeHealth', workerType, duration, true);
+      this.metricsService.recordOperation(
+        'getWorkerTypeHealth',
+        workerType,
+        duration,
+        true,
+      );
       return health;
     } catch (error: unknown) {
       const e = error instanceof Error ? error : new Error(String(error));
       const duration = Date.now() - startTime;
-      this.metricsService.recordOperation('getWorkerTypeHealth', workerType, duration, false);
-      this.logger.error(`Failed to get health for worker type ${workerType}: ${e.message}`, e.stack);
+      this.metricsService.recordOperation(
+        'getWorkerTypeHealth',
+        workerType,
+        duration,
+        false,
+      );
+      this.logger.error(
+        `Failed to get health for worker type ${workerType}: ${e.message}`,
+        e.stack,
+      );
       throw new HttpException(
         `Failed to get health: ${e.message}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -208,4 +296,3 @@ export class KubernetesObservabilityController {
     }
   }
 }
-

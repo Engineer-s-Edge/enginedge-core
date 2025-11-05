@@ -28,7 +28,12 @@ export class KubernetesObservabilityService {
     container?: string,
     tailLines?: number,
   ): Promise<string> {
-    return this.observabilityPort.getPodLogs(podName, namespace, container, tailLines);
+    return this.observabilityPort.getPodLogs(
+      podName,
+      namespace,
+      container,
+      tailLines,
+    );
   }
 
   /**
@@ -52,14 +57,20 @@ export class KubernetesObservabilityService {
   /**
    * Get resource metrics for a pod
    */
-  async getPodMetrics(podName: string, namespace?: string): Promise<PodMetrics | null> {
+  async getPodMetrics(
+    podName: string,
+    namespace?: string,
+  ): Promise<PodMetrics | null> {
     return this.observabilityPort.getPodMetrics(podName, namespace);
   }
 
   /**
    * Get all pods for a worker type
    */
-  async getPodsByWorkerType(workerType: string, namespace?: string): Promise<PodInfo[]> {
+  async getPodsByWorkerType(
+    workerType: string,
+    namespace?: string,
+  ): Promise<PodInfo[]> {
     return this.observabilityPort.getPodsByWorkerType(workerType, namespace);
   }
 
@@ -73,4 +84,3 @@ export class KubernetesObservabilityService {
     return this.observabilityPort.getWorkerTypeHealth(workerType, namespace);
   }
 }
-

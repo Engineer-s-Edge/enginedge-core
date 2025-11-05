@@ -10,25 +10,29 @@ export class HandleWorkerResponseUseCase {
   constructor(
     @Inject('IRequestRepository')
     private readonly requestRepository: IRequestRepository,
-    private readonly coordinateMultiWorker: CoordinateMultiWorkerUseCase
+    private readonly coordinateMultiWorker: CoordinateMultiWorkerUseCase,
   ) {}
 
   async execute(
     requestId: string,
     assignmentId: string,
     response: unknown,
-    error?: string
+    error?: string,
   ): Promise<void> {
     const request = await this.requestRepository.findById(requestId);
     if (!request) {
-      this.logger.warn(`Request ${requestId} not found for assignment ${assignmentId}`);
+      this.logger.warn(
+        `Request ${requestId} not found for assignment ${assignmentId}`,
+      );
       return;
     }
 
     // Find and update assignment
     const assignment = request.workers.find((w) => w.id === assignmentId);
     if (!assignment) {
-      this.logger.warn(`Assignment ${assignmentId} not found in request ${requestId}`);
+      this.logger.warn(
+        `Assignment ${assignmentId} not found in request ${requestId}`,
+      );
       return;
     }
 
@@ -45,8 +49,7 @@ export class HandleWorkerResponseUseCase {
     await this.coordinateMultiWorker.execute(requestId);
 
     this.logger.log(
-      `Worker response processed for assignment ${assignmentId} in request ${requestId}`
+      `Worker response processed for assignment ${assignmentId} in request ${requestId}`,
     );
   }
 }
-

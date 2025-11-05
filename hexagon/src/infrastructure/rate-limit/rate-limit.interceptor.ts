@@ -22,16 +22,23 @@ export class RateLimitInterceptor implements NestInterceptor {
     const req = context.switchToHttp().getRequest();
     const accept = (req.headers['accept'] as string) || '';
     const isSse = accept.includes('text/event-stream');
-    const isWs = (req.headers['upgrade'] as string)?.toLowerCase() === 'websocket';
+    const isWs =
+      (req.headers['upgrade'] as string)?.toLowerCase() === 'websocket';
     if (isSse || isWs) {
       return next.handle();
     }
     const key = `${req.ip}:${req.method}:${req.route?.path || req.url}`;
 
     const now = Date.now();
-    const bucket = this.buckets.get(key) || { tokens: this.capacity, lastRefill: now };
+    const bucket = this.buckets.get(key) || {
+      tokens: this.capacity,
+      lastRefill: now,
+    };
     const elapsed = now - bucket.lastRefill;
-    bucket.tokens = Math.min(this.capacity, bucket.tokens + elapsed * this.refillPerMs);
+    bucket.tokens = Math.min(
+      this.capacity,
+      bucket.tokens + elapsed * this.refillPerMs,
+    );
     bucket.lastRefill = now;
 
     if (bucket.tokens < 1) {
@@ -42,4 +49,3 @@ export class RateLimitInterceptor implements NestInterceptor {
     return next.handle();
   }
 }
-

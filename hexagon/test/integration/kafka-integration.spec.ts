@@ -75,4 +75,3 @@ describe('Kafka Integration', () => {
     expect(receivedMessage).toBeDefined();
   }, 10000);
 });
-

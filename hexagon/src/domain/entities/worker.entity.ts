@@ -13,7 +13,7 @@ export class Worker {
     id: string,
     type: WorkerType,
     endpoint: string,
-    capabilities: string[] = []
+    capabilities: string[] = [],
   ) {
     this.id = id;
     this.type = type;
@@ -35,4 +35,3 @@ export class Worker {
     return this.status === WorkerStatus.HEALTHY;
   }
 }
-

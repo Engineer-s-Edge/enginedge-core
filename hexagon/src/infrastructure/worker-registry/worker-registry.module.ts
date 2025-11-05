@@ -42,4 +42,3 @@ import { MetricsModule } from '../metrics/metrics.module';
   ],
 })
 export class WorkerRegistryModule {}
-

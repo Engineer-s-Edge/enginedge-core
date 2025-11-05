@@ -9,13 +9,13 @@ export class WorkflowOrchestrationService {
 
   constructor(
     private readonly orchestrateRequest: OrchestrateRequestUseCase,
-    private readonly manageWorkflowState: ManageWorkflowStateUseCase
+    private readonly manageWorkflowState: ManageWorkflowStateUseCase,
   ) {}
 
   async orchestrateWorkflow(
     workflowType: WorkflowType,
     userId: string,
-    data: Record<string, unknown>
+    data: Record<string, unknown>,
   ): Promise<string> {
     const request = await this.orchestrateRequest.execute({
       userId,
@@ -25,12 +25,23 @@ export class WorkflowOrchestrationService {
 
     // Create workflow state
     const steps = this.getWorkflowSteps(workflowType);
-    await this.manageWorkflowState.createWorkflow(request.id, workflowType, steps);
+    await this.manageWorkflowState.createWorkflow(
+      request.id,
+      workflowType,
+      steps,
+    );
 
     return request.id;
   }
 
-  private getWorkflowSteps(workflowType: WorkflowType): Array<{ stepNumber: number; workerType: string; dependsOn: number[]; parallel?: boolean }> {
+  private getWorkflowSteps(
+    workflowType: WorkflowType,
+  ): Array<{
+    stepNumber: number;
+    workerType: string;
+    dependsOn: number[];
+    parallel?: boolean;
+  }> {
     switch (workflowType) {
       case WorkflowType.RESUME_BUILD:
         return [
@@ -40,7 +51,12 @@ export class WorkflowOrchestrationService {
         ];
       case WorkflowType.EXPERT_RESEARCH:
         return [
-          { stepNumber: 1, workerType: 'agent-tool', dependsOn: [], parallel: true },
+          {
+            stepNumber: 1,
+            workerType: 'agent-tool',
+            dependsOn: [],
+            parallel: true,
+          },
           { stepNumber: 2, workerType: 'data-processing', dependsOn: [1] },
           { stepNumber: 3, workerType: 'assistant', dependsOn: [2] },
         ];
@@ -49,4 +65,3 @@ export class WorkflowOrchestrationService {
     }
   }
 }
-

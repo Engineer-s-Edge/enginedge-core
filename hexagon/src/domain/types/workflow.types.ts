@@ -38,4 +38,3 @@ export enum WorkerAssignmentStatus {
   COMPLETED = 'completed',
   FAILED = 'failed',
 }
-

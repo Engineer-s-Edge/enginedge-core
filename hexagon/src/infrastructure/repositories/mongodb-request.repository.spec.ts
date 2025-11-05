@@ -34,7 +34,7 @@ describe('MongoDbRequestRepository', () => {
         'req-1',
         'user-1',
         WorkflowType.RESUME_BUILD,
-        { test: 'data' }
+        { test: 'data' },
       );
 
       mockModel.findOneAndUpdate.mockResolvedValue({});
@@ -48,7 +48,7 @@ describe('MongoDbRequestRepository', () => {
           userId: 'user-1',
           workflow: WorkflowType.RESUME_BUILD,
         }),
-        { upsert: true, new: true }
+        { upsert: true, new: true },
       );
     });
   });
@@ -101,9 +101,8 @@ describe('MongoDbRequestRepository', () => {
           result: { result: 'test' },
           completedAt: expect.any(Date),
         }),
-        expect.any(Object)
+        expect.any(Object),
       );
     });
   });
 });
-

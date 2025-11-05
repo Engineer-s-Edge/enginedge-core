@@ -11,7 +11,7 @@ describe('OrchestrationRequest', () => {
       'req-1',
       'user-1',
       WorkflowType.RESUME_BUILD,
-      { test: 'data' }
+      { test: 'data' },
     );
   });
 
@@ -35,8 +35,13 @@ describe('OrchestrationRequest', () => {
 
   describe('addWorkerAssignment', () => {
     it('should add worker assignment to workers array', () => {
-      const assignment = new WorkerAssignment('assign-1', 'worker-1', WorkerType.ASSISTANT, 'req-1');
-      
+      const assignment = new WorkerAssignment(
+        'assign-1',
+        'worker-1',
+        WorkerType.ASSISTANT,
+        'req-1',
+      );
+
       request.addWorkerAssignment(assignment);
 
       expect(request.workers.length).toBe(1);
@@ -62,12 +67,22 @@ describe('OrchestrationRequest', () => {
 
   describe('allWorkersComplete', () => {
     it('should return true when all workers are completed', () => {
-      const assignment1 = new WorkerAssignment('assign-1', 'worker-1', WorkerType.ASSISTANT, 'req-1');
-      const assignment2 = new WorkerAssignment('assign-2', 'worker-2', WorkerType.RESUME, 'req-1');
-      
+      const assignment1 = new WorkerAssignment(
+        'assign-1',
+        'worker-1',
+        WorkerType.ASSISTANT,
+        'req-1',
+      );
+      const assignment2 = new WorkerAssignment(
+        'assign-2',
+        'worker-2',
+        WorkerType.RESUME,
+        'req-1',
+      );
+
       assignment1.complete({ result: 'test1' });
       assignment2.complete({ result: 'test2' });
-      
+
       request.addWorkerAssignment(assignment1);
       request.addWorkerAssignment(assignment2);
 
@@ -75,12 +90,22 @@ describe('OrchestrationRequest', () => {
     });
 
     it('should return false when any worker is pending', () => {
-      const assignment1 = new WorkerAssignment('assign-1', 'worker-1', WorkerType.ASSISTANT, 'req-1');
-      const assignment2 = new WorkerAssignment('assign-2', 'worker-2', WorkerType.RESUME, 'req-1');
-      
+      const assignment1 = new WorkerAssignment(
+        'assign-1',
+        'worker-1',
+        WorkerType.ASSISTANT,
+        'req-1',
+      );
+      const assignment2 = new WorkerAssignment(
+        'assign-2',
+        'worker-2',
+        WorkerType.RESUME,
+        'req-1',
+      );
+
       assignment1.complete({ result: 'test1' });
       // assignment2 is still pending
-      
+
       request.addWorkerAssignment(assignment1);
       request.addWorkerAssignment(assignment2);
 
@@ -88,4 +113,3 @@ describe('OrchestrationRequest', () => {
     });
   });
 });
-

@@ -33,4 +33,3 @@ import { WorkerRegistryModule } from '../worker-registry/worker-registry.module'
   ],
 })
 export class OrchestrationModule {}
-

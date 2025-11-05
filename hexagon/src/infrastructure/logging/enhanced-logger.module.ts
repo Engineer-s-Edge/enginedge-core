@@ -32,4 +32,3 @@ import { ILoggerPort } from './shared/logger.port';
   ],
 })
 export class EnhancedLoggerModule {}
-

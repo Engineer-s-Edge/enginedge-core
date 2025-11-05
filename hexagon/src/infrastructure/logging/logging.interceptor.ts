@@ -22,7 +22,8 @@ export class LoggingInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest();
     const { method, url, body, query, params, headers } = request;
-    const correlationId = headers['x-correlation-id'] || headers['x-request-id'] || undefined;
+    const correlationId =
+      headers['x-correlation-id'] || headers['x-request-id'] || undefined;
     const userId = request.user?.sub || request.user?.userId || undefined;
 
     this.hexagonLogger.setContext({
@@ -61,7 +62,7 @@ export class LoggingInterceptor implements NestInterceptor {
           duration,
         });
         return throwError(() => error);
-      })
+      }),
     );
   }
 
@@ -69,7 +70,13 @@ export class LoggingInterceptor implements NestInterceptor {
     if (!body) return body;
     const sanitized = { ...body };
     // Remove sensitive fields
-    const sensitiveFields = ['password', 'token', 'secret', 'apiKey', 'authorization'];
+    const sensitiveFields = [
+      'password',
+      'token',
+      'secret',
+      'apiKey',
+      'authorization',
+    ];
     sensitiveFields.forEach((field) => {
       if (sanitized[field]) {
         sanitized[field] = '[REDACTED]';
@@ -78,4 +85,3 @@ export class LoggingInterceptor implements NestInterceptor {
     return sanitized;
   }
 }
-

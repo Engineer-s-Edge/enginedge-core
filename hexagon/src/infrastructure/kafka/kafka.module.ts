@@ -19,7 +19,11 @@ import { IKafkaConsumer } from '@application/ports/kafka-consumer.port';
     KafkaProducerAdapter,
     KafkaConsumerAdapter,
   ],
-  exports: ['IKafkaProducer', 'IKafkaConsumer', KafkaProducerAdapter, KafkaConsumerAdapter],
+  exports: [
+    'IKafkaProducer',
+    'IKafkaConsumer',
+    KafkaProducerAdapter,
+    KafkaConsumerAdapter,
+  ],
 })
 export class KafkaModule {}
-

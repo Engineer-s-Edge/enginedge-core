@@ -24,10 +24,7 @@ export interface IKubernetesObservabilityPort {
    * @param namespace Kubernetes namespace (optional, defaults to configured namespace)
    * @returns Pod status information
    */
-  getPodStatus(
-    podName: string,
-    namespace?: string,
-  ): Promise<PodStatus>;
+  getPodStatus(podName: string, namespace?: string): Promise<PodStatus>;
 
   /**
    * Get recent events for a pod
@@ -156,4 +153,3 @@ export interface WorkerTypeHealth {
   status: 'healthy' | 'degraded' | 'unhealthy';
   pods: PodInfo[];
 }
-

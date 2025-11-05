@@ -6,4 +6,3 @@ export interface IWorkflowRepository {
   findByRequestId(requestId: string): Promise<Workflow | null>;
   updateState(id: string, state: Record<string, unknown>): Promise<void>;
 }
-

@@ -23,7 +23,7 @@ const RequestSchema = new Schema(
     correlationId: { type: String },
     idempotencyKey: { type: String },
   },
-  { collection: 'orchestration_requests' }
+  { collection: 'orchestration_requests' },
 );
 
 const WorkflowSchema = new Schema(
@@ -36,7 +36,7 @@ const WorkflowSchema = new Schema(
     createdAt: { type: Date, required: true },
     updatedAt: { type: Date, required: true },
   },
-  { collection: 'workflows' }
+  { collection: 'workflows' },
 );
 
 @Module({
@@ -44,7 +44,9 @@ const WorkflowSchema = new Schema(
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
-        const uri = configService.get<string>('MONGODB_URI') || 'mongodb://localhost:27017/enginedge-hexagon';
+        const uri =
+          configService.get<string>('MONGODB_URI') ||
+          'mongodb://localhost:27017/enginedge-hexagon';
         return {
           uri,
         };

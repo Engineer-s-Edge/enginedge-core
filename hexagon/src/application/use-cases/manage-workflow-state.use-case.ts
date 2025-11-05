@@ -9,17 +9,25 @@ export class ManageWorkflowStateUseCase {
 
   constructor(
     @Inject('IWorkflowRepository')
-    private readonly workflowRepository: IWorkflowRepository
+    private readonly workflowRepository: IWorkflowRepository,
   ) {}
 
-  async createWorkflow(requestId: string, workflowType: string, steps: any[]): Promise<Workflow> {
+  async createWorkflow(
+    requestId: string,
+    workflowType: string,
+    steps: any[],
+  ): Promise<Workflow> {
     const workflow = new Workflow(requestId, workflowType as any, steps);
     await this.workflowRepository.save(workflow);
     this.logger.log(`Workflow created for request ${requestId}`);
     return workflow;
   }
 
-  async updateWorkflowState(workflowId: string, key: string, value: unknown): Promise<void> {
+  async updateWorkflowState(
+    workflowId: string,
+    key: string,
+    value: unknown,
+  ): Promise<void> {
     const workflow = await this.workflowRepository.findById(workflowId);
     if (!workflow) {
       throw new Error(`Workflow ${workflowId} not found`);
@@ -38,7 +46,8 @@ export class ManageWorkflowStateUseCase {
 
     workflow.advanceStep();
     await this.workflowRepository.save(workflow);
-    this.logger.debug(`Workflow ${workflowId} advanced to step ${workflow.currentStep}`);
+    this.logger.debug(
+      `Workflow ${workflowId} advanced to step ${workflow.currentStep}`,
+    );
   }
 }
-

@@ -10,7 +10,7 @@ export class OrchestrationService implements OnModuleInit {
   constructor(
     @Inject('IKafkaConsumer')
     private readonly kafkaConsumer: IKafkaConsumer,
-    private readonly handleWorkerResponse: HandleWorkerResponseUseCase
+    private readonly handleWorkerResponse: HandleWorkerResponseUseCase,
   ) {}
 
   async onModuleInit() {
@@ -49,14 +49,20 @@ export class OrchestrationService implements OnModuleInit {
     }
   }
 
-  private async handleWorkerMessage(topic: string, message: any): Promise<void> {
+  private async handleWorkerMessage(
+    topic: string,
+    message: any,
+  ): Promise<void> {
     try {
       // Extract request and assignment IDs from message
       const requestId = message.requestId || message.correlationId;
       const assignmentId = message.assignmentId || message.taskId;
 
       if (!requestId) {
-        this.logger.warn(`Message from topic ${topic} missing requestId`, message);
+        this.logger.warn(
+          `Message from topic ${topic} missing requestId`,
+          message,
+        );
         return;
       }
 
@@ -66,18 +72,20 @@ export class OrchestrationService implements OnModuleInit {
           requestId,
           assignmentId || 'unknown',
           null,
-          message.error || message.message || 'Unknown error'
+          message.error || message.message || 'Unknown error',
         );
       } else {
         await this.handleWorkerResponse.execute(
           requestId,
           assignmentId || 'unknown',
-          message.result || message.data || message
+          message.result || message.data || message,
         );
       }
     } catch (error) {
-      this.logger.error(`Error handling worker message from topic ${topic}`, error);
+      this.logger.error(
+        `Error handling worker message from topic ${topic}`,
+        error,
+      );
     }
   }
 }
-

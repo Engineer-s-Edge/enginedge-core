@@ -6,7 +6,7 @@ import { Roles } from '../auth/roles.decorator';
 
 /**
  * Datalake Proxy Controller - ADMIN ONLY
- * 
+ *
  * Routes requests to datalake services (MinIO, Trino, Airflow, Jupyter, Spark)
  * All endpoints require admin role to prevent public exposure of datalake UIs
  */

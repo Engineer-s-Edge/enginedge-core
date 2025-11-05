@@ -17,16 +17,31 @@ describe('ResultAggregationService', () => {
         'req-1',
         'user-1',
         WorkflowType.RESUME_BUILD,
-        {}
+        {},
       );
 
-      const resumeAssignment = new WorkerAssignment('assign-1', 'worker-1', WorkerType.RESUME, 'req-1');
+      const resumeAssignment = new WorkerAssignment(
+        'assign-1',
+        'worker-1',
+        WorkerType.RESUME,
+        'req-1',
+      );
       resumeAssignment.complete({ resume: 'resume data' });
 
-      const assistantAssignment = new WorkerAssignment('assign-2', 'worker-2', WorkerType.ASSISTANT, 'req-1');
+      const assistantAssignment = new WorkerAssignment(
+        'assign-2',
+        'worker-2',
+        WorkerType.ASSISTANT,
+        'req-1',
+      );
       assistantAssignment.complete({ tailored: 'tailored content' });
 
-      const latexAssignment = new WorkerAssignment('assign-3', 'worker-3', WorkerType.LATEX, 'req-1');
+      const latexAssignment = new WorkerAssignment(
+        'assign-3',
+        'worker-3',
+        WorkerType.LATEX,
+        'req-1',
+      );
       latexAssignment.complete({ pdfUrl: 'https://example.com/resume.pdf' });
 
       request.addWorkerAssignment(resumeAssignment);
@@ -46,16 +61,31 @@ describe('ResultAggregationService', () => {
         'req-2',
         'user-1',
         WorkflowType.EXPERT_RESEARCH,
-        {}
+        {},
       );
 
-      const agentToolAssignment = new WorkerAssignment('assign-1', 'worker-1', WorkerType.AGENT_TOOL, 'req-2');
+      const agentToolAssignment = new WorkerAssignment(
+        'assign-1',
+        'worker-1',
+        WorkerType.AGENT_TOOL,
+        'req-2',
+      );
       agentToolAssignment.complete({ sources: ['source1', 'source2'] });
 
-      const dataProcessingAssignment = new WorkerAssignment('assign-2', 'worker-2', WorkerType.DATA_PROCESSING, 'req-2');
+      const dataProcessingAssignment = new WorkerAssignment(
+        'assign-2',
+        'worker-2',
+        WorkerType.DATA_PROCESSING,
+        'req-2',
+      );
       dataProcessingAssignment.complete({ processed: 'processed data' });
 
-      const assistantAssignment = new WorkerAssignment('assign-3', 'worker-3', WorkerType.ASSISTANT, 'req-2');
+      const assistantAssignment = new WorkerAssignment(
+        'assign-3',
+        'worker-3',
+        WorkerType.ASSISTANT,
+        'req-2',
+      );
       assistantAssignment.complete({ synthesis: 'synthesized report' });
 
       request.addWorkerAssignment(agentToolAssignment);
@@ -75,10 +105,15 @@ describe('ResultAggregationService', () => {
         'req-3',
         'user-1',
         WorkflowType.RESUME_BUILD,
-        {}
+        {},
       );
 
-      const assignment = new WorkerAssignment('assign-1', 'worker-1', WorkerType.RESUME, 'req-3');
+      const assignment = new WorkerAssignment(
+        'assign-1',
+        'worker-1',
+        WorkerType.RESUME,
+        'req-3',
+      );
       assignment.fail('Worker error');
 
       request.addWorkerAssignment(assignment);
@@ -91,4 +126,3 @@ describe('ResultAggregationService', () => {
     });
   });
 });
-

@@ -69,10 +69,9 @@ describe('KafkaProducerAdapter', () => {
     it('should throw error when producer not connected', async () => {
       await adapter.onModuleDestroy();
 
-      await expect(
-        adapter.publish('test-topic', {})
-      ).rejects.toThrow('Kafka producer not connected');
+      await expect(adapter.publish('test-topic', {})).rejects.toThrow(
+        'Kafka producer not connected',
+      );
     });
   });
 });
-

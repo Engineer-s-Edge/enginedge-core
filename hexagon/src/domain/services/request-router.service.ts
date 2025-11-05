@@ -7,15 +7,15 @@ import { v4 as uuidv4 } from 'uuid';
 // Helper function to map worker type string to enum
 function mapWorkerType(type: string): WorkerType {
   const mapping: Record<string, WorkerType> = {
-    'assistant': WorkerType.ASSISTANT,
-    'resume': WorkerType.RESUME,
-    'latex': WorkerType.LATEX,
+    assistant: WorkerType.ASSISTANT,
+    resume: WorkerType.RESUME,
+    latex: WorkerType.LATEX,
     'agent-tool': WorkerType.AGENT_TOOL,
     'data-processing': WorkerType.DATA_PROCESSING,
-    'interview': WorkerType.INTERVIEW,
-    'scheduling': WorkerType.SCHEDULING,
-    'identity': WorkerType.IDENTITY,
-    'news': WorkerType.NEWS,
+    interview: WorkerType.INTERVIEW,
+    scheduling: WorkerType.SCHEDULING,
+    identity: WorkerType.IDENTITY,
+    news: WorkerType.NEWS,
   };
   return mapping[type] || WorkerType.ASSISTANT;
 }
@@ -29,9 +29,24 @@ export class RequestRouter {
       case WorkflowType.RESUME_BUILD:
         // Resume → Assistant → LaTeX
         assignments.push(
-          new WorkerAssignment(uuidv4(), 'resume-1', WorkerType.RESUME, request.id),
-          new WorkerAssignment(uuidv4(), 'assistant-1', WorkerType.ASSISTANT, request.id),
-          new WorkerAssignment(uuidv4(), 'latex-1', WorkerType.LATEX, request.id)
+          new WorkerAssignment(
+            uuidv4(),
+            'resume-1',
+            WorkerType.RESUME,
+            request.id,
+          ),
+          new WorkerAssignment(
+            uuidv4(),
+            'assistant-1',
+            WorkerType.ASSISTANT,
+            request.id,
+          ),
+          new WorkerAssignment(
+            uuidv4(),
+            'latex-1',
+            WorkerType.LATEX,
+            request.id,
+          ),
         );
         break;
 
@@ -42,21 +57,31 @@ export class RequestRouter {
             uuidv4(),
             'agent-tool-1',
             WorkerType.AGENT_TOOL,
-            request.id
+            request.id,
           ),
           new WorkerAssignment(
             uuidv4(),
             'data-processing-1',
             WorkerType.DATA_PROCESSING,
-            request.id
+            request.id,
           ),
-          new WorkerAssignment(uuidv4(), 'assistant-1', WorkerType.ASSISTANT, request.id)
+          new WorkerAssignment(
+            uuidv4(),
+            'assistant-1',
+            WorkerType.ASSISTANT,
+            request.id,
+          ),
         );
         break;
 
       case WorkflowType.CONVERSATION_CONTEXT:
         assignments.push(
-          new WorkerAssignment(uuidv4(), 'assistant-1', WorkerType.ASSISTANT, request.id)
+          new WorkerAssignment(
+            uuidv4(),
+            'assistant-1',
+            WorkerType.ASSISTANT,
+            request.id,
+          ),
         );
         break;
 
@@ -65,7 +90,12 @@ export class RequestRouter {
         const workerType = this.detectSingleWorkerType(request.data);
         if (workerType) {
           assignments.push(
-            new WorkerAssignment(uuidv4(), `${workerType}-1`, mapWorkerType(workerType), request.id)
+            new WorkerAssignment(
+              uuidv4(),
+              `${workerType}-1`,
+              mapWorkerType(workerType),
+              request.id,
+            ),
           );
         }
         break;
@@ -75,7 +105,12 @@ export class RequestRouter {
         const customWorkers = this.detectCustomWorkflow(request.data);
         customWorkers.forEach((workerTypeStr) => {
           assignments.push(
-            new WorkerAssignment(uuidv4(), `${workerTypeStr}-1`, mapWorkerType(workerTypeStr), request.id)
+            new WorkerAssignment(
+              uuidv4(),
+              `${workerTypeStr}-1`,
+              mapWorkerType(workerTypeStr),
+              request.id,
+            ),
           );
         });
     }
@@ -110,4 +145,3 @@ export class RequestRouter {
     return workers;
   }
 }
-

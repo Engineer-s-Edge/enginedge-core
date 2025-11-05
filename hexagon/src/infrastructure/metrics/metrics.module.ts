@@ -20,4 +20,3 @@ import { Registry, collectDefaultMetrics } from 'prom-client';
   exports: ['PrometheusRegistry'],
 })
 export class MetricsModule {}
-
