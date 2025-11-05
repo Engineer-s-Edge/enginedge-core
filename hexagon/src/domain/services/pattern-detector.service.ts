@@ -1,8 +1,6 @@
-import { Injectable } from '@nestjs/common';
 import { OrchestrationRequest } from '../entities/orchestration-request.entity';
 import { WorkflowType } from '../types/workflow.types';
 
-@Injectable()
 export class PatternDetector {
   detectPattern(request: OrchestrationRequest): WorkflowType {
     // If workflow is explicitly specified, use it

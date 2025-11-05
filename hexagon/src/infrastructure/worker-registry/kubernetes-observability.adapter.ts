@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { KubeConfig, CoreV1Api } from '@kubernetes/client-node';
 // Metrics API may not be available in all Kubernetes client versions
- 
+
 type MetricsV1beta1Api = any;
 import {
   IKubernetesObservabilityPort,

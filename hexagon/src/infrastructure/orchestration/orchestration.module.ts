@@ -8,9 +8,6 @@ import { HandleWorkerResponseUseCase } from '@application/use-cases/handle-worke
 import { WorkflowOrchestrationService } from '@application/services/workflow-orchestration.service';
 import { WorkerManagementService } from '@application/services/worker-management.service';
 import { ResultAggregationService } from '@application/services/result-aggregation.service';
-import { RequestRouter } from '@domain/services/request-router.service';
-import { PatternDetector } from '@domain/services/pattern-detector.service';
-import { WorkflowValidator } from '@domain/services/workflow-validator.service';
 import { KafkaModule } from '../kafka/kafka.module';
 import { DatabaseModule } from '../database/database.module';
 import { WorkerRegistryModule } from '../worker-registry/worker-registry.module';
@@ -27,9 +24,6 @@ import { WorkerRegistryModule } from '../worker-registry/worker-registry.module'
     WorkflowOrchestrationService,
     WorkerManagementService,
     ResultAggregationService,
-    RequestRouter,
-    PatternDetector,
-    WorkflowValidator,
   ],
 })
 export class OrchestrationModule {}

@@ -1,4 +1,3 @@
-import { Injectable } from '@nestjs/common';
 import { OrchestrationRequest } from '../entities/orchestration-request.entity';
 import { WorkerAssignment } from '../entities/worker-assignment.entity';
 import { WorkflowType, WorkerType } from '../types/workflow.types';
@@ -20,7 +19,6 @@ function mapWorkerType(type: string): WorkerType {
   return mapping[type] || WorkerType.ASSISTANT;
 }
 
-@Injectable()
 export class RequestRouter {
   route(request: OrchestrationRequest): WorkerAssignment[] {
     const assignments: WorkerAssignment[] = [];

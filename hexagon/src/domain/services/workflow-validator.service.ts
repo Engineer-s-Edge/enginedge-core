@@ -1,8 +1,6 @@
-import { Injectable } from '@nestjs/common';
 import { OrchestrationRequest } from '../entities/orchestration-request.entity';
 import { WorkflowType } from '../types/workflow.types';
 
-@Injectable()
 export class WorkflowValidator {
   validate(request: OrchestrationRequest): { valid: boolean; error?: string } {
     // Validate workflow type

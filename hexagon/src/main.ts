@@ -6,9 +6,7 @@ import {
 } from '@nestjs/platform-fastify';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import { Registry } from 'prom-client';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { setupWsProxy } from './infrastructure/ws/ws-proxy';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -26,15 +24,7 @@ async function bootstrap() {
     }),
   );
 
-  // Get the Prometheus registry from the MetricsModule
-  const registry = app.get<Registry>('PrometheusRegistry');
-  app
-    .getHttpAdapter()
-    .getInstance()
-    .get('/metrics', async (_req, reply) => {
-      reply.header('Content-Type', registry.contentType);
-      return reply.send(await registry.metrics());
-    });
+  // metrics endpoint is exposed via MetricsModule controller
 
   const config = new DocumentBuilder()
     .setTitle('EnginEdge Hexagon')
@@ -52,8 +42,7 @@ async function bootstrap() {
 
   const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
   await app.listen({ port, host: '0.0.0.0' });
-  const httpServer = app.getHttpAdapter().getHttpServer();
-  setupWsProxy(httpServer);
+  // ws-proxy is initialized by WsProxyModule on module init
 
   console.log(`Hexagon running on port ${port}`);
 }
