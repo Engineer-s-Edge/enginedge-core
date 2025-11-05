@@ -10,6 +10,8 @@ import { PatternDetector } from '@domain/services/pattern-detector.service';
 import { WorkflowValidator } from '@domain/services/workflow-validator.service';
 import { RequestRouter } from '@domain/services/request-router.service';
 import { WorkflowDefinitionService } from '@domain/services/workflow-definition.service';
+// Note: InfrastructureModule is @Global(), so its exports (including WorkerRegistryModule exports)
+// are available here. However, we don't import it directly to maintain hexagonal architecture boundaries.
 
 @Module({
   providers: [

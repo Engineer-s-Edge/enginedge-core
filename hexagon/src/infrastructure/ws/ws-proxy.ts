@@ -2,6 +2,7 @@ import { IncomingMessage } from 'http';
 import { WebSocketServer, WebSocket } from 'ws';
 import { jwtVerify, createLocalJWKSet } from 'jose';
 import axios from 'axios';
+import { Duplex } from 'stream';
 
 async function getJwks() {
   const baseUrl =
@@ -28,7 +29,7 @@ export async function setupWsProxy(server: any) {
   const wss = new WebSocketServer({ noServer: true });
   const jwks = await getJwks();
 
-  server.on('upgrade', async (req: IncomingMessage, socket, head) => {
+  server.on('upgrade', async (req: IncomingMessage, socket: Duplex, head: Buffer) => {
     const url = req.url || '';
     const routes = [
       {
@@ -94,11 +95,11 @@ export async function setupWsProxy(server: any) {
 
       wsClient.on(
         'message',
-        (data) => wsTarget.readyState === WebSocket.OPEN && wsTarget.send(data),
+        (data: Buffer) => wsTarget.readyState === WebSocket.OPEN && wsTarget.send(data),
       );
       wsTarget.on(
         'message',
-        (data) => wsClient.readyState === WebSocket.OPEN && wsClient.send(data),
+        (data: Buffer) => wsClient.readyState === WebSocket.OPEN && wsClient.send(data),
       );
       wsTarget.on('close', () => wsClient.close());
       wsClient.on('close', () => wsTarget.close());

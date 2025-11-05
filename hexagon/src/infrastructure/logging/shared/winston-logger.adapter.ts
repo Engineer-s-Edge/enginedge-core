@@ -55,7 +55,7 @@ export class WinstonLoggerAdapter
             'NODE_ENV',
             'development',
           ),
-          release: this.configService.get<string>('SENTRY_RELEASE', undefined),
+          release: this.configService.get<string>('SENTRY_RELEASE') || undefined,
           tracesSampleRate: Number(
             this.configService.get<string>('SENTRY_TRACES_SAMPLE_RATE', '0'),
           ),

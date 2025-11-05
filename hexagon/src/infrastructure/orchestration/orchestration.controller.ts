@@ -17,7 +17,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 export class OrchestrateRequestDto {
   workflow?: string;
-  data: Record<string, unknown>;
+  data!: Record<string, unknown>;
   correlationId?: string;
   idempotencyKey?: string;
 }

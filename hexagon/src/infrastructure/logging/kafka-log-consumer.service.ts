@@ -10,6 +10,7 @@ import {
   OnModuleInit,
   OnModuleDestroy,
   Logger,
+  Inject,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { IKafkaConsumer } from '@application/ports/kafka-consumer.port';
@@ -33,6 +34,7 @@ export class KafkaLogConsumerService implements OnModuleInit, OnModuleDestroy {
 
   constructor(
     private readonly configService: ConfigService,
+    @Inject('IKafkaConsumer')
     private readonly kafkaConsumer: IKafkaConsumer,
     private readonly winstonLogger: WinstonLoggerAdapter,
   ) {

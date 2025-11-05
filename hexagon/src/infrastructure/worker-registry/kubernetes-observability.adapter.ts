@@ -109,9 +109,9 @@ export class KubernetesObservabilityAdapter
         namespace: ns,
       });
 
-      const pod = res.body;
+      const pod = (res as any).body || res;
       const containerStatuses =
-        pod.status?.containerStatuses?.map((cs) => ({
+        pod.status?.containerStatuses?.map((cs: any) => ({
           name: cs.name,
           ready: cs.ready,
           restartCount: cs.restartCount,
@@ -127,14 +127,14 @@ export class KubernetesObservabilityAdapter
       // Determine if pod is ready (all containers ready)
       const ready =
         containerStatuses.length > 0 &&
-        containerStatuses.every((cs) => cs.ready);
+        containerStatuses.every((cs: any) => cs.ready);
 
       return {
         name: pod.metadata?.name || podName,
         namespace: pod.metadata?.namespace || ns,
         phase: pod.status?.phase || 'Unknown',
         ready,
-        conditions: pod.status?.conditions?.map((c) => ({
+        conditions: pod.status?.conditions?.map((c: any) => ({
           type: c.type,
           status: c.status,
           reason: c.reason,
@@ -173,7 +173,7 @@ export class KubernetesObservabilityAdapter
         limit,
       } as any);
 
-      const events = (res.body as any).items || [];
+      const events = ((res as any).body?.items || (res as any).items) || [];
       return events
         .map((event: any) => ({
           type: event.type || 'Normal',
@@ -282,12 +282,12 @@ export class KubernetesObservabilityAdapter
         labelSelector: `app=${workerType}`,
       });
 
-      const pods = res.body.items || [];
-      return pods.map((pod) => {
+      const pods = ((res as any).body?.items || (res as any).items) || [];
+      return pods.map((pod: any) => {
         const containerStatuses = pod.status?.containerStatuses || [];
         const ready =
           containerStatuses.length > 0 &&
-          containerStatuses.every((cs) => cs.ready);
+          containerStatuses.every((cs: any) => cs.ready);
 
         return {
           name: pod.metadata?.name || '',

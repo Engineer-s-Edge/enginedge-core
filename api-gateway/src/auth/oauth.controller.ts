@@ -1,7 +1,7 @@
 import { Controller, Get, Delete, Query, Param, Res } from '@nestjs/common';
 import { HttpCode, HttpStatus } from '@nestjs/common';
+import { FastifyReply } from 'fastify';
 import { IdentityClientService } from './identity-client.service';
-import { Response } from 'express';
 
 @Controller('oauth')
 export class OAuthController {
@@ -23,7 +23,7 @@ export class OAuthController {
     @Param('provider') provider: string,
     @Query('code') code: string,
     @Query('state') state?: string,
-    @Res() res?: Response
+    @Res() res?: FastifyReply
   ) {
     const result = await this.identity.oauthCallback(provider, code, state);
     // If result contains redirect URL, redirect to it

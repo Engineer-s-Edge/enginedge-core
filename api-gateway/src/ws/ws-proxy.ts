@@ -3,10 +3,50 @@ import { WebSocketServer, WebSocket } from 'ws';
 import { jwtVerify, createLocalJWKSet } from 'jose';
 import axios from 'axios';
 
-async function getJwks() {
-  const baseUrl = process.env.IDENTITY_SERVICE_URL || 'http://identity-worker:3000';
-  const { data } = await axios.get(`${baseUrl}/.well-known/jwks.json`);
-  return createLocalJWKSet(data);
+let jwksCache: ReturnType<typeof createLocalJWKSet> | null = null;
+let jwksFetchPromise: Promise<void> | null = null;
+
+async function getJwks(): Promise<ReturnType<typeof createLocalJWKSet>> {
+  // Return cached JWKS if available
+  if (jwksCache) {
+    return jwksCache;
+  }
+
+  // If a fetch is already in progress, wait for it
+  if (jwksFetchPromise) {
+    await jwksFetchPromise;
+    if (jwksCache) {
+      return jwksCache;
+    }
+  }
+
+  // Start a new fetch
+  jwksFetchPromise = (async () => {
+    try {
+      const baseUrl = process.env.IDENTITY_SERVICE_URL || 'http://identity-worker:3000';
+      const { data } = await axios.get(`${baseUrl}/.well-known/jwks.json`, {
+        timeout: 5000,
+      });
+      jwksCache = createLocalJWKSet(data);
+    } catch (error: any) {
+      console.warn(
+        `[WsProxy] Failed to fetch JWKS from identity service: ${error.message}. ` +
+          `WebSocket connections will be rejected until identity service is available.`
+      );
+      // Don't cache on error, allow retry on next connection attempt
+      throw error;
+    } finally {
+      jwksFetchPromise = null;
+    }
+  })();
+
+  await jwksFetchPromise;
+  
+  if (!jwksCache) {
+    throw new Error('Failed to fetch JWKS');
+  }
+
+  return jwksCache;
 }
 
 function pickHeaders(headers: any) {
@@ -25,7 +65,6 @@ function pickHeaders(headers: any) {
 
 export async function setupWsProxy(server: any) {
   const wss = new WebSocketServer({ noServer: true });
-  const jwks = await getJwks();
 
   server.on('upgrade', async (req: IncomingMessage, socket, head) => {
     const url = req.url || '';
@@ -68,8 +107,17 @@ export async function setupWsProxy(server: any) {
         ? auth.slice(7)
         : new URLSearchParams(url.split('?')[1] || '').get('token') || '';
       if (!token) throw new Error('missing token');
+      
+      // Lazy load JWKS - only fetch when first WebSocket connection is attempted
+      const jwks = await getJwks();
       await jwtVerify(token, jwks);
-    } catch {
+    } catch (error: any) {
+      // If JWKS fetch failed, reject connection
+      if (error.message?.includes('ENOTFOUND') || error.message?.includes('ECONNREFUSED')) {
+        console.warn(
+          `[WsProxy] Identity service unavailable, rejecting WebSocket connection to ${url}`
+        );
+      }
       socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
       socket.destroy();
       return;

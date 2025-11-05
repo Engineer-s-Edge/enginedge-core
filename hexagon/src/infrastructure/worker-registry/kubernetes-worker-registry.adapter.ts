@@ -62,14 +62,12 @@ export class KubernetesWorkerRegistryAdapter
     if (this.k8sApi) {
       try {
         for (const workerType of this.workerTypes) {
-          const services = await this.k8sApi.listServiceForAllNamespaces(
-            undefined,
-            undefined,
-            undefined,
-            `app=${workerType}`,
-          );
+          const services = await this.k8sApi.listServiceForAllNamespaces({
+            labelSelector: `app=${workerType}`,
+          });
           const workers: InfraWorker[] = [];
-          for (const service of services.body.items) {
+          const items = ((services as any).body?.items || (services as any).items) || [];
+          for (const service of items) {
             const port = service.spec?.ports?.[0]?.port || 3000;
             const endpoint = `http://${service.metadata?.name}:${port}`;
             workers.push({

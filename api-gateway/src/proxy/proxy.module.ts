@@ -8,8 +8,10 @@ import { DataProxyController } from './data.controller';
 import { LatexProxyController } from './latex.controller';
 import { ToolsProxyController } from './tools.controller';
 import { DatalakeProxyController } from './datalake.controller';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
+  imports: [AuthModule],
   controllers: [
     AssistantProxyController,
     SchedulingProxyController,
