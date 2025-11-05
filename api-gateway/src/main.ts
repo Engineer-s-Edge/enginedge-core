@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { AppModule } from './app.module';
+import { KafkaLoggerService } from './infrastructure/logging/kafka-logger.service';
 import { ValidationPipe } from '@nestjs/common';
 import { Registry, collectDefaultMetrics } from 'prom-client';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
@@ -12,6 +13,8 @@ async function bootstrap() {
     AppModule,
     new FastifyAdapter({ trustProxy: true })
   );
+  // Use Kafka-backed logger
+  app.useLogger(app.get(KafkaLoggerService));
 
   app.setGlobalPrefix('api');
   app.enableShutdownHooks();

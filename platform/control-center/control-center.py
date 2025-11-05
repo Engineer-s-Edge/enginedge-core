@@ -60,7 +60,8 @@ K8S_SERVICE_GROUPS = {
             "config/worker-config.yaml", "apps/llm-worker.yaml", "apps/agent-tool-worker.yaml",
             "apps/data-processing-worker.yaml", "apps/interview-worker.yaml",
             "apps/latex-worker.yaml", "apps/resume-worker.yaml",
-            "apps/wolfram-kernel.yaml"
+            "apps/wolfram-kernel.yaml", "apps/main-node.yaml",
+            "rbac/main-node-observability-rbac.yaml"
         ],
     },
     "Scheduling App": {

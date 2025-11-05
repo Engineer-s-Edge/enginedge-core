@@ -1,4 +1,6 @@
-import { Module } from '@nestjs/common';
+import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { KafkaLoggerService } from './infrastructure/logging/kafka-logger.service';
 import { HealthModule } from './health/health.module';
 import { AuthModule } from './auth/auth.module';
 import { RateLimitModule } from './rate-limit/rate-limit.module';
@@ -12,9 +14,11 @@ import { LatexProxyController } from './proxy/latex.controller';
 import { ToolsProxyController } from './proxy/tools.controller';
 import { DatalakeProxyController } from './proxy/datalake.controller';
 import { RolesGuard } from './auth/roles.guard';
+import { RequestContextService } from './infrastructure/logging/request-context.service';
+import { RequestContextMiddleware } from './infrastructure/logging/request-context.middleware';
 
 @Module({
-  imports: [HealthModule, AuthModule, RateLimitModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), HealthModule, AuthModule, RateLimitModule],
   controllers: [
     AssistantProxyController,
     SchedulingProxyController,
@@ -26,6 +30,10 @@ import { RolesGuard } from './auth/roles.guard';
     ToolsProxyController,
     DatalakeProxyController,
   ],
-  providers: [ProxyService, RolesGuard],
+  providers: [ProxyService, RolesGuard, KafkaLoggerService, RequestContextService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(RequestContextMiddleware).forRoutes('*');
+  }
+}

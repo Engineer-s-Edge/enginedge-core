@@ -16,6 +16,7 @@ resources:
 - config/scheduling-model-config.yaml
 - config/resume-worker-config.yaml
 - config/resume-nlp-service-config.yaml
+- rbac/main-node-observability-rbac.yaml
 
 patches:
 - path: emptydir-patch.yaml

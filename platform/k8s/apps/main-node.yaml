@@ -37,6 +37,8 @@ spec:
         app: enginedge
         component: main-node
     spec:
+      # ServiceAccount with read-only Kubernetes permissions for observability
+      serviceAccountName: main-node-observability
       volumes:
       - name: app-logs
         emptyDir: {}

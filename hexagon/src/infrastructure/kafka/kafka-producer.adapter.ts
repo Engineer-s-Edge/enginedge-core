@@ -2,6 +2,7 @@ import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/commo
 import { ConfigService } from '@nestjs/config';
 import { Kafka, Producer } from 'kafkajs';
 import { IKafkaProducer } from '@application/ports/kafka-producer.port';
+import { RequestContextService } from '../logging/shared/request-context.service';
 
 @Injectable()
 export class KafkaProducerAdapter implements IKafkaProducer, OnModuleInit, OnModuleDestroy {
@@ -10,7 +11,10 @@ export class KafkaProducerAdapter implements IKafkaProducer, OnModuleInit, OnMod
   private producer: Producer;
   private connected = false;
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly requestContext?: RequestContextService,
+  ) {
     const brokers = (this.configService.get<string>('KAFKA_BROKERS') || 'localhost:9092').split(',');
     const clientId = this.configService.get<string>('KAFKA_CLIENT_ID', 'enginedge-hexagon');
 
@@ -53,12 +57,19 @@ export class KafkaProducerAdapter implements IKafkaProducer, OnModuleInit, OnMod
     }
 
     try {
+      const ctx = this.requestContext?.getStore() || {};
       await this.producer.send({
         topic,
         messages: [
           {
             value: JSON.stringify(message),
             timestamp: Date.now().toString(),
+            headers: {
+              'x-request-id': (ctx.requestId as any) || '',
+              'x-correlation-id': (ctx.correlationId as any) || '',
+              'x-user-id': (ctx.userId as any) || '',
+              'x-service-name': (ctx.serviceName as any) || (process.env.SERVICE_NAME || 'hexagon'),
+            },
           },
         ],
       });

@@ -10,8 +10,11 @@ import { DatabaseModule } from './infrastructure/database/database.module';
 import { RedisModule } from './infrastructure/redis/redis.module';
 import { KafkaModule } from './infrastructure/kafka/kafka.module';
 import { WorkerRegistryModule } from './infrastructure/worker-registry/worker-registry.module';
-import { LoggerModule } from './infrastructure/logging/logger.module';
+import { EnhancedLoggerModule } from './infrastructure/logging/enhanced-logger.module';
 import { LoggingInterceptor } from './infrastructure/logging/logging.interceptor';
+import { MetricsModule } from './infrastructure/metrics/metrics.module';
+import { RequestContextMiddleware } from './infrastructure/logging/request-context.middleware';
+import { MiddlewareConsumer, NestModule } from '@nestjs/common';
 
 @Module({
   imports: [
@@ -19,7 +22,8 @@ import { LoggingInterceptor } from './infrastructure/logging/logging.interceptor
       isGlobal: true,
       envFilePath: ['.env.local', '.env'],
     }),
-    LoggerModule,
+    MetricsModule,
+    EnhancedLoggerModule,
     DatabaseModule,
     RedisModule,
     KafkaModule,
@@ -37,5 +41,9 @@ import { LoggingInterceptor } from './infrastructure/logging/logging.interceptor
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(RequestContextMiddleware).forRoutes('*');
+  }
+}
 

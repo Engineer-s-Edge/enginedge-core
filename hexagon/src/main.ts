@@ -3,7 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import { Registry, collectDefaultMetrics } from 'prom-client';
+import { Registry } from 'prom-client';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { setupWsProxy } from './infrastructure/ws/ws-proxy';
 
@@ -19,8 +19,8 @@ async function bootstrap() {
     new ValidationPipe({ whitelist: true, transform: true, forbidUnknownValues: true })
   );
 
-  const registry = new Registry();
-  collectDefaultMetrics({ register: registry });
+  // Get the Prometheus registry from the MetricsModule
+  const registry = app.get<Registry>('PrometheusRegistry');
   app
     .getHttpAdapter()
     .getInstance()

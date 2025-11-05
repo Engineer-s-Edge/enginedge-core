@@ -36,6 +36,8 @@ helm upgrade --install api-gateway C:\Users\chris\Engineering\EnginEdge\enginedg
 helm upgrade --install identity-worker C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\charts\identity-worker --namespace default
 
 # --- Deploying Core Applications ---
+# Apply RBAC first (before main-node deployment)
+kubectl apply -f C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\rbac/main-node-observability-rbac.yaml
 kubectl apply -f C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/agent-tool-worker.yaml
 kubectl apply -f C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/control-plane.yaml
 kubectl apply -f C:\Users\chris\Engineering\EnginEdge\enginedge-core\platform\k8s\apps/main-node.yaml
