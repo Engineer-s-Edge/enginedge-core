@@ -59,9 +59,15 @@ export class KafkaProducerAdapter
       this.logger.log('Kafka producer connected');
     } catch (error) {
       // Log connection failure but don't throw - allow app to start without Kafka
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      if (errorMessage.includes('ECONNREFUSED') || errorMessage.includes('Connection')) {
-        this.logger.warn('Kafka producer not available - will retry periodically');
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      if (
+        errorMessage.includes('ECONNREFUSED') ||
+        errorMessage.includes('Connection')
+      ) {
+        this.logger.warn(
+          'Kafka producer not available - will retry periodically',
+        );
         // Start periodic reconnection attempts
         this.startReconnectionAttempts();
       } else {
@@ -116,7 +122,9 @@ export class KafkaProducerAdapter
   async publish(topic: string, message: any): Promise<void> {
     if (!this.connected) {
       // Don't throw - just log warning if Kafka is not available
-      this.logger.warn(`Kafka producer not connected - message to ${topic} not sent`);
+      this.logger.warn(
+        `Kafka producer not connected - message to ${topic} not sent`,
+      );
       return;
     }
 

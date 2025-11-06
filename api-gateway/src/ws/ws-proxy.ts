@@ -41,7 +41,7 @@ async function getJwks(): Promise<ReturnType<typeof createLocalJWKSet>> {
   })();
 
   await jwksFetchPromise;
-  
+
   if (!jwksCache) {
     throw new Error('Failed to fetch JWKS');
   }
@@ -107,7 +107,7 @@ export async function setupWsProxy(server: any) {
         ? auth.slice(7)
         : new URLSearchParams(url.split('?')[1] || '').get('token') || '';
       if (!token) throw new Error('missing token');
-      
+
       // Lazy load JWKS - only fetch when first WebSocket connection is attempted
       const jwks = await getJwks();
       await jwtVerify(token, jwks);

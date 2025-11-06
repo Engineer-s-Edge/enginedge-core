@@ -2,7 +2,7 @@
  * Enhanced Logger Module
  *
  * Provides Winston logger with Kafka log consumption for centralized logging.
- * 
+ *
  * This module composes the base LoggerModule to provide the 'LOGGER' token
  * and additional enhanced logging capabilities.
  */

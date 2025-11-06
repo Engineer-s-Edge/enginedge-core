@@ -106,7 +106,12 @@ export class KafkaLoggerService implements LoggerService {
     }, 5000);
   }
 
-  private async emit(level: string, message: any, meta?: Record<string, unknown>, logToConsole = true) {
+  private async emit(
+    level: string,
+    message: any,
+    meta?: Record<string, unknown>,
+    logToConsole = true
+  ) {
     if (!this.should(level)) return;
     const ctx = this.requestContext.getStore() || {};
     const entry = {

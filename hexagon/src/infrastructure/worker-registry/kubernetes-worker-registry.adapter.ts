@@ -66,7 +66,8 @@ export class KubernetesWorkerRegistryAdapter
             labelSelector: `app=${workerType}`,
           });
           const workers: InfraWorker[] = [];
-          const items = ((services as any).body?.items || (services as any).items) || [];
+          const items =
+            (services as any).body?.items || (services as any).items || [];
           for (const service of items) {
             const port = service.spec?.ports?.[0]?.port || 3000;
             const endpoint = `http://${service.metadata?.name}:${port}`;

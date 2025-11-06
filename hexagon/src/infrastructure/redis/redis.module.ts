@@ -13,7 +13,7 @@ import Redis from 'ioredis';
           configService.get<string>('REDIS_URL') || 'redis://localhost:6379/0';
         const keyPrefix =
           configService.get<string>('REDIS_KEY_PREFIX') || 'hexagon:';
-        
+
         let reconnectInterval: NodeJS.Timeout | null = null;
         let isConnected = false;
         const reconnectIntervalMs = 5000; // Check every 5 seconds
@@ -46,7 +46,9 @@ import Redis from 'ioredis';
         // Handle disconnection
         redisClient.on('close', () => {
           if (isConnected) {
-            console.log('[Redis] Connection closed - will attempt to reconnect');
+            console.log(
+              '[Redis] Connection closed - will attempt to reconnect',
+            );
             isConnected = false;
             startReconnectAttempts();
           }
@@ -57,12 +59,15 @@ import Redis from 'ioredis';
           // Check for connection refused errors (Redis not available)
           const errorMessage = err.message || '';
           const errorString = String(err);
-          const isConnectionRefused = 
+          const isConnectionRefused =
             errorMessage.includes('ECONNREFUSED') ||
             errorString.includes('ECONNREFUSED') ||
-            (err instanceof AggregateError && err.errors?.some((e: any) => 
-              String(e).includes('ECONNREFUSED') || e.message?.includes('ECONNREFUSED')
-            ));
+            (err instanceof AggregateError &&
+              err.errors?.some(
+                (e: any) =>
+                  String(e).includes('ECONNREFUSED') ||
+                  e.message?.includes('ECONNREFUSED'),
+              ));
 
           if (isConnectionRefused) {
             // Connection refused - Redis is likely not running
@@ -77,7 +82,10 @@ import Redis from 'ioredis';
             return;
           }
           // Log other errors that might be important (but only once per error type)
-          console.warn('[Redis] Connection error:', errorMessage || errorString);
+          console.warn(
+            '[Redis] Connection error:',
+            errorMessage || errorString,
+          );
         });
 
         // Function to start periodic reconnection attempts

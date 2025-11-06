@@ -173,7 +173,7 @@ export class KubernetesObservabilityAdapter
         limit,
       } as any);
 
-      const events = ((res as any).body?.items || (res as any).items) || [];
+      const events = (res as any).body?.items || (res as any).items || [];
       return events
         .map((event: any) => ({
           type: event.type || 'Normal',
@@ -282,7 +282,7 @@ export class KubernetesObservabilityAdapter
         labelSelector: `app=${workerType}`,
       });
 
-      const pods = ((res as any).body?.items || (res as any).items) || [];
+      const pods = (res as any).body?.items || (res as any).items || [];
       return pods.map((pod: any) => {
         const containerStatuses = pod.status?.containerStatuses || [];
         const ready =

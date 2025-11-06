@@ -43,7 +43,10 @@ export class RateLimitInterceptor implements NestInterceptor {
     bucket.lastRefill = now;
 
     if (bucket.tokens < 1) {
-      throw new HttpException('Rate limit exceeded', HttpStatus.TOO_MANY_REQUESTS);
+      throw new HttpException(
+        'Rate limit exceeded',
+        HttpStatus.TOO_MANY_REQUESTS,
+      );
     }
     bucket.tokens -= 1;
     this.buckets.set(key, bucket);

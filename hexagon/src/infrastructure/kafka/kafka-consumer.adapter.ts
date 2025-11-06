@@ -63,9 +63,15 @@ export class KafkaConsumerAdapter
       this.logger.log('Kafka consumer connected');
     } catch (error) {
       // Log connection failure but don't throw - allow app to start without Kafka
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      if (errorMessage.includes('ECONNREFUSED') || errorMessage.includes('Connection')) {
-        this.logger.warn('Kafka consumer not available - will retry periodically');
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      if (
+        errorMessage.includes('ECONNREFUSED') ||
+        errorMessage.includes('Connection')
+      ) {
+        this.logger.warn(
+          'Kafka consumer not available - will retry periodically',
+        );
         // Start periodic reconnection attempts
         this.startReconnectionAttempts();
       } else {
