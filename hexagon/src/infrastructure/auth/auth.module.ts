@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { RolesGuard } from './roles.guard';
 import { AuthController } from './auth.controller';
 import { JwksController } from './jwks.controller';
 import { UsersController } from './users.controller';
@@ -13,7 +14,7 @@ import { JwtService } from './jwt.service';
     UsersController,
     OAuthController,
   ],
-  providers: [IdentityClientService, JwtService],
+  providers: [IdentityClientService, JwtService, RolesGuard],
   exports: [JwtService],
 })
 export class AuthModule {}

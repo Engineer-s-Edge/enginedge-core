@@ -46,6 +46,11 @@ export class IdentityClientService {
     return data;
   }
 
+  async listUsers() {
+    const { data } = await axios.get(`${this.baseUrl}/internal/users`);
+    return data;
+  }
+
   async updateUser(id: string, payload: any) {
     const { data } = await axios.patch(`${this.baseUrl}/internal/users/${id}`, payload);
     return data;
