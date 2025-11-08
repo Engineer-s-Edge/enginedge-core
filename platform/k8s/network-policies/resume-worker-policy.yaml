@@ -24,7 +24,7 @@ spec:
     - podSelector:
         matchLabels:
           app: enginedge
-          component: resume-nlp-service
+          component: spacy-service
     ports:
     - protocol: TCP
       port: 3006
@@ -56,7 +56,7 @@ spec:
     - podSelector:
         matchLabels:
           app: enginedge
-          component: resume-nlp-service
+          component: spacy-service
     ports:
     - protocol: TCP
       port: 8001

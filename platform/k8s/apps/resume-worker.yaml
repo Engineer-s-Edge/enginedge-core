@@ -80,7 +80,7 @@ spec:
         - name: REDIS_URL
           value: "redis://redis-master:6379/1"
         - name: RESUME_NLP_SERVICE_URL
-          value: "http://resume-nlp-service:8001"
+          value: "http://spacy-service:8001"
         - name: LATEX_WORKER_URL
           value: "http://latex-worker:3005"
         - name: ASSISTANT_WORKER_URL

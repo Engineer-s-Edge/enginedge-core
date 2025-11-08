@@ -8,14 +8,14 @@ resources:
 - apps/scheduling-worker.yaml
 - apps/scheduling-model.yaml
 - apps/resume-worker.yaml
-- apps/resume-nlp-service.yaml
+- apps/spacy-service.yaml
 - apps/mongodb.yaml
 - config/main-node-config.yaml
 # - config/worker-node-config.yaml
 - config/interview-worker-config.yaml
 - config/scheduling-model-config.yaml
 - config/resume-worker-config.yaml
-- config/resume-nlp-service-config.yaml
+- config/spacy-service-config.yaml
 - rbac/main-node-observability-rbac.yaml
 
 patches:

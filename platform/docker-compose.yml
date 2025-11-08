@@ -251,21 +251,21 @@ services:
       MONGODB_URI: mongodb://mongodb:27017/resume-worker
       REDIS_URL: redis://enginedge-redis:6379/7
       REDIS_KEY_PREFIX: resume:
-      RESUME_NLP_SERVICE_URL: http://resume-nlp-service:8001
+      RESUME_NLP_SERVICE_URL: http://spacy-service:8001
     ports:
       - "${RESUME_WORKER_PORT:-3006}:3006"
     depends_on:
       - kafka
       - mongodb
       - redis
-      - resume-nlp-service
+      - spacy-service
     networks: [enginedge]
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
   spacy-service:
     build:
-      context: ../../enginedge-workers/resume-nlp-service
+      context: ../../enginedge-workers/spacy-service
     container_name: spacy-service
     environment:
       PORT: 8001

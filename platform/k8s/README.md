@@ -10,7 +10,7 @@ This directory contains Kubernetes manifests for deploying the EnginEdge platfor
 k8s/
 ├── README.md                                    # This file
 ├── resume-worker-deployment.yaml                # Resume Worker deployment, service, HPA
-├── resume-nlp-service-deployment.yaml           # Resume NLP Service deployment, service, HPA
+├── spacy-service-deployment.yaml           # Resume NLP Service deployment, service, HPA
 ├── resume-services-configmap.yaml               # ConfigMaps for resume services
 ├── resume-services-secrets.yaml                 # Secrets for resume services
 └── resume-services-servicemonitor.yaml          # Prometheus ServiceMonitors
@@ -49,10 +49,10 @@ kubectl apply -f resume-services-configmap.yaml
 kubectl apply -f resume-services-secrets.yaml
 
 # Deploy Resume NLP Service (needs to be ready for resume-worker)
-kubectl apply -f resume-nlp-service-deployment.yaml
+kubectl apply -f spacy-service-deployment.yaml
 
 # Wait for NLP service to be ready
-kubectl wait --for=condition=ready pod -l app=resume-nlp-service -n enginedge --timeout=120s
+kubectl wait --for=condition=ready pod -l app=spacy-service -n enginedge --timeout=120s
 
 # Deploy Resume Worker
 kubectl apply -f resume-worker-deployment.yaml
@@ -66,7 +66,7 @@ kubectl apply -f resume-services-servicemonitor.yaml
 ```bash
 # Check pods
 kubectl get pods -n enginedge -l app=resume-worker
-kubectl get pods -n enginedge -l app=resume-nlp-service
+kubectl get pods -n enginedge -l app=spacy-service
 
 # Check services
 kubectl get svc -n enginedge | grep resume
@@ -76,7 +76,7 @@ kubectl get hpa -n enginedge | grep resume
 
 # Check logs
 kubectl logs -f deployment/resume-worker -n enginedge
-kubectl logs -f deployment/resume-nlp-service -n enginedge
+kubectl logs -f deployment/spacy-service -n enginedge
 ```
 
 ## Configuration
@@ -94,7 +94,7 @@ Edit `resume-services-configmap.yaml` and `resume-worker-deployment.yaml`:
 
 ### Resume NLP Service Environment Variables
 
-Edit `resume-services-configmap.yaml` and `resume-nlp-service-deployment.yaml`:
+Edit `resume-services-configmap.yaml` and `spacy-service-deployment.yaml`:
 
 - `PORT` - Service port (default: 8001)
 - `WORKERS` - Number of uvicorn workers (default: 4)
@@ -122,8 +122,8 @@ vi resume-services-secrets.yaml
 # Scale resume-worker
 kubectl scale deployment resume-worker --replicas=5 -n enginedge
 
-# Scale resume-nlp-service
-kubectl scale deployment resume-nlp-service --replicas=8 -n enginedge
+# Scale spacy-service
+kubectl scale deployment spacy-service --replicas=8 -n enginedge
 ```
 
 ### Auto-scaling (HPA)
@@ -148,7 +148,7 @@ kubectl get hpa -n enginedge
 
 # Describe HPA
 kubectl describe hpa resume-worker-hpa -n enginedge
-kubectl describe hpa resume-nlp-service-hpa -n enginedge
+kubectl describe hpa spacy-service-hpa -n enginedge
 ```
 
 ## Monitoring
@@ -183,7 +183,7 @@ scrape_configs:
         regex: resume-worker
     metrics_path: '/metrics'
 
-  - job_name: 'resume-nlp-service'
+  - job_name: 'spacy-service'
     kubernetes_sd_configs:
       - role: endpoints
         namespaces:
@@ -192,7 +192,7 @@ scrape_configs:
     relabel_configs:
       - source_labels: [__meta_kubernetes_service_label_app]
         action: keep
-        regex: resume-nlp-service
+        regex: spacy-service
     metrics_path: '/metrics'
 ```
 
@@ -218,16 +218,16 @@ kubectl exec -it deployment/resume-worker -n enginedge -- /bin/sh
 
 ```bash
 # Check logs
-kubectl logs -f deployment/resume-nlp-service -n enginedge
+kubectl logs -f deployment/spacy-service -n enginedge
 
 # Check if spaCy model loaded
-kubectl logs deployment/resume-nlp-service -n enginedge | grep "spaCy"
+kubectl logs deployment/spacy-service -n enginedge | grep "spaCy"
 
 # Check events
-kubectl get events -n enginedge --field-selector involvedObject.name=resume-nlp-service
+kubectl get events -n enginedge --field-selector involvedObject.name=spacy-service
 
 # Get into container
-kubectl exec -it deployment/resume-nlp-service -n enginedge -- /bin/sh
+kubectl exec -it deployment/spacy-service -n enginedge -- /bin/sh
 ```
 
 ### Common Issues
@@ -235,29 +235,29 @@ kubectl exec -it deployment/resume-nlp-service -n enginedge -- /bin/sh
 **Issue: Resume NLP Service fails to start**
 ```bash
 # Check if spaCy model is installed
-kubectl logs deployment/resume-nlp-service -n enginedge | grep "model"
+kubectl logs deployment/spacy-service -n enginedge | grep "model"
 
 # Rebuild Docker image with spaCy model
-cd enginedge-workers/resume-nlp-service
-docker build -t resume-nlp-service:latest .
+cd enginedge-workers/spacy-service
+docker build -t spacy-service:latest .
 ```
 
 **Issue: Resume Worker can't connect to NLP service**
 ```bash
 # Check service exists
-kubectl get svc resume-nlp-service -n enginedge
+kubectl get svc spacy-service -n enginedge
 
 # Test connectivity from resume-worker
-kubectl exec -it deployment/resume-worker -n enginedge -- curl http://resume-nlp-service:8001/health
+kubectl exec -it deployment/resume-worker -n enginedge -- curl http://spacy-service:8001/health
 ```
 
 **Issue: High memory usage**
 ```bash
 # Check resource usage
-kubectl top pods -n enginedge -l app=resume-nlp-service
+kubectl top pods -n enginedge -l app=spacy-service
 
 # Increase memory limits in deployment
-kubectl edit deployment resume-nlp-service -n enginedge
+kubectl edit deployment spacy-service -n enginedge
 ```
 
 ## Updates and Rollbacks
@@ -302,7 +302,7 @@ kubectl rollout undo deployment/resume-worker --to-revision=2 -n enginedge
 
 ### Total Cluster Requirements
 
-For default configuration (3 resume-worker + 4 resume-nlp-service):
+For default configuration (3 resume-worker + 4 spacy-service):
 - **Minimum**: ~6Gi memory, 6 CPU cores
 - **Recommended**: ~12Gi memory, 12 CPU cores (with headroom)
 
@@ -325,7 +325,7 @@ For default configuration (3 resume-worker + 4 resume-nlp-service):
 ## Additional Resources
 
 - [Resume Worker Documentation](../../enginedge-workers/resume-worker/documentation/)
-- [Resume NLP Service Documentation](../../enginedge-workers/resume-nlp-service/)
+- [Resume NLP Service Documentation](../../enginedge-workers/spacy-service/)
 - [Platform Docker Compose](../docker-compose.yml)
 - [Deployment Guide](../../enginedge-workers/resume-worker/documentation/DEPLOYMENT.md)
 
