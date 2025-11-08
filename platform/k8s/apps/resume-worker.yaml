@@ -79,7 +79,7 @@ spec:
           value: "mongodb://mongodb:27017/resume-worker"
         - name: REDIS_URL
           value: "redis://redis-master:6379/1"
-        - name: RESUME_NLP_SERVICE_URL
+        - name: SPACY_SERVICE_URL
           value: "http://spacy-service:8001"
         - name: LATEX_WORKER_URL
           value: "http://latex-worker:3005"

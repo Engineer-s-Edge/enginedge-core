@@ -90,7 +90,7 @@ Edit `resume-services-configmap.yaml` and `resume-worker-deployment.yaml`:
 - `MONGODB_URI` - MongoDB connection string
 - `KAFKA_BROKERS` - Kafka broker addresses
 - `REDIS_URL` - Redis connection string
-- `RESUME_NLP_SERVICE_URL` - NLP service URL
+- `SPACY_SERVICE_URL` - NLP service URL
 
 ### Resume NLP Service Environment Variables
 

@@ -251,7 +251,7 @@ services:
       MONGODB_URI: mongodb://mongodb:27017/resume-worker
       REDIS_URL: redis://enginedge-redis:6379/7
       REDIS_KEY_PREFIX: resume:
-      RESUME_NLP_SERVICE_URL: http://spacy-service:8001
+      SPACY_SERVICE_URL: http://spacy-service:8001
     ports:
       - "${RESUME_WORKER_PORT:-3006}:3006"
     depends_on:
