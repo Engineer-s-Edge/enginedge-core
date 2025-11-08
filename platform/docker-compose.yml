@@ -263,15 +263,15 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
-  resume-nlp-service:
+  spacy-service:
     build:
       context: ../../enginedge-workers/resume-nlp-service
-    container_name: resume-nlp-service
+    container_name: spacy-service
     environment:
       PORT: 8001
       KAFKA_BROKERS: kafka:9092
     ports:
-      - "${RESUME_NLP_SERVICE_PORT:-8001}:8001"
+      - "${SPACY_SERVICE_PORT:-8001}:8001"
     depends_on:
       - kafka
     networks: [enginedge]

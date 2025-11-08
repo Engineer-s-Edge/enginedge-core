@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: resume-nlp-service
+  name: spacy-service
   namespace: default
   labels:
     app: enginedge
-    component: resume-nlp-service
+    component: spacy-service
 spec:
   type: ClusterIP
   ports:
@@ -14,27 +14,27 @@ spec:
     name: http
   selector:
     app: enginedge
-    component: resume-nlp-service
+    component: spacy-service
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: resume-nlp-service
+  name: spacy-service
   namespace: default
   labels:
     app: enginedge
-    component: resume-nlp-service
+    component: spacy-service
 spec:
   replicas: 4
   selector:
     matchLabels:
       app: enginedge
-      component: resume-nlp-service
+      component: spacy-service
   template:
     metadata:
       labels:
         app: enginedge
-        component: resume-nlp-service
+        component: spacy-service
     spec:
       initContainers:
       - name: wait-for-kafka
@@ -49,8 +49,8 @@ spec:
           done
           echo "Kafka is ready!"
       containers:
-      - name: resume-nlp-service
-        image: resume-nlp-service:latest
+      - name: spacy-service
+        image: spacy-service:latest
         imagePullPolicy: Never
         ports:
         - containerPort: 8001
@@ -58,7 +58,7 @@ spec:
         - configMapRef:
             name: worker-config
         - configMapRef:
-            name: resume-nlp-service-config
+            name: spacy-service-config
         env:
         - name: PORT
           value: "8001"
