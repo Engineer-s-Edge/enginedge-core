@@ -50,18 +50,29 @@ K8S_SERVICE_GROUPS = {
     "Messaging": {
         "description": "Kafka (via Confluent) and Redis for real-time communication and caching.",
         "helm_releases": ["redis"],
-        "manifests": ["apps/zookeeper.yaml", "apps/kafka.yaml"],
+        "manifests": ["apps/zookeeper.yaml", "apps/kafka.yaml", "apps/kafka-topics-init.yaml"],
     },
     "Core Applications": {
         "description": "The main hexagon orchestrator and hexagonal worker services (hexagon, assistant-worker, agent-tool-worker, etc.)",
-        "helm_releases": ["api-gateway", "identity-worker"],
+        "helm_releases": [],
         "manifests": [
-            "config/core-config.yaml", "apps/control-plane.yaml",
-            "config/worker-config.yaml", "apps/llm-worker.yaml", "apps/agent-tool-worker.yaml",
-            "apps/data-processing-worker.yaml", "apps/interview-worker.yaml",
-            "apps/latex-worker.yaml", "apps/resume-worker.yaml",
-            "apps/wolfram-kernel.yaml", "apps/main-node.yaml",
-            "rbac/main-node-observability-rbac.yaml"
+            "config/core-config.yaml",
+            "config/worker-config.yaml",
+            "config/spacy-service-config.yaml",
+            "rbac/main-node-observability-rbac.yaml",
+            "apps/hexagon.yaml",
+            "apps/api-gateway.yaml",
+            "apps/identity-worker.yaml",
+            "apps/assistant-worker.yaml",
+            "apps/agent-tool-worker.yaml",
+            "apps/data-processing-worker.yaml",
+            "apps/interview-worker.yaml",
+            "apps/latex-worker.yaml",
+            "apps/resume-worker.yaml",
+            "apps/scheduling-worker.yaml",
+            "apps/spacy-service.yaml",
+            "apps/wolfram-kernel.yaml",
+            "apps/mongodb.yaml"
         ],
     },
     "Scheduling App": {
@@ -73,6 +84,17 @@ K8S_SERVICE_GROUPS = {
         "description": "The scheduled CronJob for ingesting news articles.",
         "helm_releases": [],
         "manifests": ["config/news-ingestion-config.yaml", "apps/news-ingestion-cronjob.yaml"],
+    },
+    "Observability": {
+        "description": "Prometheus, Grafana, and monitoring dashboards for system observability.",
+        "helm_releases": ["kube-prometheus-stack"],
+        "manifests": [
+            "observability/prometheus-config.yaml",
+            "observability/alerting-rules.yaml",
+            "observability/dashboards/api-gateway-dashboard.yaml",
+            "observability/dashboards/workers-overview-dashboard.yaml",
+            "observability/dashboards/datalake-overview-dashboard.yaml",
+        ],
     }
 }
 
@@ -137,7 +159,41 @@ def _helm_available() -> bool:
 
 
 def _kind_available() -> bool:
-    return shutil.which("kind") is not None
+    """Check if kind is available, refreshing PATH on Windows if needed."""
+    # First try standard check
+    if shutil.which("kind") is not None:
+        return True
+    
+    # On Windows, refresh PATH from user environment
+    if _is_windows():
+        try:
+            import winreg
+            # Get user PATH from registry
+            with winreg.OpenKey(winreg.HKEY_CURRENT_USER, "Environment") as key:
+                user_path = winreg.QueryValueEx(key, "PATH")[0]
+            # Get system PATH
+            with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"SYSTEM\CurrentControlSet\Control\Session Manager\Environment") as key:
+                system_path = winreg.QueryValueEx(key, "PATH")[0]
+            # Combine and update os.environ temporarily
+            combined_path = f"{user_path};{system_path}"
+            os.environ["PATH"] = combined_path
+            # Try again with refreshed PATH
+            if shutil.which("kind") is not None:
+                return True
+        except Exception:
+            pass
+        
+        # Fallback: Check known WinGet location
+        user_profile = os.environ.get("USERPROFILE", "")
+        if user_profile:
+            winget_kind_path = os.path.join(
+                user_profile,
+                r"AppData\Local\Microsoft\WinGet\Packages\Kubernetes.kind_Microsoft.Winget.Source_8wekyb3d8bbwe\kind.exe"
+            )
+            if os.path.exists(winget_kind_path):
+                return True
+    
+    return False
 
 
 def _docker_available() -> bool:
@@ -226,7 +282,20 @@ def _start_kind_cluster_interactive() -> bool:
 
     # Determine config path
     config_path = os.path.join(REPO_ROOT, "kind-config.yaml")
-    cmd = ["kind", "create", "cluster", "--name", "enginedge"]
+    # Get the full path to kind if needed
+    kind_cmd = shutil.which("kind") or "kind"
+    # On Windows, if still not found, try known WinGet location
+    if not kind_cmd or kind_cmd == "kind":
+        if _is_windows():
+            user_profile = os.environ.get("USERPROFILE", "")
+            if user_profile:
+                winget_kind_path = os.path.join(
+                    user_profile,
+                    r"AppData\Local\Microsoft\WinGet\Packages\Kubernetes.kind_Microsoft.Winget.Source_8wekyb3d8bbwe\kind.exe"
+                )
+                if os.path.exists(winget_kind_path):
+                    kind_cmd = winget_kind_path
+    cmd = [kind_cmd, "create", "cluster", "--name", "enginedge"]
     if os.path.exists(config_path):
         cmd.extend(["--config", config_path])
 
@@ -403,7 +472,15 @@ def _build_and_load_kind_images(selected_groups: List[str]):
                 subprocess.run(["docker", "image", "inspect", tag], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 CONSOLE.print(f"[green]{tag} already exists locally. Skipping build.[/green]")
                 if _kind_available():
-                    subprocess.run(["kind", "load", "docker-image", tag, "--name", "enginedge"], check=True)
+                    # Get the full path to kind if needed
+                    kind_cmd = shutil.which("kind") or "kind"
+                    # On Windows, if still not found, try known WinGet location
+                    if not kind_cmd or kind_cmd == "kind":
+                        if _is_windows():
+                            winget_kind_path = r"C:\Users\chris\AppData\Local\Microsoft\WinGet\Packages\Kubernetes.kind_Microsoft.Winget.Source_8wekyb3d8bbwe\kind.exe"
+                            if os.path.exists(winget_kind_path):
+                                kind_cmd = winget_kind_path
+                    subprocess.run([kind_cmd, "load", "docker-image", tag, "--name", "enginedge"], check=True)
                     CONSOLE.print(f"[green]Loaded {tag} into kind cluster.[/green]")
                 continue
             except subprocess.CalledProcessError:
@@ -430,7 +507,21 @@ def _build_and_load_kind_images(selected_groups: List[str]):
 
         if _kind_available():
             try:
-                subprocess.run(["kind", "load", "docker-image", tag, "--name", "enginedge"], check=True)
+                # Get the full path to kind if needed
+                kind_cmd = shutil.which("kind") or "kind"
+                # On Windows, if still not found, try known WinGet location
+                if not kind_cmd or kind_cmd == "kind":
+                    if _is_windows():
+                        user_profile = os.environ.get("USERPROFILE", "")
+                        if user_profile:
+                            winget_kind_path = os.path.join(
+                                user_profile,
+                                r"AppData\Local\Microsoft\WinGet\Packages\Kubernetes.kind_Microsoft.Winget.Source_8wekyb3d8bbwe\kind.exe"
+                            )
+                            if os.path.exists(winget_kind_path):
+                                kind_cmd = winget_kind_path
+                
+                subprocess.run([kind_cmd, "load", "docker-image", tag, "--name", "enginedge"], check=True)
                 CONSOLE.print(f"[green]Loaded {tag} into kind cluster.[/green]")
             except subprocess.CalledProcessError as e:
                 CONSOLE.print(f"[yellow]Failed to load {tag} into kind: {e}[/yellow]")
@@ -660,17 +751,25 @@ def generate_k8s_deploy_script(selected_groups: List[str]):
 
         # Define helm charts here to avoid repeating this static info
         helm_charts = {
-            "postgres-metastore": "bitnami/postgresql", "minio": "minio/minio",
-            "kafka": "bitnami/kafka", "redis": "bitnami/redis"
+            "postgres-metastore": "bitnami/postgresql", 
+            "minio": "minio/minio",
+            "kafka": "bitnami/kafka", 
+            "redis": "bitnami/redis",
+            "kube-prometheus-stack": "prometheus-community/kube-prometheus-stack"
         }
         helm_values = {
-            "postgres-metastore": "charts/postgres/values.yaml", "minio": "charts/minio/values.yaml",
-            "kafka": "charts/kafka/values.yaml", "redis": "charts/redis/values.yaml"
+            "postgres-metastore": "charts/postgres/values.yaml", 
+            "minio": "charts/minio/values.yaml",
+            "kafka": "charts/kafka/values.yaml", 
+            "redis": "charts/redis/values.yaml",
+            "kube-prometheus-stack": "observability/helm-values.yaml"
         }
 
         # Write commands in a logical order: manifests (secrets/configs), then helm, then apps
         secrets_and_configs = [m for m in manifests_to_apply if "secrets/" in m or "config/" in m]
+        rbac_manifests = [m for m in manifests_to_apply if "rbac/" in m]
         apps = [m for m in manifests_to_apply if "apps/" in m]
+        observability = [m for m in manifests_to_apply if "observability/" in m]
 
         if secrets_and_configs:
             f.write("# --- Applying Secrets and ConfigMaps ---\n")
@@ -678,10 +777,17 @@ def generate_k8s_deploy_script(selected_groups: List[str]):
                 f.write(f"kubectl apply -f {manifest}\n")
             f.write("\n")
 
+        if rbac_manifests:
+            f.write("# --- Applying RBAC Resources ---\n")
+            for manifest in sorted(rbac_manifests):
+                f.write(f"kubectl apply -f {manifest}\n")
+            f.write("\n")
+
         if helm_releases_to_install:
             f.write("# --- Installing Helm Charts for 3rd party services ---\n")
             f.write("helm repo add bitnami https://charts.bitnami.com/bitnami\n")
             f.write("helm repo add minio https://charts.min.io/\n")
+            f.write("helm repo add prometheus-community https://prometheus-community.github.io/helm-charts\n")
             f.write("helm repo update\n\n")
             for release in helm_releases_to_install:
                 chart = helm_charts.get(release)
@@ -689,6 +795,12 @@ def generate_k8s_deploy_script(selected_groups: List[str]):
                 if chart and values_rel:
                     values = os.path.join(K8S_DIR, values_rel)
                     f.write(f"helm install {release} {chart} -f {values} --namespace default\n")
+            f.write("\n")
+
+        if observability:
+            f.write("# --- Applying Observability Manifests ---\n")
+            for manifest in sorted(observability):
+                f.write(f"kubectl apply -f {manifest}\n")
             f.write("\n")
 
         if apps:
@@ -709,27 +821,39 @@ def generate_k8s_deploy_script(selected_groups: List[str]):
         f.write("try { kubectl cluster-info | Out-Null } catch { Write-Host 'Cluster offline'; exit 1 }\n")
         f.write("Write-Host 'Starting Kubernetes deployment...'\n\n")
 
-        f.write("# --- Applying Secrets and ConfigMaps ---\n")
-        for manifest in sorted([m for m in manifests_to_apply if "secrets/" in m or "config/" in m]):
-            f.write(f"kubectl apply -f '{manifest}'\n")
-        f.write("\n")
+        secrets_and_configs_ps = [m for m in manifests_to_apply if "secrets/" in m or "config/" in m]
+        if secrets_and_configs_ps:
+            f.write("# --- Applying Secrets and ConfigMaps ---\n")
+            for manifest in sorted(secrets_and_configs_ps):
+                f.write(f"kubectl apply -f '{manifest}'\n")
+            f.write("\n")
+
+        rbac_manifests_ps = [m for m in manifests_to_apply if "rbac/" in m]
+        if rbac_manifests_ps:
+            f.write("# --- Applying RBAC Resources ---\n")
+            for manifest in sorted(rbac_manifests_ps):
+                f.write(f"kubectl apply -f '{manifest}'\n")
+            f.write("\n")
 
         if helm_releases_to_install:
             f.write("# --- Installing Helm Charts for 3rd party services ---\n")
             f.write("helm repo add bitnami https://charts.bitnami.com/bitnami\n")
             f.write("helm repo add minio https://charts.min.io/\n")
+            f.write("helm repo add prometheus-community https://prometheus-community.github.io/helm-charts\n")
             f.write("helm repo update\n\n")
             helm_charts = {
                 "postgres-metastore": "bitnami/postgresql",
                 "minio": "minio/minio",
                 "kafka": "bitnami/kafka",
                 "redis": "bitnami/redis",
+                "kube-prometheus-stack": "prometheus-community/kube-prometheus-stack"
             }
             helm_values = {
                 "postgres-metastore": "charts/postgres/values.yaml",
                 "minio": "charts/minio/values.yaml",
                 "kafka": "charts/kafka/values.yaml",
                 "redis": "charts/redis/values.yaml",
+                "kube-prometheus-stack": "observability/helm-values.yaml"
             }
             for release in helm_releases_to_install:
                 chart = helm_charts.get(release)
@@ -737,6 +861,13 @@ def generate_k8s_deploy_script(selected_groups: List[str]):
                 if chart and values_rel:
                     values = os.path.join(K8S_DIR, values_rel)
                     f.write(f"helm install {release} {chart} -f '{values}' --namespace default\n")
+            f.write("\n")
+
+        observability_ps = [m for m in manifests_to_apply if "observability/" in m]
+        if observability_ps:
+            f.write("# --- Applying Observability Manifests ---\n")
+            for manifest in sorted(observability_ps):
+                f.write(f"kubectl apply -f '{manifest}'\n")
             f.write("\n")
 
         f.write("# --- Deploying Core Applications ---\n")
@@ -845,6 +976,65 @@ def generate_k8s_destroy_script(selected_groups: List[str], preserve_pvc: bool =
     script_filename_sh = f"destroy_k8s_{script_name_part}.sh"
     script_filename_ps1 = f"destroy_k8s_{script_name_part}.ps1"
 
+    def extract_pvc_names_from_manifests(manifest_paths: List[str]) -> List[str]:
+        """Extract PVC names from manifest files so we can exclude them when preserve_pvc is True."""
+        pvc_names = []
+        for path in manifest_paths:
+            if not os.path.exists(path):
+                continue
+            try:
+                with open(path, "r") as f:
+                    for doc in yaml.safe_load_all(f):
+                        if isinstance(doc, dict) and doc.get("kind") == "PersistentVolumeClaim":
+                            metadata = doc.get("metadata", {})
+                            name = metadata.get("name")
+                            if name:
+                                pvc_names.append(name)
+            except Exception:
+                continue
+        return pvc_names
+
+    # Extract PVC names that should be preserved
+    pvc_names_to_preserve = extract_pvc_names_from_manifests(manifests_to_delete) if preserve_pvc else []
+
+    def extract_resources_from_manifest(manifest_path: str) -> List[Tuple[str, str, str]]:
+        """Extract (kind, name, namespace) tuples from a manifest file."""
+        resources = []
+        if not os.path.exists(manifest_path):
+            return resources
+        try:
+            with open(manifest_path, "r") as f:
+                for doc in yaml.safe_load_all(f):
+                    if isinstance(doc, dict) and doc.get("kind") and doc.get("metadata"):
+                        kind = doc.get("kind")
+                        metadata = doc.get("metadata", {})
+                        name = metadata.get("name")
+                        namespace = metadata.get("namespace", "default")
+                        if name:
+                            resources.append((kind, name, namespace))
+        except Exception:
+            pass
+        return resources
+
+    def kind_to_resource_type(kind: str) -> str:
+        """Convert Kubernetes Kind to kubectl resource type (lowercase, typically plural)."""
+        # Mapping of Kind to kubectl resource type
+        kind_map = {
+            "PersistentVolumeClaim": "pvc",
+            "Deployment": "deployment",
+            "StatefulSet": "statefulset",
+            "Service": "service",
+            "ConfigMap": "configmap",
+            "Secret": "secret",
+            "CronJob": "cronjob",
+            "Job": "job",
+            "DaemonSet": "daemonset",
+            "ReplicaSet": "replicaset",
+            "Pod": "pod",
+        }
+        # Use mapping if available, otherwise lowercase the kind
+        return kind_map.get(kind, kind.lower())
+
     # Bash script (includes offline guard)
     with open(script_filename_sh, "w") as f:
         f.write("#!/bin/bash\n# Destroys selected application components from Kubernetes.\nset -e\n\n")
@@ -852,12 +1042,32 @@ def generate_k8s_destroy_script(selected_groups: List[str], preserve_pvc: bool =
         f.write(f"echo 'Starting Kubernetes teardown for: {', '.join(selected_groups)}...'\n\n")
 
         apps_and_configs = [m for m in manifests_to_delete if "apps/" in m or "config/" in m]
+        rbac_manifests = [m for m in manifests_to_delete if "rbac/" in m]
         secrets = [m for m in manifests_to_delete if "secrets/" in m]
 
-        if apps_and_configs:
-            f.write("# --- Deleting Applications and ConfigMaps ---\n")
-            for file in sorted(apps_and_configs, reverse=True):
-                f.write(f"kubectl delete -f {file} --ignore-not-found=true\n")
+        if apps_and_configs or rbac_manifests:
+            f.write("# --- Deleting Applications, ConfigMaps, and RBAC ---\n")
+            combined_manifests = sorted(apps_and_configs + rbac_manifests, reverse=True)
+            if preserve_pvc and pvc_names_to_preserve:
+                # When preserving PVCs, delete resources individually, excluding PVCs
+                f.write("# Note: PVCs are being preserved, deleting resources individually...\n")
+                for file in combined_manifests:
+                    resources = extract_resources_from_manifest(file)
+                    if resources:
+                        f.write(f"# Processing {file} (excluding PVCs)\n")
+                        for kind, name, namespace in resources:
+                            if kind == "PersistentVolumeClaim" and name in pvc_names_to_preserve:
+                                f.write(f"# Skipping PVC '{name}' (preserve_pvc=true)\n")
+                            else:
+                                resource_type = kind_to_resource_type(kind)
+                                f.write(f"kubectl delete {resource_type}/{name} -n {namespace} --ignore-not-found=true\n")
+                    else:
+                        # Fallback to file-based deletion if parsing fails
+                        f.write(f"kubectl delete -f {file} --ignore-not-found=true\n")
+            else:
+                # Normal deletion when not preserving PVCs
+                for file in combined_manifests:
+                    f.write(f"kubectl delete -f {file} --ignore-not-found=true\n")
             f.write("\n")
 
         if helm_releases_to_delete:
@@ -874,6 +1084,11 @@ def generate_k8s_destroy_script(selected_groups: List[str], preserve_pvc: bool =
             f.write("\n")
 
         if preserve_pvc:
+            f.write("# --- Preserving PersistentVolumeClaims ---\n")
+            if pvc_names_to_preserve:
+                f.write("echo 'Preserving PersistentVolumeClaims: " + ", ".join(pvc_names_to_preserve) + "'\n")
+                for pvc_name in pvc_names_to_preserve:
+                    f.write(f"# PVC '{pvc_name}' is preserved and will not be deleted\n")
             f.write("echo 'PersistentVolumeClaims preserved (wolfram-state and other PVCs retained).'\n")
         else:
             f.write("# --- Deleting PersistentVolumeClaims ---\n")
@@ -892,10 +1107,32 @@ def generate_k8s_destroy_script(selected_groups: List[str], preserve_pvc: bool =
         f.write("try { kubectl cluster-info | Out-Null } catch { Write-Host 'Cluster offline'; exit 1 }\n")
         f.write("Write-Host 'Starting Kubernetes teardown...'\n\n")
 
-        f.write("# --- Deleting Applications and ConfigMaps ---\n")
-        for file in sorted([m for m in manifests_to_delete if "apps/" in m or "config/" in m], reverse=True):
-            f.write(f"kubectl delete -f '{file}' --ignore-not-found=true\n")
-        f.write("\n")
+        apps_and_configs_ps = [m for m in manifests_to_delete if "apps/" in m or "config/" in m]
+        rbac_manifests_ps = [m for m in manifests_to_delete if "rbac/" in m]
+        if apps_and_configs_ps or rbac_manifests_ps:
+            f.write("# --- Deleting Applications, ConfigMaps, and RBAC ---\n")
+            combined_manifests_ps = sorted(apps_and_configs_ps + rbac_manifests_ps, reverse=True)
+            if preserve_pvc and pvc_names_to_preserve:
+                # When preserving PVCs, delete resources individually, excluding PVCs
+                f.write("# Note: PVCs are being preserved, deleting resources individually...\n")
+                for file in combined_manifests_ps:
+                    resources = extract_resources_from_manifest(file)
+                    if resources:
+                        f.write(f"# Processing {file} (excluding PVCs)\n")
+                        for kind, name, namespace in resources:
+                            if kind == "PersistentVolumeClaim" and name in pvc_names_to_preserve:
+                                f.write(f"# Skipping PVC '{name}' (preserve_pvc=true)\n")
+                            else:
+                                resource_type = kind_to_resource_type(kind)
+                                f.write(f"kubectl delete {resource_type}/{name} -n {namespace} --ignore-not-found=true\n")
+                    else:
+                        # Fallback to file-based deletion if parsing fails
+                        f.write(f"kubectl delete -f '{file}' --ignore-not-found=true\n")
+            else:
+                # Normal deletion when not preserving PVCs
+                for file in combined_manifests_ps:
+                    f.write(f"kubectl delete -f '{file}' --ignore-not-found=true\n")
+            f.write("\n")
 
         if helm_releases_to_delete:
             f.write("# --- Deleting Helm Releases ---\n")
@@ -911,6 +1148,11 @@ def generate_k8s_destroy_script(selected_groups: List[str], preserve_pvc: bool =
             f.write("\n")
 
         if preserve_pvc:
+            f.write("# --- Preserving PersistentVolumeClaims ---\n")
+            if pvc_names_to_preserve:
+                f.write("Write-Host 'Preserving PersistentVolumeClaims: " + ", ".join(pvc_names_to_preserve) + "'\n")
+                for pvc_name in pvc_names_to_preserve:
+                    f.write(f"# PVC '{pvc_name}' is preserved and will not be deleted\n")
             f.write("Write-Host 'PersistentVolumeClaims preserved (wolfram-state and other PVCs retained).'\n")
         else:
             f.write("# --- Deleting PersistentVolumeClaims ---\n")
@@ -1291,7 +1533,15 @@ def manage_kubernetes_environment():
                     confirm = inquirer.confirm(message="Delete local kind cluster 'enginedge'?", default=False).execute()
                     if confirm:
                         try:
-                            subprocess.run(["kind", "delete", "cluster", "--name", "enginedge"], check=True)
+                            # Get the full path to kind if needed
+                            kind_cmd = shutil.which("kind") or "kind"
+                            # On Windows, if still not found, try known WinGet location
+                            if not kind_cmd or kind_cmd == "kind":
+                                if _is_windows():
+                                    winget_kind_path = r"C:\Users\chris\AppData\Local\Microsoft\WinGet\Packages\Kubernetes.kind_Microsoft.Winget.Source_8wekyb3d8bbwe\kind.exe"
+                                    if os.path.exists(winget_kind_path):
+                                        kind_cmd = winget_kind_path
+                            subprocess.run([kind_cmd, "delete", "cluster", "--name", "enginedge"], check=True)
                             CONSOLE.print("[green]Deleted kind cluster 'enginedge'.[/green]\n")
                         except subprocess.CalledProcessError as e:
                             CONSOLE.print(f"[red]Failed to delete kind cluster: {e}[/red]")

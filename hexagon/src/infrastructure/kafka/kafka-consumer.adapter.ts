@@ -132,34 +132,70 @@ export class KafkaConsumerAdapter
       return;
     }
 
-    try {
-      await this.consumer.subscribe({ topic, fromBeginning: false });
-      this.subscriptions.set(topic, handler);
+    if (!this.connected) {
+      this.logger.warn(
+        `Cannot subscribe to topic ${topic} - consumer not connected`,
+      );
+      return;
+    }
 
-      // Start consumer if not already running
-      if (!this.consumerRunning) {
-        this.consumerRunning = true;
-        await this.consumer.run({
-          eachMessage: async (payload: EachMessagePayload) => {
-            const handler = this.subscriptions.get(payload.topic);
-            if (handler && payload.message.value) {
-              try {
-                const message = JSON.parse(payload.message.value.toString());
-                await handler(message);
-              } catch (error) {
-                this.logger.error(
-                  `Error processing message from topic ${payload.topic}`,
-                  error,
-                );
-              }
-            }
-          },
-        });
+    try {
+      // If consumer is already running, we cannot subscribe to new topics
+      if (this.consumerRunning) {
+        this.logger.error(
+          `Cannot subscribe to topic ${topic} - consumer is already running. All topics must be subscribed before starting the consumer.`,
+        );
+        // Store the handler anyway so if the consumer restarts, it will pick it up
+        this.subscriptions.set(topic, handler);
+        return;
       }
 
+      await this.consumer.subscribe({ topic, fromBeginning: false });
+      this.subscriptions.set(topic, handler);
       this.logger.log(`Subscribed to topic: ${topic}`);
     } catch (error) {
       this.logger.error(`Failed to subscribe to topic ${topic}`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Start the consumer to begin processing messages.
+   * This should be called after all topics have been subscribed to.
+   */
+  async startConsumer(): Promise<void> {
+    if (this.consumerRunning) {
+      this.logger.warn('Consumer is already running');
+      return;
+    }
+
+    if (!this.connected) {
+      this.logger.warn('Cannot start consumer - not connected');
+      return;
+    }
+
+    try {
+      this.consumerRunning = true;
+      await this.consumer.run({
+        eachMessage: async (payload: EachMessagePayload) => {
+          const handler = this.subscriptions.get(payload.topic);
+          if (handler && payload.message.value) {
+            try {
+              const message = JSON.parse(payload.message.value.toString());
+              await handler(message);
+            } catch (error) {
+              this.logger.error(
+                `Error processing message from topic ${payload.topic}`,
+                error,
+              );
+            }
+          }
+        },
+      });
+      this.logger.log('Kafka consumer started and running');
+    } catch (error) {
+      this.consumerRunning = false;
+      this.logger.error('Failed to start consumer', error);
       throw error;
     }
   }

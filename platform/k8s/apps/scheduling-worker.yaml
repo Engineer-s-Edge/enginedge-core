@@ -54,7 +54,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: mongodb-secret
-              key: connection-string
+              key: mongodb-uri
         
         # Google Calendar OAuth
         - name: GOOGLE_CLIENT_ID
@@ -82,7 +82,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: jwt-secret
-              key: jwt-secret
+              key: JWT_SECRET
         
         # Application Config
         - name: NODE_ENV

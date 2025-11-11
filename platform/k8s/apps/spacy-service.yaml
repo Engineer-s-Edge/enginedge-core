@@ -25,7 +25,7 @@ metadata:
     app: enginedge
     component: spacy-service
 spec:
-  replicas: 4
+  replicas: 1
   selector:
     matchLabels:
       app: enginedge
@@ -83,19 +83,23 @@ spec:
           httpGet:
             path: /health
             port: 8001
-          initialDelaySeconds: 60
+          initialDelaySeconds: 120
           periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
         readinessProbe:
           httpGet:
             path: /health
             port: 8001
-          initialDelaySeconds: 30
+          initialDelaySeconds: 60
           periodSeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 3
         resources:
           requests:
-            memory: "1Gi"
+            memory: "2Gi"
             cpu: "1000m"
           limits:
-            memory: "4Gi"
+            memory: "6Gi"
             cpu: "4000m"
 

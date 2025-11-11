@@ -1,5 +1,16 @@
 FROM node:20-alpine AS builder
 
+# Install Python and build tools for native modules (canvas)
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    cairo-dev \
+    jpeg-dev \
+    pango-dev \
+    giflib-dev \
+    pixman-dev
+
 WORKDIR /app
 
 # Copy package files
@@ -18,6 +29,17 @@ RUN npm run build
 
 # Production stage
 FROM node:20-alpine
+
+# Install Python and build tools for native modules (canvas)
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    cairo-dev \
+    jpeg-dev \
+    pango-dev \
+    giflib-dev \
+    pixman-dev
 
 WORKDIR /app
 

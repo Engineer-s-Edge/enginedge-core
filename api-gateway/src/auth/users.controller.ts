@@ -17,6 +17,11 @@ import { RolesGuard } from './roles.guard';
 import { Req } from '@nestjs/common';
 import { Request } from 'express';
 
+// Extend Express Request to include user property
+interface RequestWithUser extends Request {
+  user?: any;
+}
+
 @Controller('users')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class UsersController {
@@ -30,11 +35,11 @@ export class UsersController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  async getUserByEmail(@Query('email') email?: string, @Req() req?: Request) {
+  async getUserByEmail(@Query('email') email?: string, @Req() req?: RequestWithUser) {
     if (email) {
       return this.identity.getUserByEmail(email);
     }
-    const roles = (req?.user as any)?.roles as string[] | undefined;
+    const roles = req?.user?.roles as string[] | undefined;
     if (!roles || !roles.includes('admin')) {
       return { message: 'Forbidden: admin role required' };
     }

@@ -34,7 +34,7 @@ export class KafkaLogConsumerService implements OnModuleInit, OnModuleDestroy {
 
   constructor(
     private readonly configService: ConfigService,
-    @Inject('IKafkaConsumer')
+    @Inject('IKafkaConsumer:Logging')
     private readonly kafkaConsumer: IKafkaConsumer,
     private readonly winstonLogger: WinstonLoggerAdapter,
   ) {
@@ -71,6 +71,7 @@ export class KafkaLogConsumerService implements OnModuleInit, OnModuleDestroy {
       )
       .split(',');
 
+    // Subscribe to all topics first
     for (const workerType of workerTypes) {
       const topic = `enginedge.logs.worker.${workerType.trim()}`;
       try {
@@ -81,6 +82,14 @@ export class KafkaLogConsumerService implements OnModuleInit, OnModuleDestroy {
       } catch (error) {
         this.logger.error(`Failed to subscribe to topic ${topic}`, error);
       }
+    }
+
+    // Now start the consumer to begin processing messages
+    try {
+      await this.kafkaConsumer.startConsumer();
+      this.logger.log('Log consumer started and running');
+    } catch (error) {
+      this.logger.error('Failed to start log consumer', error);
     }
   }
 

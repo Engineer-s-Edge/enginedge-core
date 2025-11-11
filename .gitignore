@@ -22,6 +22,12 @@
 # Kubernetes secrets
 platform/k8s/secrets/*.yaml
 !platform/k8s/secrets/*.yaml.example
+platform/k8s/secrets/mongodb-keyfile
+platform/k8s/secrets/kafka-tls-certs/
+!platform/k8s/secrets/README.md
+
+# Local deployment config
+platform/control-center/hexagon.json
 
 # Secret files
 .secrets/

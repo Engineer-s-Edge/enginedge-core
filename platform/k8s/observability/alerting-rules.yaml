@@ -4,7 +4,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
   name: enginedge-alerts
-  namespace: observability
+  namespace: default
   labels:
     app: enginedge
     prometheus: kube-prometheus

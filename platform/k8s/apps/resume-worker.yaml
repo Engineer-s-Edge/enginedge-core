@@ -25,7 +25,7 @@ metadata:
     app: enginedge
     component: resume-worker
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: enginedge
@@ -43,7 +43,7 @@ spec:
         args:
         - |
           echo "Waiting for Kafka to be ready..."
-          until nc -z kafka 9092; do
+          until nc -z kafka-0.kafka.default.svc.cluster.local 9092; do
             echo "Kafka is not ready yet. Waiting..."
             sleep 5
           done
@@ -54,7 +54,7 @@ spec:
         args:
         - |
           echo "Waiting for MongoDB to be ready..."
-          until nc -z mongodb 27017; do
+          until nc -z mongodb-service 27017; do
             echo "MongoDB is not ready yet. Waiting..."
             sleep 5
           done
@@ -68,15 +68,13 @@ spec:
         envFrom:
         - configMapRef:
             name: worker-config
-        - configMapRef:
-            name: resume-worker-config
         env:
         - name: NODE_ENV
           value: "production"
         - name: PORT
           value: "3006"
         - name: MONGODB_URI
-          value: "mongodb://mongodb:27017/resume-worker"
+          value: "mongodb://mongodb-service:27017/resume-worker"
         - name: REDIS_URL
           value: "redis://redis-master:6379/1"
         - name: SPACY_SERVICE_URL

@@ -20,6 +20,7 @@ export class KubernetesWorkerRegistryAdapter
 {
   private readonly logger = new Logger(KubernetesWorkerRegistryAdapter.name);
   private k8sApi: CoreV1Api | null = null;
+  private readonly namespace: string;
   private workers = new Map<string, InfraWorker[]>();
   private workerTypes = [
     'assistant-worker',
@@ -34,6 +35,11 @@ export class KubernetesWorkerRegistryAdapter
   ];
 
   constructor(private readonly configService: ConfigService) {
+    this.namespace = this.configService.get<string>(
+      'KUBERNETES_NAMESPACE',
+      'default',
+    );
+
     const discoveryMode = this.configService.get<string>(
       'WORKER_DISCOVERY_MODE',
       'kubernetes',
@@ -62,12 +68,15 @@ export class KubernetesWorkerRegistryAdapter
     if (this.k8sApi) {
       try {
         for (const workerType of this.workerTypes) {
-          const services = await this.k8sApi.listServiceForAllNamespaces({
+          // List all services in the namespace with label selector
+          const services = await this.k8sApi.listNamespacedService({
+            namespace: this.namespace,
             labelSelector: `app=${workerType}`,
           });
           const workers: InfraWorker[] = [];
           const items =
             (services as any).body?.items || (services as any).items || [];
+          // Filter services by worker type label
           for (const service of items) {
             const port = service.spec?.ports?.[0]?.port || 3000;
             const endpoint = `http://${service.metadata?.name}:${port}`;

@@ -15,9 +15,9 @@ data:
     zookeeper.connect=zookeeper:2181
     log.dirs=/var/lib/kafka/data
     num.partitions=1
-    default.replication.factor=1
+    default.replication.factor=2
     log.retention.hours=168
-    auto.create.topics.enable=true
+    auto.create.topics.enable=false
 
 ---
 apiVersion: v1
@@ -34,7 +34,7 @@ spec:
   ports:
   - port: 9092
     targetPort: 9092
-    name: client
+    name: plaintext
 
 ---
 apiVersion: apps/v1
@@ -46,7 +46,7 @@ metadata:
     app: kafka
 spec:
   serviceName: kafka
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: kafka
@@ -59,24 +59,26 @@ spec:
       - name: kafka
         image: confluentinc/cp-kafka:7.8.0
         imagePullPolicy: IfNotPresent
+        command:
+        - sh
+        - -c
+        - |
+          export KAFKA_BROKER_ID=$(cat /shared/broker-id)
+          export KAFKA_ADVERTISED_LISTENERS="PLAINTEXT://${HOSTNAME}.kafka.default.svc.cluster.local:9092"
+          export KAFKA_LISTENER_SECURITY_PROTOCOL_MAP="PLAINTEXT:PLAINTEXT"
+          export KAFKA_INTER_BROKER_LISTENER_NAME="PLAINTEXT"
+          exec /etc/confluent/docker/run
         ports:
         - containerPort: 9092
-          name: client
+          name: plaintext
         env:
-        - name: KAFKA_BROKER_ID
-          value: "1"
         - name: KAFKA_ZOOKEEPER_CONNECT
           value: "zookeeper.default.svc.cluster.local:2181"
-        - name: KAFKA_ADVERTISED_LISTENERS
-          value: "PLAINTEXT://kafka-0.kafka.default.svc.cluster.local:9092"
-        - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
-          value: "PLAINTEXT:PLAINTEXT"
-        - name: KAFKA_INTER_BROKER_LISTENER_NAME
-          value: "PLAINTEXT"
+        # Using PLAINTEXT listener (no SSL)
         - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
-          value: "1"
+          value: "2"
         - name: KAFKA_AUTO_CREATE_TOPICS_ENABLE
-          value: "true"
+          value: "false"
         livenessProbe:
           tcpSocket:
             port: 9092
@@ -97,7 +99,21 @@ spec:
         volumeMounts:
         - name: kafka-data
           mountPath: /var/lib/kafka/data
+        - name: broker-id-shared
+          mountPath: /shared
+          readOnly: true
       initContainers:
+      - name: set-broker-id
+        image: busybox:1.36.1
+        command: ['sh', '-c']
+        args:
+        - |
+          BROKER_ID=$(echo $HOSTNAME | sed 's/kafka-//')
+          echo "Setting broker ID to $BROKER_ID"
+          echo "$BROKER_ID" > /shared/broker-id
+        volumeMounts:
+        - name: broker-id-shared
+          mountPath: /shared
       - name: wait-for-zookeeper
         image: busybox:1.36.1
         command: ['sh', '-c']
@@ -109,6 +125,9 @@ spec:
             sleep 2
           done
           echo "Zookeeper is ready!"
+      volumes:
+      - name: broker-id-shared
+        emptyDir: {}
   volumeClaimTemplates:
   - metadata:
       name: kafka-data

@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: datalake-dashboard
-  namespace: enginedge
+  namespace: default
   labels:
     app: enginedge
     grafana_dashboard: "1"

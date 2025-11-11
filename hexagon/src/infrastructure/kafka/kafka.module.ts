@@ -14,7 +14,24 @@ import { IKafkaConsumer } from '@application/ports/kafka-consumer.port';
     },
     {
       provide: 'IKafkaConsumer',
-      useClass: KafkaConsumerAdapter,
+      useFactory: (configService: ConfigService) => {
+        return new KafkaConsumerAdapter(configService);
+      },
+      inject: [ConfigService],
+    },
+    {
+      provide: 'IKafkaConsumer:Logging',
+      useFactory: (configService: ConfigService) => {
+        return new KafkaConsumerAdapter(configService);
+      },
+      inject: [ConfigService],
+    },
+    {
+      provide: 'IKafkaConsumer:Orchestration',
+      useFactory: (configService: ConfigService) => {
+        return new KafkaConsumerAdapter(configService);
+      },
+      inject: [ConfigService],
     },
     KafkaProducerAdapter,
     KafkaConsumerAdapter,
@@ -22,6 +39,8 @@ import { IKafkaConsumer } from '@application/ports/kafka-consumer.port';
   exports: [
     'IKafkaProducer',
     'IKafkaConsumer',
+    'IKafkaConsumer:Logging',
+    'IKafkaConsumer:Orchestration',
     KafkaProducerAdapter,
     KafkaConsumerAdapter,
   ],

@@ -8,7 +8,7 @@ export class OrchestrationService implements OnModuleInit {
   private readonly logger = new Logger(OrchestrationService.name);
 
   constructor(
-    @Inject('IKafkaConsumer')
+    @Inject('IKafkaConsumer:Orchestration')
     private readonly kafkaConsumer: IKafkaConsumer,
     private readonly handleWorkerResponse: HandleWorkerResponseUseCase,
   ) {}
@@ -37,6 +37,7 @@ export class OrchestrationService implements OnModuleInit {
       'ocr.process.response',
     ];
 
+    // Subscribe to all topics first
     for (const topic of responseTopics) {
       try {
         await this.kafkaConsumer.subscribe(topic, async (message: any) => {
@@ -46,6 +47,14 @@ export class OrchestrationService implements OnModuleInit {
       } catch (error) {
         this.logger.error(`Failed to subscribe to topic ${topic}`, error);
       }
+    }
+
+    // Now start the consumer to begin processing messages
+    try {
+      await this.kafkaConsumer.startConsumer();
+      this.logger.log('Orchestration service consumer started');
+    } catch (error) {
+      this.logger.error('Failed to start orchestration consumer', error);
     }
   }
 
