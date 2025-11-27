@@ -1,0 +1,40 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: main-node-policy
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      app: enginedge
+      component: main-node
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - {} # Allow all ingress for now
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: enginedge
+          component: mongodb
+    ports:
+    - protocol: TCP
+      port: 27017
+  - to:
+    - podSelector:
+        matchLabels:
+          app: enginedge
+          component: kafka
+    ports:
+    - protocol: TCP
+      port: 9092
+  - to:
+    - podSelector:
+        matchLabels:
+          app: enginedge
+          component: wolfram-kernel
+    ports:
+    - protocol: TCP
+      port: 5000

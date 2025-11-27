@@ -1,0 +1,16 @@
+image:
+  repository: ghcr.io/chris-alexander-pop/REPLACE_IMAGE
+  tag: latest
+  pullPolicy: IfNotPresent
+
+component: worker
+port: 3000
+
+service:
+  type: ClusterIP
+
+imagePullSecrets:
+  - name: ghcr-pull-secret
+
+env: []
+

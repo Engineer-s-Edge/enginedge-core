@@ -1,0 +1,121 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: resume-worker
+  namespace: default
+  labels:
+    app: enginedge
+    component: resume-worker
+spec:
+  type: ClusterIP
+  ports:
+  - port: 3006
+    targetPort: 3006
+    name: http
+  selector:
+    app: enginedge
+    component: resume-worker
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: resume-worker
+  namespace: default
+  labels:
+    app: enginedge
+    component: resume-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: enginedge
+      component: resume-worker
+  template:
+    metadata:
+      labels:
+        app: enginedge
+        component: resume-worker
+    spec:
+      initContainers:
+      - name: wait-for-kafka
+        image: busybox:1.36.1
+        command: ['sh', '-c']
+        args:
+        - |
+          echo "Waiting for Kafka to be ready..."
+          until nc -z kafka-0.kafka.default.svc.cluster.local 9092; do
+            echo "Kafka is not ready yet. Waiting..."
+            sleep 5
+          done
+          echo "Kafka is ready!"
+      - name: wait-for-mongodb
+        image: busybox:1.36.1
+        command: ['sh', '-c']
+        args:
+        - |
+          echo "Waiting for MongoDB to be ready..."
+          until nc -z mongodb-service 27017; do
+            echo "MongoDB is not ready yet. Waiting..."
+            sleep 5
+          done
+          echo "MongoDB is ready!"
+      containers:
+      - name: resume-worker
+        image: ghcr.io/chris-alexander-pop/resume-worker:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3006
+        envFrom:
+        - configMapRef:
+            name: worker-config
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "3006"
+        - name: MONGODB_URI
+          value: "mongodb://mongodb-service:27017/resume-worker"
+        - name: REDIS_URL
+          value: "redis://redis-master:6379/1"
+        - name: SPACY_SERVICE_URL
+          value: "http://spacy-service:8001"
+        - name: LATEX_WORKER_URL
+          value: "http://latex-worker:3005"
+        - name: ASSISTANT_WORKER_URL
+          value: "http://assistant-worker:3001"
+        - name: DATA_PROCESSING_WORKER_URL
+          value: "http://data-processing-worker:3003"
+        - name: LOG_LEVEL
+          value: "info"
+        - name: PROMETHEUS_ENABLED
+          value: "true"
+        - name: NODE_OPTIONS
+          value: "--max-old-space-size=1536"
+        securityContext:
+          runAsUser: 1000
+          runAsGroup: 1000
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3006
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3006
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "2000m"
+
+

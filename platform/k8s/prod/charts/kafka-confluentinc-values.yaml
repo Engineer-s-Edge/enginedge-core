@@ -1,0 +1,43 @@
+# Alternative Kafka values using Confluent Community Edition images
+# This replaces Bitnami Kafka with maintained Confluent images
+# Use: helm install kafka confluentinc/cp-kafka -f kafka-confluentinc-values.yaml
+
+# Note: This requires adding Confluent repo:
+# helm repo add confluentinc https://packages.confluent.io/helm
+# helm repo update
+
+image:
+  repository: confluentinc/cp-kafka
+  tag: 7.8.0
+  pullPolicy: IfNotPresent
+
+broker:
+  id: 1
+
+global:
+  provider:
+    name: kubernetes
+
+listeners:
+  internal:
+    enabled: true
+  controller:
+    enabled: true
+  external:
+    enabled: false
+
+controller:
+  count: 1
+  storage:
+    persistent: false
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 1Gi
+  requests:
+    cpu: 250m
+    memory: 512Mi
+
+log4j:
+  rootLogger: WARN

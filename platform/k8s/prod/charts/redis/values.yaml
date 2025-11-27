@@ -1,0 +1,26 @@
+# Custom values for the Bitnami Redis Helm chart
+# Updated for chart 22.x
+# Documentation: https://github.com/bitnami/charts/tree/main/bitnami/redis
+
+architecture: standalone
+
+auth:
+  enabled: false
+
+master:
+  persistence:
+    enabled: false
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "250m"
+
+replica:
+  replicaCount: 0
+
+metrics:
+  enabled: false
+

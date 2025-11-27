@@ -1,0 +1,16 @@
+image:
+  repository: ghcr.io/chris-alexander-pop/api-gateway
+  tag: latest
+  pullPolicy: Always
+
+service:
+  type: NodePort
+  port: 8080
+  nodePort: 30010
+
+imagePullSecrets:
+  - name: ghcr-pull-secret
+
+resources: {}
+
+

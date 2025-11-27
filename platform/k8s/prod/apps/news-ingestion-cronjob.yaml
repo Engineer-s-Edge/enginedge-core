@@ -1,0 +1,49 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: news-ingestion-cronjob
+  namespace: default
+spec:
+  # Schedule to run every 2 hours, matching the original Airflow DAG
+  schedule: "0 */2 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: news-ingestion
+            image: ghcr.io/chris-alexander-pop/news-ingestion-job:latest
+            imagePullPolicy: Always # Assumes local image for kind
+            # Load non-sensitive config from our ConfigMap
+            envFrom:
+            - configMapRef:
+                name: news-ingestion-config
+            # Load sensitive credentials from our Secret
+            env:
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-secret
+                  key: rootUser
+            - name: MINIO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-secret
+                  key: rootPassword
+            # Set resource limits for the job
+            resources:
+              requests:
+                memory: "256Mi"
+                cpu: "250m"
+              limits:
+                memory: "512Mi"
+                cpu: "500m"
+            securityContext:
+              runAsUser: 1001
+              runAsGroup: 1001
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - ALL
+

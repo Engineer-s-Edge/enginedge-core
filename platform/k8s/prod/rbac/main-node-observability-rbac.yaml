@@ -1,0 +1,65 @@
+---
+# ServiceAccount for main-node (hexagon) with read-only Kubernetes permissions
+# This allows the application to observe pods, logs, and events for incident response
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: main-node-observability
+  namespace: default
+  labels:
+    app: enginedge
+    component: main-node
+    purpose: observability
+---
+# Role with read-only permissions for Kubernetes observability
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: main-node-observability-role
+  namespace: default
+  labels:
+    app: enginedge
+    component: main-node
+    purpose: observability
+rules:
+  # Read pod information for status checks
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list"]
+  # Read pod logs for debugging
+  - apiGroups: [""]
+    resources: ["pods/log"]
+    verbs: ["get"]
+  # Read events for incident response
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["get", "list"]
+  # Read services for worker discovery (already used by worker registry)
+  - apiGroups: [""]
+    resources: ["services"]
+    verbs: ["get", "list"]
+  # Optional: Read pod metrics if metrics-server is available
+  # Note: Metrics API may use a different API group depending on cluster setup
+  - apiGroups: ["metrics.k8s.io"]
+    resources: ["pods"]
+    verbs: ["get", "list"]
+---
+# RoleBinding to associate ServiceAccount with Role
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: main-node-observability-binding
+  namespace: default
+  labels:
+    app: enginedge
+    component: main-node
+    purpose: observability
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: main-node-observability-role
+subjects:
+  - kind: ServiceAccount
+    name: main-node-observability
+    namespace: default
+

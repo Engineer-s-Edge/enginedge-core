@@ -19,12 +19,22 @@
 !.vscode/launch.json
 !.vscode/extensions.json
 
-# Kubernetes secrets
-platform/k8s/secrets/*.yaml
-!platform/k8s/secrets/*.yaml.example
-platform/k8s/secrets/mongodb-keyfile
-platform/k8s/secrets/kafka-tls-certs/
-!platform/k8s/secrets/README.md
+# Kubernetes secrets (Dev)
+platform/k8s/dev/secrets/*.yaml
+!platform/k8s/dev/secrets/*.yaml.example
+platform/k8s/dev/secrets/mongodb-keyfile
+platform/k8s/dev/secrets/kafka-tls-certs/
+!platform/k8s/dev/secrets/README.md
+
+# Kubernetes secrets (Prod)
+platform/k8s/prod/secrets/*.yaml
+!platform/k8s/prod/secrets/*.yaml.example
+platform/k8s/prod/secrets/mongodb-keyfile
+platform/k8s/prod/secrets/kafka-tls-certs/
+!platform/k8s/prod/secrets/README.md
+
+# Deployment artifacts
+enginedge-deploy.zip
 
 # Local deployment config
 platform/control-center/hexagon.json
@@ -46,3 +56,8 @@ pids
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 .vercel
+
+
+
+# Miscellaneous
+enginedge-deploy.zip

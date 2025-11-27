@@ -21,7 +21,8 @@ from InquirerPy.base.control import Choice
 
 # --- Constants ---
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-K8S_DIR = os.path.join(REPO_ROOT, "platform", "k8s")
+# Default to dev environment
+K8S_DIR = os.path.join(REPO_ROOT, "platform", "k8s", "dev")
 CONSOLE = Console()
 COMPOSE_FILE = os.path.join(REPO_ROOT, "platform", "docker-compose.yml")
 COMPOSE_ENV = os.path.join(REPO_ROOT, "platform", ".env")
@@ -1460,7 +1461,8 @@ def manage_kubernetes_environment():
                         CONSOLE.print("[yellow]Deploy cancelled: cluster is offline.[/yellow]")
                         continue
                     # Build and load local images to kind to avoid ErrImageNeverPull
-                    if action_choice == "deploy":
+                    # Skip this in production mode
+                    if action_choice == "deploy" and "prod" not in K8S_DIR:
                         _build_and_load_kind_images(selected_groups)
                     generate_k8s_deploy_script(selected_groups)
                     if action_choice == "deploy":
@@ -1645,6 +1647,7 @@ def manage_kubernetes_environment():
 
 def main():
     """Main function to run the control center."""
+    global K8S_DIR
     try:
         CONSOLE.print(Panel("[bold green]EnginEdge Service Control Center[/bold green]", expand=False))
         # Top-level mode selection
@@ -1652,12 +1655,17 @@ def main():
             message="Choose environment mode:",
             choices=[
                 Choice("k8s", "Kubernetes (kind)"),
+                Choice("prod", "Production (On-Prem)"),
                 Choice("dev", "Dev (Hybrid: Docker Compose)"),
                 Choice(None, "Exit"),
             ],
             default="k8s",
         ).execute()
         if mode == "k8s":
+            manage_kubernetes_environment()
+        elif mode == "prod":
+            K8S_DIR = os.path.join(REPO_ROOT, "platform", "k8s", "prod")
+            CONSOLE.print(f"[yellow]Switched to Production Mode. Using manifests from: {K8S_DIR}[/yellow]")
             manage_kubernetes_environment()
         elif mode == "dev":
             manage_dev_hybrid_environment()

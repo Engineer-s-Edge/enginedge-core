@@ -26,7 +26,23 @@ log_error() {
 # Get script directory
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 PLATFORM_DIR="$(dirname "$SCRIPT_DIR")"
-K8S_DIR="$PLATFORM_DIR/k8s"
+
+# Parse arguments
+USE_PROD=false
+for arg in "$@"
+do
+    if [ "$arg" == "--prod" ]; then
+        USE_PROD=true
+    fi
+done
+
+if [ "$USE_PROD" = true ]; then
+    K8S_DIR="$PLATFORM_DIR/k8s/prod"
+    log_info "Using PRODUCTION manifests from $K8S_DIR"
+else
+    K8S_DIR="$PLATFORM_DIR/k8s/dev"
+    log_info "Using DEV manifests from $K8S_DIR"
+fi
 
 check_prerequisites() {
     log_info "Checking prerequisites..."

@@ -1,0 +1,180 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kafka-topics-init
+  namespace: default
+spec:
+  ttlSecondsAfterFinished: 100
+  backoffLimit: 10
+  template:
+    metadata:
+      labels:
+        app: kafka-topics-init
+    spec:
+      restartPolicy: OnFailure
+      initContainers:
+      - name: wait-for-kafka
+        image: busybox:1.36.1
+        command:
+        - sh
+        - -c
+        - |
+          echo "Waiting for Kafka to be ready..."
+          until nc -z kafka-0.kafka.default.svc.cluster.local 9092; do
+            echo "Kafka is not ready yet..."
+            sleep 5
+          done
+          echo "Kafka is ready!"
+      containers:
+      - name: create-topics
+        image: confluentinc/cp-kafka:7.8.0
+        command:
+        - sh
+        - -c
+        - |
+          set -e
+          echo "Creating Kafka topics..."
+          
+          # Worker response topics
+          kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 \
+            --create --if-not-exists --topic job.responses.assistant \
+            --partitions 3 --replication-factor 2
+          
+          kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 \
+            --create --if-not-exists --topic job.responses.resume \
+            --partitions 3 --replication-factor 2
+          
+          kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 \
+            --create --if-not-exists --topic job.responses.latex \
+            --partitions 3 --replication-factor 2
+          
+          kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 \
+            --create --if-not-exists --topic job.responses.agent-tool \
+            --partitions 3 --replication-factor 2
+          
+          kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 \
+            --create --if-not-exists --topic job.responses.data-processing \
+            --partitions 3 --replication-factor 2
+          
+          kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 \
+            --create --if-not-exists --topic job.responses.interview \
+            --partitions 3 --replication-factor 2
+          
+          kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 \
+            --create --if-not-exists --topic job.responses.scheduling \
+            --partitions 3 --replication-factor 2
+          
+          # Worker request topics
+          kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 \
+            --create --if-not-exists --topic job.requests.assistant \
+            --partitions 3 --replication-factor 2
+          
+          kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 \
+            --create --if-not-exists --topic job.requests.resume \
+            --partitions 3 --replication-factor 2
+          
+          kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 \
+            --create --if-not-exists --topic job.requests.latex \
+            --partitions 3 --replication-factor 2
+          
+          kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 \
+            --create --if-not-exists --topic job.requests.agent-tool \
+            --partitions 3 --replication-factor 2
+          
+          kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 \
+            --create --if-not-exists --topic job.requests.data-processing \
+            --partitions 3 --replication-factor 2
+          
+          kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 \
+            --create --if-not-exists --topic job.requests.interview \
+            --partitions 3 --replication-factor 2
+          
+          kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 \
+            --create --if-not-exists --topic job.requests.scheduling \
+            --partitions 3 --replication-factor 2
+          
+          # Legacy worker topics
+          kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 \
+            --create --if-not-exists --topic llm.responses \
+            --partitions 3 --replication-factor 2
+          
+          kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 \
+            --create --if-not-exists --topic resume.bullet.evaluate.response \
+            --partitions 3 --replication-factor 2
+          
+          kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 \
+            --create --if-not-exists --topic resume.posting.extract.response \
+            --partitions 3 --replication-factor 2
+          
+          kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 \
+            --create --if-not-exists --topic resume.pdf.parse.response \
+            --partitions 3 --replication-factor 2
+          
+          kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 \
+            --create --if-not-exists --topic resume.text.analyze.response \
+            --partitions 3 --replication-factor 2
+          
+          kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 \
+            --create --if-not-exists --topic document.process.response \
+            --partitions 3 --replication-factor 2
+          
+          kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 \
+            --create --if-not-exists --topic document.search.response \
+            --partitions 3 --replication-factor 2
+          
+          kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 \
+            --create --if-not-exists --topic document.upload.response \
+            --partitions 3 --replication-factor 2
+          
+          kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 \
+            --create --if-not-exists --topic embedding.generate.response \
+            --partitions 3 --replication-factor 2
+          
+          kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 \
+            --create --if-not-exists --topic vector.search.response \
+            --partitions 3 --replication-factor 2
+          
+          kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 \
+            --create --if-not-exists --topic ocr.process.response \
+            --partitions 3 --replication-factor 2
+          
+          # Worker log topics
+          kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 \
+            --create --if-not-exists --topic enginedge.logs.worker.assistant-worker \
+            --partitions 2 --replication-factor 2
+          
+          kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 \
+            --create --if-not-exists --topic enginedge.logs.worker.agent-tool-worker \
+            --partitions 2 --replication-factor 2
+          
+          kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 \
+            --create --if-not-exists --topic enginedge.logs.worker.data-processing-worker \
+            --partitions 2 --replication-factor 2
+          
+          kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 \
+            --create --if-not-exists --topic enginedge.logs.worker.identity-worker \
+            --partitions 2 --replication-factor 2
+          
+          kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 \
+            --create --if-not-exists --topic enginedge.logs.worker.interview-worker \
+            --partitions 2 --replication-factor 2
+          
+          kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 \
+            --create --if-not-exists --topic enginedge.logs.worker.latex-worker \
+            --partitions 2 --replication-factor 2
+          
+          kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 \
+            --create --if-not-exists --topic enginedge.logs.worker.news-worker \
+            --partitions 2 --replication-factor 2
+          
+          kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 \
+            --create --if-not-exists --topic enginedge.logs.worker.resume-worker \
+            --partitions 2 --replication-factor 2
+          
+          kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 \
+            --create --if-not-exists --topic enginedge.logs.worker.scheduling-worker \
+            --partitions 2 --replication-factor 2
+          
+          echo "All topics created successfully!"
+          echo "Listing all topics:"
+          kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 --list

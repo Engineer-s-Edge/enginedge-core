@@ -1,0 +1,24 @@
+# kube-prometheus-stack values overrides
+prometheus:
+  prometheusSpec:
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    probeSelectorNilUsesHelmValues: false
+    scrapeInterval: 15s
+    retention: 15d
+    enableAdminAPI: true
+
+alertmanager:
+  enabled: true
+
+grafana:
+  enabled: true
+  defaultDashboardsTimezone: browser
+  service:
+    type: NodePort
+    nodePort: 30011
+  sidecar:
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
+      searchNamespace: ALL

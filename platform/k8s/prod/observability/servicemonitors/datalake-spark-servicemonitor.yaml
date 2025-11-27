@@ -1,0 +1,21 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: datalake-spark
+  namespace: enginedge
+  labels:
+    app: enginedge
+    component: datalake
+    service: spark
+spec:
+  selector:
+    matchLabels:
+      app: enginedge
+      component: datalake
+      service: spark-master
+  endpoints:
+    - port: http
+      path: /metrics/json
+      interval: 30s
+      scrapeTimeout: 10s
+      scheme: http

@@ -1,0 +1,30 @@
+# Custom values for the Bitnami PostgreSQL Helm chart
+# Updated for chart 16.x
+# Documentation: https://github.com/bitnami/charts/tree/main/bitnami/postgresql
+
+auth:
+  database: "metastore"
+  username: "postgres"
+  existingSecret: "postgres-secret"
+
+# We only need a single, primary instance. No read replicas.
+primary:
+  persistence:
+    enabled: true
+    size: 8Gi
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "500m"
+    limits:
+      memory: "2Gi"
+      cpu: "1"
+
+# Disable read replicas as they are not needed for this use case
+readReplicas:
+  enabled: false
+
+# Disable metrics exporter to save resources
+metrics:
+  enabled: false
+
