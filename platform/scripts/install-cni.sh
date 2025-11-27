@@ -42,7 +42,11 @@ install_calico() {
     kubectl wait --for=condition=available deployment/tigera-operator -n tigera-operator --timeout=300s || true
     
     # Install Calico custom resources
-    kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/${CALICO_VERSION}/manifests/custom-resources.yaml
+    # NOTE: We patch the CIDR to 10.244.0.0/16 to avoid conflicts with physical networks (192.168.x.x)
+    log_info "Applying Calico configuration with CIDR 10.244.0.0/16..."
+    curl -s https://raw.githubusercontent.com/projectcalico/calico/${CALICO_VERSION}/manifests/custom-resources.yaml | \
+    sed 's|cidr: 192.168.0.0/16|cidr: 10.244.0.0/16|g' | \
+    kubectl apply -f -
     
     # Wait for Calico pods to be ready
     log_info "Waiting for Calico pods to be ready (this may take a few minutes)..."

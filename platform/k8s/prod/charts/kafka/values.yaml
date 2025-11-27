@@ -2,15 +2,23 @@
 # Updated for chart 32.x
 # Documentation: https://github.com/bitnami/charts/tree/main/bitnami/kafka
 
+global:
+  security:
+    allowInsecureImages: true
+
 # We only need one Kafka broker for a local environment
+image:
+  registry: public.ecr.aws
+  repository: bitnami/kafka
+  tag: latest
 controller:
   replicaCount: 1
   resources:
     requests:
-      memory: "1.5Gi"
-      cpu: "500m"
+      memory: "512Mi"
+      cpu: "250m"
     limits:
-      memory: "3Gi"
+      memory: "1Gi"
       cpu: "1"
   defaultInitContainers:
     prepareConfig:
@@ -65,7 +73,7 @@ metrics:
 # Additional configuration for stability
 extraEnvVars:
   - name: KAFKA_HEAP_OPTS
-    value: "-Xmx2g -Xms1g"
+    value: "-Xmx512m -Xms256m"
 
 # Configure JVM options for better performance
 extraEnvVarsCM: ""

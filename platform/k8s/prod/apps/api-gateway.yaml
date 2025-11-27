@@ -25,7 +25,7 @@ metadata:
     app: enginedge
     component: api-gateway
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: enginedge

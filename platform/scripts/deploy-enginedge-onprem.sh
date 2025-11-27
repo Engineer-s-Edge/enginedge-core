@@ -61,11 +61,37 @@ check_prerequisites() {
     
     # Check Helm
     if ! command -v helm &> /dev/null; then
-        log_error "Helm not found. Please install Helm first."
-        exit 1
+        log_warn "Helm not found. Installing Helm..."
+        curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+        if ! command -v helm &> /dev/null; then
+            log_error "Helm installation failed."
+            exit 1
+        fi
+        log_info "Helm installed successfully."
     fi
     
     log_info "Prerequisites check passed"
+}
+
+check_storage() {
+    log_info "Checking storage provisioner..."
+    
+    if ! kubectl get sc | grep -q "(default)"; then
+        log_warn "No default storage class found. Installing Rancher Local Path Provisioner..."
+        
+        # Install Local Path Provisioner
+        kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.26/deploy/local-path-storage.yaml
+        
+        # Wait for it to be created
+        sleep 5
+        
+        # Patch it to be default
+        kubectl patch storageclass local-path -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+        
+        log_info "Rancher Local Path Provisioner installed and set as default."
+    else
+        log_info "Default storage class found."
+    fi
 }
 
 check_secrets() {
@@ -231,6 +257,7 @@ deploy_applications() {
     kubectl apply -f "$K8S_DIR/apps/spacy-service.yaml" || log_warn "spaCy Service deployment failed"
     kubectl apply -f "$K8S_DIR/apps/scheduling-model.yaml" || log_warn "Scheduling Model deployment failed"
     kubectl apply -f "$K8S_DIR/apps/wolfram-kernel.yaml" || log_warn "Wolfram Kernel deployment failed"
+    kubectl apply -f "$K8S_DIR/apps/datalake.yaml" || log_warn "Datalake deployment failed"
     
     # Kafka topics
     kubectl apply -f "$K8S_DIR/apps/kafka-topics-init.yaml" || log_warn "Kafka topics init failed"
@@ -263,6 +290,7 @@ main() {
     log_info "Starting EnginEdge on-premises deployment..."
     
     check_prerequisites
+    check_storage
     check_secrets
     add_helm_repos
     deploy_infrastructure
