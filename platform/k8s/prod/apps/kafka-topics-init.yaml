@@ -20,7 +20,8 @@ spec:
         - -c
         - |
           echo "Waiting for Kafka to be ready..."
-          until nc -z kafka-0.kafka.default.svc.cluster.local 9092; do
+          # Try both the headless service and the regular service
+          until nc -z kafka 9092; do
             echo "Kafka is not ready yet..."
             sleep 5
           done
@@ -35,18 +36,21 @@ spec:
           set -e
           echo "Creating Kafka topics..."
           
+          # Use the service name that works
+          BOOTSTRAP_SERVER="kafka:9092"
+          
           # Worker response topics
-          kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 \
+          kafka-topics --bootstrap-server $BOOTSTRAP_SERVER \
             --create --if-not-exists --topic job.responses.assistant \
-            --partitions 3 --replication-factor 2
+            --partitions 3 --replication-factor 1
           
-          kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 \
+          kafka-topics --bootstrap-server $BOOTSTRAP_SERVER \
             --create --if-not-exists --topic job.responses.resume \
-            --partitions 3 --replication-factor 2
+            --partitions 3 --replication-factor 1
           
-          kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 \
+          kafka-topics --bootstrap-server $BOOTSTRAP_SERVER \
             --create --if-not-exists --topic job.responses.latex \
-            --partitions 3 --replication-factor 2
+            --partitions 3 --replication-factor 1
           
           kafka-topics --bootstrap-server kafka-0.kafka.default.svc.cluster.local:9092 \
             --create --if-not-exists --topic job.responses.agent-tool \

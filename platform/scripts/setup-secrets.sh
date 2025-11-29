@@ -56,6 +56,10 @@ HIVE_METASTORE_DB=metastore
 TOKERN_USER=tokern
 TOKERN_PASSWORD=tokern123
 TOKERN_DB=tokern
+
+# --- JWT Secret ---
+# Secret key for signing JWT tokens
+JWT_SECRET=change-me-to-a-secure-random-string
 EOF
     echo "⚠️  Created template: $ENV_FILE"
     echo "    -> ACTION: Edit this file and replace placeholders with real values."
@@ -126,6 +130,11 @@ fi
 
 kubectl create secret generic google-secret \
   --from-file=google-credentials.json="$GOOGLE_JSON_FILE" \
+  --dry-run=client -o yaml | kubectl apply -f -
+
+# 4. jwt-secret
+kubectl create secret generic jwt-secret \
+  --from-literal=JWT_SECRET="$JWT_SECRET" \
   --dry-run=client -o yaml | kubectl apply -f -
 
 echo "✅ Secrets applied."

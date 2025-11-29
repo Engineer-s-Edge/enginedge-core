@@ -44,7 +44,7 @@ spec:
         args:
         - |
           echo "Waiting for Kafka to be ready..."
-          until nc -z kafka-0.kafka.default.svc.cluster.local 9092; do
+          until nc -z kafka 9092; do
             echo "Kafka is not ready yet. Waiting..."
             sleep 5
           done

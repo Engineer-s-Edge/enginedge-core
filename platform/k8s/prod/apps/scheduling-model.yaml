@@ -36,7 +36,7 @@ spec:
     spec:
       containers:
       - name: scheduling-model-api
-        image: ghcr.io/chris-alexander-pop/scheduling-model-api:latest
+        image: ghcr.io/chris-alexander-pop/scheduling-model:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8000

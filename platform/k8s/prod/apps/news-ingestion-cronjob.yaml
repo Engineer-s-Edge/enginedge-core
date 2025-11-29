@@ -3,7 +3,21 @@ kind: CronJob
 metadata:
   name: news-ingestion-cronjob
   namespace: default
+  annotations:
+    description: |
+      DEPRECATED: This cronjob is suspended because news ingestion is now handled
+      by the main-node service via the POST /api/news/ingest/all endpoint.
+      The main-node NewsInfrastructureService provides the same functionality
+      with better integration into the hexagon architecture.
+      
+      To trigger ingestion manually, use:
+        curl -X POST http://api-gateway/api/news/ingest/all?limit=60
+      
+      Or enable this cronjob by setting suspend: false if you need
+      standalone batch ingestion that doesn't require main-node.
 spec:
+  # SUSPENDED - news ingestion is handled by main-node service
+  suspend: true
   # Schedule to run every 2 hours, matching the original Airflow DAG
   schedule: "0 */2 * * *"
   jobTemplate:
@@ -14,7 +28,7 @@ spec:
           containers:
           - name: news-ingestion
             image: ghcr.io/chris-alexander-pop/news-ingestion-job:latest
-            imagePullPolicy: Always # Assumes local image for kind
+            imagePullPolicy: Always
             # Load non-sensitive config from our ConfigMap
             envFrom:
             - configMapRef:

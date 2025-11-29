@@ -41,12 +41,28 @@ spec:
       - name: wolfram-state
         persistentVolumeClaim:
           claimName: wolfram-state
+      - name: app-logs
+        emptyDir: {}
+      initContainers:
+      - name: fix-permissions
+        image: busybox:1.36.1
+        command: ["sh", "-c", "mkdir -p /app/logs && chown -R 1000:1000 /app/logs"]
+        volumeMounts:
+        - name: app-logs
+          mountPath: /app/logs
       containers:
       - name: wolfram-kernel
         image: ghcr.io/chris-alexander-pop/wolfram-kernel:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 5000
+        volumeMounts:
+        - name: wolfram-state
+          mountPath: /home/appuser/.WolframEngine
+        - name: wolfram-state
+          mountPath: /home/appuser/.Wolfram
+        - name: app-logs
+          mountPath: /app/logs
         env:
         - name: HOME
           value: /home/appuser
@@ -60,11 +76,6 @@ spec:
           requests:
             cpu: "500m"
             memory: "512Mi"
-        volumeMounts:
-        - name: wolfram-state
-          mountPath: /home/appuser/.WolframEngine
-        - name: wolfram-state
-          mountPath: /home/appuser/.Wolfram
         # Probes: only mark Ready when /health returns 200
         readinessProbe:
           httpGet:
