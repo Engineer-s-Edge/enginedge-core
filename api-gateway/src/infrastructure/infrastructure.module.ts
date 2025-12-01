@@ -6,6 +6,7 @@ import { ProxyModule } from '../proxy/proxy.module';
 import { MetricsModule } from './metrics/metrics.module';
 import { LoggingModule } from './logging/logging.module';
 import { WsProxyModule } from '../ws/ws-proxy.module';
+import { DocsProxyController } from './docs/docs.controller';
 
 @Global()
 @Module({
@@ -18,6 +19,7 @@ import { WsProxyModule } from '../ws/ws-proxy.module';
     ProxyModule,
     WsProxyModule,
   ],
+  controllers: [DocsProxyController],
   exports: [
     MetricsModule,
     LoggingModule,

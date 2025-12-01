@@ -15,6 +15,7 @@ spec:
       containers:
         - name: datalake-observability
           image: ghcr.io/chris-alexander-pop/datalake:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 3010
           envFrom:
