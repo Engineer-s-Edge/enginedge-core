@@ -14,8 +14,8 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: api.enginedge.local
-    http:
+  # Allow IP-based access (no host requirement)
+  - http:
       paths:
       - path: /
         pathType: Prefix

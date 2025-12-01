@@ -69,6 +69,9 @@ chmod +x scripts/*.sh
 ./scripts/install-metrics-server.sh
 curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
+# Install NGINX Ingress Controller (required for API Gateway access)
+./scripts/install-nginx-ingress.sh
+
 # Get join command (save this!)
 kubeadm token create --print-join-command
 ```
@@ -116,10 +119,45 @@ kubectl get pods -o wide  # See pods distributed across nodes
 - `setup-worker-node.sh` - Install Kubernetes on workers
 - `install-cni.sh` - Install Calico CNI
 - `install-metrics-server.sh` - Install metrics server
+- `install-nginx-ingress.sh` - Install NGINX Ingress Controller (required for API Gateway)
+- `verify-api-gateway-ingress.sh` - Verify API Gateway ingress setup
+- `test-api-gateway-ingress.sh` - Test API Gateway ingress connectivity
 - `setup-secrets.sh` - Create Kubernetes secrets
 - `deploy-enginedge-onprem.sh` - Deploy all EnginEdge core platform services
 
 **Note**: This deploys the core platform only. Data Lake deployment is separate (see below).
+
+## Setting Up API Gateway Ingress
+
+After deploying EnginEdge, set up ingress to access the API Gateway:
+
+1. **Apply the ingress configuration:**
+   ```bash
+   kubectl apply -f ../../platform/k8s/prod/apps/api-gateway-ingress.yaml
+   ```
+
+2. **Verify the setup:**
+   ```bash
+   cd enginedge-core/platform/onprem-setup
+   ./scripts/verify-api-gateway-ingress.sh
+   ```
+
+3. **Get the ingress controller port:**
+   ```bash
+   kubectl get svc -n ingress-nginx
+   ```
+   Note the NodePort (usually 30080 for HTTP).
+
+4. **Test the API Gateway:**
+   ```bash
+   ./scripts/test-api-gateway-ingress.sh <node-ip> <port>
+   # Example: ./scripts/test-api-gateway-ingress.sh 192.168.72.102 30080
+   ```
+
+   Or test manually:
+   ```bash
+   curl http://<node-ip>:<port>/api/health
+   ```
 
 ## Deploying Data Lake (Optional)
 
