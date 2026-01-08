@@ -10,6 +10,10 @@ resources:
 - apps/resume-worker.yaml
 - apps/spacy-service.yaml
 - apps/mongodb.yaml
+# Datalake Components
+- apps/hive-metastore.yml
+- apps/spark.yml
+- apps/trino.yml
 - config/main-node-config.yaml
 # - config/worker-node-config.yaml
 - config/interview-worker-config.yaml
@@ -19,7 +23,6 @@ resources:
 - rbac/main-node-observability-rbac.yaml
 
 patches:
-- path: emptydir-patch.yaml
 - path: host-docker-internal.yaml
 
 namespace: default 

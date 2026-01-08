@@ -22,40 +22,17 @@ metadata:
 data:
   init-users.sh: |
     #!/bin/bash
-    set -e
-    
-    echo "Waiting for MongoDB to start..."
-    until mongosh --eval "db.adminCommand('ping')" &>/dev/null; do
-      echo "MongoDB is not ready yet..."
-      sleep 2
-    done
-    
-    echo "MongoDB is ready. Creating users..."
-    
-    # Create root user if it doesn't exist
+    set -euo pipefail
+
+    echo "Initializing MongoDB users (docker-entrypoint-initdb.d)..."
+
     mongosh admin --eval "
-    try {
-      db.createUser({
-        user: '$MONGO_INITDB_ROOT_USERNAME',
-        pwd: '$MONGO_INITDB_ROOT_PASSWORD',
-        roles: [{ role: 'root', db: 'admin' }]
-      });
-      print('Root user created successfully');
-    } catch (e) {
-      if (e.codeName === 'DuplicateKey' || e.code === 11000) {
-        print('Root user already exists');
-        db.changeUserPassword('$MONGO_INITDB_ROOT_USERNAME', '$MONGO_INITDB_ROOT_PASSWORD');
-        print('Root user password updated');
-      } else {
-        throw e;
-      }
-    }
-    "
-    
-    # Create application user if it doesn't exist
-    mongosh admin --eval "
-    try {
-      db.createUser({
+    const adminDb = db.getSiblingDB('admin');
+
+    // Create application user if it doesn't exist
+    const existing = adminDb.getUser('$MONGODB_APP_USERNAME');
+    if (!existing) {
+      adminDb.createUser({
         user: '$MONGODB_APP_USERNAME',
         pwd: '$MONGODB_APP_PASSWORD',
         roles: [
@@ -65,18 +42,12 @@ data:
         ]
       });
       print('Application user created successfully');
-    } catch (e) {
-      if (e.codeName === 'DuplicateKey' || e.code === 11000) {
-        print('Application user already exists');
-        db.changeUserPassword('$MONGODB_APP_USERNAME', '$MONGODB_APP_PASSWORD');
-        print('Application user password updated');
-      } else {
-        throw e;
-      }
+    } else {
+      print('Application user already exists');
     }
     "
-    
-    echo "User initialization complete!"
+
+    echo "MongoDB user initialization complete!"
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -99,36 +70,6 @@ spec:
         app: enginedge
         component: mongodb
     spec:
-      initContainers:
-      - name: init-users
-        image: mongo:5.0.24
-        command: ["/bin/bash", "/scripts/init-users.sh"]
-        env:
-        - name: MONGO_INITDB_ROOT_USERNAME
-          valueFrom:
-            secretKeyRef:
-              name: mongodb-secret
-              key: mongodb-root-username
-        - name: MONGO_INITDB_ROOT_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: mongodb-secret
-              key: mongodb-root-password
-        - name: MONGODB_APP_USERNAME
-          valueFrom:
-            secretKeyRef:
-              name: mongodb-secret
-              key: mongodb-app-username
-        - name: MONGODB_APP_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: mongodb-secret
-              key: mongodb-app-password
-        volumeMounts:
-        - name: mongodb-persistent-storage
-          mountPath: /data/db
-        - name: init-scripts
-          mountPath: /scripts
       containers:
       - name: mongodb
         image: mongo:5.0.24
@@ -145,13 +86,11 @@ spec:
             secretKeyRef:
               name: mongodb-secret
               key: mongodb-root-password
-        command:
-        - mongod
-        args:
-        - --bind_ip_all
         volumeMounts:
         - name: mongodb-persistent-storage
           mountPath: /data/db
+        - name: init-scripts
+          mountPath: /docker-entrypoint-initdb.d
         securityContext:
           runAsUser: 999
           runAsGroup: 999

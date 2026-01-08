@@ -73,6 +73,7 @@ K8S_SERVICE_GROUPS = {
             "apps/scheduling-worker.yaml",
             "apps/spacy-service.yaml",
             "apps/wolfram-kernel.yaml",
+            "secrets/mongodb-secret.yaml",
             "apps/mongodb.yaml"
         ],
     },
@@ -80,6 +81,15 @@ K8S_SERVICE_GROUPS = {
         "description": "The AI-powered scheduling model service.",
         "helm_releases": [],
         "manifests": ["config/scheduling-model-config.yaml", "apps/scheduling-model.yaml"],
+    },
+    "Data Lake": {
+        "description": "Iceberg-enabled Data Lake engines (Hive Metastore, Spark, Trino). Assumes MinIO + Postgres are installed via the Stateful Backend group.",
+        "helm_releases": [],
+        "manifests": [
+            "apps/hive-metastore.yml",
+            "apps/spark.yml",
+            "apps/trino.yml"
+        ],
     },
     "News Ingestion Job": {
         "description": "The scheduled CronJob for ingesting news articles.",
@@ -366,8 +376,6 @@ def _candidate_build_dirs_for_image(image_name: str) -> List[str]:
         "core": "hexagon",  # Legacy reference, now points to hexagon
         "hexagon": "hexagon",
         "scheduling-model-api": "scheduling_model",
-        # News ingestion job lives under scripts/jobs with its Dockerfile
-        "news-ingestion-job": "scripts/jobs",
         "wolfram-kernel": "local-kernel",
     }
     if base in special:
@@ -387,11 +395,16 @@ def _candidate_build_dirs_for_image(image_name: str) -> List[str]:
     enginedge_workers = os.path.join(parent_dir, "enginedge-workers")
     for c in candidates:
         search_dirs.append(os.path.join(enginedge_workers, c))
-    
-    # EnginEdge-monorepo directory (for scheduling model, local-kernel, news ingestion, etc.)
-    enginedge_monorepo = os.path.join(parent_dir, "EnginEdge-monorepo")
+
+    # enginedge-scheduling-model directory (for scheduling-model-api image)
+    enginedge_scheduling_model = os.path.join(parent_dir, "enginedge-scheduling-model")
     for c in candidates:
-        search_dirs.append(os.path.join(enginedge_monorepo, c))
+        search_dirs.append(os.path.join(enginedge_scheduling_model, c))
+
+    # enginedge-local-kernel directory (for wolfram-kernel image)
+    enginedge_local_kernel = os.path.join(parent_dir, "enginedge-local-kernel")
+    for c in candidates:
+        search_dirs.append(os.path.join(enginedge_local_kernel, c))
     
     return search_dirs
 
@@ -403,6 +416,20 @@ def _find_build_context_for_image(image_name: str) -> Optional[str]:
         if os.path.isfile(hexagon_dockerfile):
             # Return hexagon directory as the build context
             return os.path.join(REPO_ROOT, "hexagon")
+
+    # Special case: scheduling-model-api lives in sibling repo enginedge-scheduling-model (Dockerfile at repo root)
+    if image_name.startswith("scheduling-model-api"):
+        parent_dir = os.path.dirname(REPO_ROOT)
+        sm_root = os.path.join(parent_dir, "enginedge-scheduling-model")
+        if os.path.isfile(os.path.join(sm_root, "Dockerfile")):
+            return sm_root
+
+    # Special case: wolfram-kernel lives in sibling repo enginedge-local-kernel (Dockerfile at repo root)
+    if image_name.startswith("wolfram-kernel"):
+        parent_dir = os.path.dirname(REPO_ROOT)
+        lk_root = os.path.join(parent_dir, "enginedge-local-kernel")
+        if os.path.isfile(os.path.join(lk_root, "Dockerfile")):
+            return lk_root
     
     # Default: search for Dockerfile in candidate directories
     for cand in _candidate_build_dirs_for_image(image_name):
@@ -437,6 +464,52 @@ def _load_env_file_if_present():
 
 
 def _build_and_load_kind_images(selected_groups: List[str]):
+    def _kind_nodes(cluster_name: str) -> List[str]:
+        try:
+            out = subprocess.run(
+                ["kind", "get", "nodes", "--name", cluster_name],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            nodes = [line.strip() for line in (out.stdout or "").splitlines() if line.strip()]
+            return nodes
+        except Exception:
+            return []
+
+    def _tag_loaded_image_for_containerd(cluster_name: str, image: str):
+        """kind load under Podman commonly results in containerd tags like localhost/<image>.
+
+        Kubernetes typically resolves unqualified image refs like 'foo:latest' to
+        'docker.io/library/foo:latest'. Ensure those tags exist inside each kind node.
+        """
+        if "/" in image:
+            # Already a qualified ref (e.g., quay.io/..., bde2020/...), don't attempt retag.
+            return
+
+        nodes = _kind_nodes(cluster_name)
+        if not nodes:
+            return
+
+        local_ref = f"localhost/{image}"
+        dockerhub_ref = f"docker.io/library/{image}"
+
+        # Use podman exec if available (supports --privileged); docker exec otherwise.
+        use_podman = shutil.which("podman") is not None
+        for node in nodes:
+            exec_prefix = ["podman", "exec", "--privileged", node] if use_podman else ["docker", "exec", node]
+            try:
+                subprocess.run(
+                    exec_prefix
+                    + ["ctr", "--namespace=k8s.io", "images", "tag", local_ref, dockerhub_ref],
+                    check=True,
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                )
+            except Exception:
+                # Best-effort; if it fails, kubelet may still find the image via other tags.
+                pass
+
     if not _docker_available():
         CONSOLE.print(Panel(
             "[yellow]Docker CLI not found. Skipping local image build/load.[/yellow]",
@@ -467,7 +540,7 @@ def _build_and_load_kind_images(selected_groups: List[str]):
             # Dockerfile is already in the context, no need for -f flag
             pass
         # Special handling for wolfram-kernel
-        elif os.path.basename(ctx) == "local-kernel":
+        elif os.path.basename(ctx) in ("local-kernel", "enginedge-local-kernel"):
             # If image already exists locally, skip rebuild and just load into kind
             try:
                 subprocess.run(["docker", "image", "inspect", tag], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -482,6 +555,7 @@ def _build_and_load_kind_images(selected_groups: List[str]):
                             if os.path.exists(winget_kind_path):
                                 kind_cmd = winget_kind_path
                     subprocess.run([kind_cmd, "load", "docker-image", tag, "--name", "enginedge"], check=True)
+                    _tag_loaded_image_for_containerd("enginedge", tag)
                     CONSOLE.print(f"[green]Loaded {tag} into kind cluster.[/green]")
                 continue
             except subprocess.CalledProcessError:
@@ -523,6 +597,7 @@ def _build_and_load_kind_images(selected_groups: List[str]):
                                 kind_cmd = winget_kind_path
                 
                 subprocess.run([kind_cmd, "load", "docker-image", tag, "--name", "enginedge"], check=True)
+                _tag_loaded_image_for_containerd("enginedge", tag)
                 CONSOLE.print(f"[green]Loaded {tag} into kind cluster.[/green]")
             except subprocess.CalledProcessError as e:
                 CONSOLE.print(f"[yellow]Failed to load {tag} into kind: {e}[/yellow]")
