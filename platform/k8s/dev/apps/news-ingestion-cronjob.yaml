@@ -6,6 +6,9 @@ metadata:
 spec:
   # Schedule to run every 2 hours, matching the original Airflow DAG
   schedule: "0 */2 * * *"
+  # In dev(kind) we default to suspending this CronJob because the job image
+  # is not built/loaded automatically (imagePullPolicy: Never).
+  suspend: true
   jobTemplate:
     spec:
       template:
