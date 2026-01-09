@@ -107,7 +107,7 @@ deploy_infrastructure() {
     # Deploy Kafka
     log_info "Deploying Kafka..."
     if ! helm list | grep -q "^kafka"; then
-        helm install kafka bitnami/kafka \
+        helm upgrade --install kafka bitnami/kafka \
             --namespace default \
             -f "$K8S_DIR/charts/kafka/values.yaml"
     else
@@ -118,7 +118,7 @@ deploy_infrastructure() {
     # Deploy Redis
     log_info "Deploying Redis..."
     if ! helm list | grep -q "^redis"; then
-        helm install redis bitnami/redis \
+        helm upgrade --install redis bitnami/redis \
             --namespace default \
             -f "$K8S_DIR/charts/redis/values.yaml"
     else
@@ -128,7 +128,7 @@ deploy_infrastructure() {
     # Deploy MinIO
     log_info "Deploying MinIO..."
     if ! helm list | grep -q "^minio"; then
-        helm install minio minio/minio \
+        helm upgrade --install minio minio/minio \
             --namespace default \
             -f "$K8S_DIR/charts/minio/values.yaml"
     else
@@ -138,7 +138,7 @@ deploy_infrastructure() {
     # Deploy PostgreSQL
     log_info "Deploying PostgreSQL..."
     if ! helm list | grep -q "^postgres-metastore"; then
-        helm install postgres-metastore bitnami/postgresql \
+        helm upgrade --install postgres-metastore bitnami/postgresql \
             --namespace default \
             -f "$K8S_DIR/charts/postgres/values.yaml"
     else
@@ -156,7 +156,7 @@ deploy_observability() {
     
     # Install Prometheus Stack
     if ! helm list -n observability | grep -q "^kube-prometheus-stack"; then
-        helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
+        helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
             --namespace observability \
             -f "$K8S_DIR/observability/helm-values.yaml"
     else

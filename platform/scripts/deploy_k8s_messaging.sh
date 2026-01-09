@@ -12,7 +12,7 @@ helm repo add bitnami https://charts.bitnami.com/bitnami
 helm repo add minio https://charts.min.io/
 helm repo update
 
-helm install kafka bitnami/kafka -f ../k8s/charts/kafka/values.yaml --namespace default
-helm install redis bitnami/redis -f ../k8s/charts/redis/values.yaml --namespace default
+helm upgrade --install kafka bitnami/kafka -f ../k8s/charts/kafka/values.yaml --namespace default
+helm upgrade --install redis bitnami/redis -f ../k8s/charts/redis/values.yaml --namespace default
 
 echo 'Kubernetes deployment finished.'

@@ -50,6 +50,11 @@ spec:
           value: "production"
         - name: PORT
           value: "3003"
+        - name: MONGODB_URI
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: mongodb-uri
         - name: KAFKA_BROKERS
           valueFrom:
             configMapKeyRef:
@@ -76,3 +81,4 @@ spec:
           limits:
             memory: "1Gi"
             cpu: "1000m"
+

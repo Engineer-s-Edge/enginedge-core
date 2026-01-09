@@ -1,15 +1,16 @@
-FROM node:20-alpine AS builder
+FROM node:20-bookworm-slim AS builder
 
-# Install Python and build tools for native modules (canvas)
-RUN apk add --no-cache \
-    python3 \
-    make \
-    g++ \
-    cairo-dev \
-    jpeg-dev \
-    pango-dev \
-    giflib-dev \
-    pixman-dev
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        python3 \
+        make \
+        g++ \
+        pkg-config \
+        libcairo2-dev \
+        libpango1.0-dev \
+        libjpeg-dev \
+        libgif-dev \
+        librsvg2-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -27,29 +28,26 @@ COPY src ./src
 # Build application
 RUN npm run build
 
-# Production stage
-FROM node:20-alpine
+# Prune to production deps for the runtime image
+RUN npm prune --omit=dev
 
-# Install Python and build tools for native modules (canvas)
-RUN apk add --no-cache \
-    python3 \
-    make \
-    g++ \
-    cairo-dev \
-    jpeg-dev \
-    pango-dev \
-    giflib-dev \
-    pixman-dev
+# Production stage
+FROM node:20-bookworm-slim
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        ca-certificates \
+        libcairo2 \
+        libpango-1.0-0 \
+        libjpeg62-turbo \
+        libgif7 \
+        librsvg2-2 \
+        libpixman-1-0 \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
-
-# Install production dependencies only
-RUN npm ci --only=production
-
-# Copy built application
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 
 # Expose port

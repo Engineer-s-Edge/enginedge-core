@@ -19,6 +19,10 @@
 !.vscode/launch.json
 !.vscode/extensions.json
 
+# Python cache
+__pycache__/
+*.pyc
+
 # Kubernetes secrets (Dev)
 platform/k8s/dev/secrets/*.yaml
 !platform/k8s/dev/secrets/*.yaml.example
@@ -38,6 +42,12 @@ enginedge-deploy.zip
 
 # Local deployment config
 platform/control-center/hexagon.json
+
+# Control Center generated scripts (artifacts)
+platform/control-center/deploy_k8s_*.sh
+platform/control-center/deploy_k8s_*.ps1
+platform/control-center/destroy_k8s_*.sh
+platform/control-center/destroy_k8s_*.ps1
 
 # Secret files
 .secrets/

@@ -62,6 +62,11 @@ spec:
         env:
         - name: PORT
           value: "8001"
+        - name: MONGODB_URI
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: mongodb-uri
         - name: WORKERS
           value: "4"
         - name: LOG_LEVEL
@@ -102,4 +107,5 @@ spec:
           limits:
             memory: "6Gi"
             cpu: "4000m"
+
 

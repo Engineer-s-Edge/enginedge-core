@@ -60,7 +60,6 @@ K8S_SERVICE_GROUPS = {
             "config/core-config.yaml",
             "config/worker-config.yaml",
             "config/spacy-service-config.yaml",
-            "rbac/main-node-observability-rbac.yaml",
             "apps/hexagon.yaml",
             "apps/api-gateway.yaml",
             "apps/identity-worker.yaml",
@@ -272,6 +271,55 @@ def _is_cluster_online(timeout_seconds: int = 8) -> bool:
         return False
 
 
+def _kind_cluster_exists(cluster_name: str) -> bool:
+    if not _kind_available():
+        return False
+    try:
+        out = subprocess.run(
+            ["kind", "get", "clusters"],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        clusters = [line.strip() for line in (out.stdout or "").splitlines() if line.strip()]
+        return cluster_name in clusters
+    except Exception:
+        return False
+
+
+def _ensure_kind_kubeconfig_and_context(cluster_name: str = "enginedge") -> None:
+    """Best-effort: make kubectl talk to an existing kind cluster.
+
+    The common failure mode (especially with Podman provider) is:
+    - kind cluster containers exist
+    - kubectl context is pointing elsewhere, so `kubectl cluster-info` says "offline"
+    """
+    if not _kind_available() or not _kubectl_available():
+        return
+    if not _kind_cluster_exists(cluster_name):
+        return
+    try:
+        subprocess.run(
+            ["kind", "export", "kubeconfig", "--name", cluster_name],
+            check=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+    except Exception:
+        pass
+
+    # Switch context if present; ignore errors.
+    try:
+        subprocess.run(
+            ["kubectl", "config", "use-context", f"kind-{cluster_name}"],
+            check=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+    except Exception:
+        pass
+
+
 def _start_kind_cluster_interactive() -> bool:
     """Offer to start a local kind cluster. Returns True if cluster is online after, else False."""
     if not _kind_available():
@@ -289,6 +337,34 @@ def _start_kind_cluster_interactive() -> bool:
         default=True,
     ).execute()
     if not use_kind:
+        return False
+
+    # If the cluster already exists, don't try to recreate it.
+    if _kind_cluster_exists("enginedge"):
+        CONSOLE.print("\n[bold]kind cluster 'enginedge' already exists; reusing it...[/bold]")
+        _ensure_kind_kubeconfig_and_context("enginedge")
+
+        # If containers exist but were stopped, try to start them (Podman provider).
+        try:
+            if shutil.which("podman"):
+                out = subprocess.run(
+                    ["kind", "get", "nodes", "--name", "enginedge"],
+                    check=True,
+                    capture_output=True,
+                    text=True,
+                )
+                nodes = [line.strip() for line in (out.stdout or "").splitlines() if line.strip()]
+                if nodes:
+                    subprocess.run(["podman", "start", *nodes], check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        except Exception:
+            pass
+
+        for _ in range(20):
+            if _is_cluster_online():
+                CONSOLE.print("[green]Cluster is online.[/green]")
+                return True
+            time.sleep(2)
+        CONSOLE.print("[yellow]Cluster exists but kubectl still can't reach it.[/yellow]")
         return False
 
     # Determine config path
@@ -314,6 +390,12 @@ def _start_kind_cluster_interactive() -> bool:
     try:
         subprocess.run(cmd, check=True)
     except subprocess.CalledProcessError as e:
+        # Common case: cluster containers exist but kubectl is pointed elsewhere.
+        if "node(s) already exist" in str(e):
+            _ensure_kind_kubeconfig_and_context("enginedge")
+            if _is_cluster_online():
+                CONSOLE.print("[green]Cluster is online.[/green]")
+                return True
         CONSOLE.print(f"[red]Failed to start kind cluster: {e}[/red]")
         return False
 
@@ -328,6 +410,8 @@ def _start_kind_cluster_interactive() -> bool:
 
 
 def _ensure_cluster_online_or_offer_start() -> bool:
+    # If kind cluster exists, ensure kubectl is targeting it before checking.
+    _ensure_kind_kubeconfig_and_context("enginedge")
     if _is_cluster_online():
         return True
     return _start_kind_cluster_interactive()
@@ -870,7 +954,7 @@ def generate_k8s_deploy_script(selected_groups: List[str]):
                 values_rel = helm_values.get(release)
                 if chart and values_rel:
                     values = os.path.join(K8S_DIR, values_rel)
-                    f.write(f"helm install {release} {chart} -f {values} --namespace default\n")
+                    f.write(f"helm upgrade --install {release} {chart} -f {values} --namespace default\n")
             f.write("\n")
 
         if observability:
@@ -936,7 +1020,7 @@ def generate_k8s_deploy_script(selected_groups: List[str]):
                 values_rel = helm_values.get(release)
                 if chart and values_rel:
                     values = os.path.join(K8S_DIR, values_rel)
-                    f.write(f"helm install {release} {chart} -f '{values}' --namespace default\n")
+                    f.write(f"helm upgrade --install {release} {chart} -f '{values}' --namespace default\n")
             f.write("\n")
 
         observability_ps = [m for m in manifests_to_apply if "observability/" in m]

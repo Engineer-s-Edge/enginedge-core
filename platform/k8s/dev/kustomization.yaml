@@ -2,7 +2,6 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-- apps/main-node.yaml
 # - apps/worker-node.yaml
 - apps/interview-worker.yaml
 - apps/scheduling-worker.yaml
@@ -14,13 +13,11 @@ resources:
 - apps/hive-metastore.yml
 - apps/spark.yml
 - apps/trino.yml
-- config/main-node-config.yaml
 # - config/worker-node-config.yaml
-- config/interview-worker-config.yaml
 - config/scheduling-model-config.yaml
 - config/resume-worker-config.yaml
 - config/spacy-service-config.yaml
-- rbac/main-node-observability-rbac.yaml
+
 
 patches:
 - path: host-docker-internal.yaml

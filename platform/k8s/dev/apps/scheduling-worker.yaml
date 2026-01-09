@@ -58,31 +58,19 @@ spec:
         
         # Google Calendar OAuth
         - name: GOOGLE_CLIENT_ID
-          valueFrom:
-            secretKeyRef:
-              name: google-oauth-secret
-              key: client-id
+          value: "dev"
         - name: GOOGLE_CLIENT_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: google-oauth-secret
-              key: client-secret
+          value: "dev"
         - name: GOOGLE_REDIRECT_URI
           value: "http://localhost:3007/calendar/auth/callback"
         
         # Google Service Account Credentials (for Calendar API)
         - name: GOOGLE_APPLICATION_CREDENTIALS_JSON
-          valueFrom:
-            secretKeyRef:
-              name: google-secret
-              key: google-credentials.json
+          value: "{}"
         
         # JWT Secret
         - name: JWT_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: jwt-secret
-              key: JWT_SECRET
+          value: "dev-jwt-secret"
         
         # Application Config
         - name: NODE_ENV

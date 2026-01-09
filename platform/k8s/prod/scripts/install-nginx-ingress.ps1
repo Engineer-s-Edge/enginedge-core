@@ -51,7 +51,7 @@ if ($useHelm) {
     helm repo update 2>&1 | Out-Null
     
     # Install ingress-nginx
-    helm install ingress-nginx ingress-nginx/ingress-nginx `
+    helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx `
         --namespace ingress-nginx `
         --create-namespace `
         --set controller.service.type=NodePort `

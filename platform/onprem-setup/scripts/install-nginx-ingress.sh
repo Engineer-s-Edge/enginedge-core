@@ -65,7 +65,7 @@ install_with_helm() {
     
     # Install ingress-nginx
     log_info "Installing ingress-nginx controller..."
-    helm install ingress-nginx ingress-nginx/ingress-nginx \
+    helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
         --namespace ingress-nginx \
         --create-namespace \
         --set controller.service.type=NodePort \

@@ -74,7 +74,10 @@ spec:
         - name: PORT
           value: "3006"
         - name: MONGODB_URI
-          value: "mongodb://mongodb-service:27017/resume-worker"
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: mongodb-uri
         - name: REDIS_URL
           value: "redis://redis-master:6379/1"
         - name: SPACY_SERVICE_URL
@@ -117,4 +120,5 @@ spec:
           limits:
             memory: "2Gi"
             cpu: "2000m"
+
 

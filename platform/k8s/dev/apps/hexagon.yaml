@@ -36,7 +36,6 @@ spec:
         app: enginedge
         component: hexagon
     spec:
-      serviceAccountName: main-node-observability
       volumes:
       - name: app-logs
         emptyDir: {}
@@ -53,9 +52,9 @@ spec:
           value: "3000"
         - name: MONGODB_URI
           valueFrom:
-            configMapKeyRef:
-              name: core-config
-              key: MONGODB_URI
+            secretKeyRef:
+              name: mongodb-secret
+              key: mongodb-uri
         - name: REDIS_URL
           valueFrom:
             configMapKeyRef:

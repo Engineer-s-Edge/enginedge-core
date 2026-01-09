@@ -17,10 +17,10 @@ helm repo add bitnami https://charts.bitnami.com/bitnami
 helm repo add minio https://charts.min.io/
 helm repo update
 
-helm install kafka bitnami/kafka -f '../k8s/charts/kafka/values.yaml' --namespace default
-helm install minio minio/minio -f '../k8s/charts/minio/values.yaml' --namespace default
-helm install postgres-metastore bitnami/postgresql -f '../k8s/charts/postgres/values.yaml' --namespace default
-helm install redis bitnami/redis -f '../k8s/charts/redis/values.yaml' --namespace default
+helm upgrade --install kafka bitnami/kafka -f '../k8s/charts/kafka/values.yaml' --namespace default
+helm upgrade --install minio minio/minio -f '../k8s/charts/minio/values.yaml' --namespace default
+helm upgrade --install postgres-metastore bitnami/postgresql -f '../k8s/charts/postgres/values.yaml' --namespace default
+helm upgrade --install redis bitnami/redis -f '../k8s/charts/redis/values.yaml' --namespace default
 
 # --- Deploying Core Applications ---
 kubectl apply -f '../k8s/apps/main-node.yaml'

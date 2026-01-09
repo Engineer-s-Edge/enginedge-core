@@ -112,10 +112,10 @@ Log-Info "Deploying Kafka..."
 if (-not (helm list -q | Select-String "kafka")) {
     $KafkaValues = Join-Path $K8sDir "charts\kafka\values.yaml"
     if (Test-Path $KafkaValues) {
-        helm install kafka bitnami/kafka --namespace default -f $KafkaValues
+        helm upgrade --install kafka bitnami/kafka --namespace default -f $KafkaValues
     } else {
         Log-Warn "Kafka values file not found at $KafkaValues. Installing with defaults."
-        helm install kafka bitnami/kafka --namespace default
+        helm upgrade --install kafka bitnami/kafka --namespace default
     }
 } else {
     Log-Warn "Kafka already installed. Skipping..."
@@ -126,10 +126,10 @@ Log-Info "Deploying Redis..."
 if (-not (helm list -q | Select-String "redis")) {
     $RedisValues = Join-Path $K8sDir "charts\redis\values.yaml"
     if (Test-Path $RedisValues) {
-        helm install redis bitnami/redis --namespace default -f $RedisValues
+        helm upgrade --install redis bitnami/redis --namespace default -f $RedisValues
     } else {
         Log-Warn "Redis values file not found at $RedisValues. Installing with defaults."
-        helm install redis bitnami/redis --namespace default
+        helm upgrade --install redis bitnami/redis --namespace default
     }
 } else {
     Log-Warn "Redis already installed. Skipping..."
@@ -140,10 +140,10 @@ Log-Info "Deploying MinIO..."
 if (-not (helm list -q | Select-String "minio")) {
     $MinioValues = Join-Path $K8sDir "charts\minio\values.yaml"
     if (Test-Path $MinioValues) {
-        helm install minio minio/minio --namespace default -f $MinioValues
+        helm upgrade --install minio minio/minio --namespace default -f $MinioValues
     } else {
         Log-Warn "MinIO values file not found at $MinioValues. Installing with defaults."
-        helm install minio minio/minio --namespace default
+        helm upgrade --install minio minio/minio --namespace default
     }
 } else {
     Log-Warn "MinIO already installed. Skipping..."
