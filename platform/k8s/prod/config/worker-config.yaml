@@ -5,4 +5,4 @@ metadata:
   namespace: default
 data:
   KAFKA_BROKERS: "kafka-0.kafka.default.svc.cluster.local:9092,kafka-1.kafka.default.svc.cluster.local:9092"
-  MONGODB_URI: "mongodb://mongodb-service:27017/enginedge-workers"
+

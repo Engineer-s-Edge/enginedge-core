@@ -7,8 +7,6 @@ data:
   # Core service configuration
   NODE_ENV: "production"
   KUBERNETES_ENABLED: "true"
-  # MongoDB connection string
-  MONGODB_URI: "mongodb://mongodb-service:27017/enginedge-hexagon"
   # Redis connection string
   REDIS_URL: "redis://redis-master:6379/0"
   # Kafka brokers

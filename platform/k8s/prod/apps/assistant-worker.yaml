@@ -46,6 +46,18 @@ spec:
         - configMapRef:
             name: worker-config
         env:
+        - name: MONGODB_APP_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: mongodb-app-username
+        - name: MONGODB_APP_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: mongodb-app-password
+        - name: MONGODB_URI
+          value: "mongodb://$(MONGODB_APP_USERNAME):$(MONGODB_APP_PASSWORD)@mongodb-service:27017/enginedge-workers?authSource=admin"
         - name: NODE_ENV
           value: "production"
         - name: PORT

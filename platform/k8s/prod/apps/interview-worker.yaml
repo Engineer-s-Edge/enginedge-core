@@ -36,19 +36,6 @@ spec:
         app: enginedge
         component: interview-worker
     spec:
-      # Add init container to wait for Kafka
-      initContainers:
-      - name: wait-for-kafka
-        image: busybox:1.36.1
-        command: ['sh', '-c']
-        args:
-        - |
-          echo "Waiting for Kafka to be ready..."
-          until nc -z kafka 9092; do
-            echo "Kafka is not ready yet. Waiting..."
-            sleep 5
-          done
-          echo "Kafka is ready!"
       containers:
       - name: interview-worker
         image: ghcr.io/chris-alexander-pop/interview-worker:latest
@@ -61,6 +48,18 @@ spec:
             name: worker-config
         # Provide common fallbacks for Kafka broker env var names used by libraries
         env:
+        - name: MONGODB_APP_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: mongodb-app-username
+        - name: MONGODB_APP_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: mongodb-app-password
+        - name: MONGODB_URI
+          value: "mongodb://$(MONGODB_APP_USERNAME):$(MONGODB_APP_PASSWORD)@mongodb-service:27017/enginedge-workers?authSource=admin"
         - name: KAFKA_BROKER
           valueFrom:
             configMapKeyRef:

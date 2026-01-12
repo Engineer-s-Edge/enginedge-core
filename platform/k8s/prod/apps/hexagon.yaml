@@ -36,7 +36,6 @@ spec:
         app: enginedge
         component: hexagon
     spec:
-      serviceAccountName: main-node-observability
       imagePullSecrets:
       - name: ghcr-pull-secret
       volumes:
@@ -53,11 +52,18 @@ spec:
           value: "production"
         - name: PORT
           value: "3000"
-        - name: MONGODB_URI
+        - name: MONGODB_APP_USERNAME
           valueFrom:
-            configMapKeyRef:
-              name: core-config
-              key: MONGODB_URI
+            secretKeyRef:
+              name: mongodb-secret
+              key: mongodb-app-username
+        - name: MONGODB_APP_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: mongodb-app-password
+        - name: MONGODB_URI
+          value: "mongodb://$(MONGODB_APP_USERNAME):$(MONGODB_APP_PASSWORD)@mongodb-service:27017/enginedge-hexagon?authSource=admin"
         - name: REDIS_URL
           valueFrom:
             configMapKeyRef:
