@@ -2,10 +2,9 @@
 
 ## Overview
 
-The Hexagon orchestrator provides endpoints for:
-- HTTP API Gateway functionality (proxying to workers)
-- Asynchronous workflow orchestration via Kafka
-- Request status tracking and polling
+The Hexagon orchestrator provides endpoints for **Asynchronous workflow orchestration**.
+
+_Note: While legacy HTTP proxy endpoints may exist, all synchronous client traffic should be routed through the dedicated API Gateway._
 
 ## Base URL
 
@@ -32,6 +31,7 @@ Authorization: Bearer <jwt-token>
 Submit a workflow orchestration request. Returns immediately with a request ID for polling.
 
 **Request Body:**
+
 ```json
 {
   "workflow": "resume-build",
@@ -46,6 +46,7 @@ Submit a workflow orchestration request. Returns immediately with a request ID f
 ```
 
 **Response:** `202 Accepted`
+
 ```json
 {
   "requestId": "req_789",
@@ -56,6 +57,7 @@ Submit a workflow orchestration request. Returns immediately with a request ID f
 ```
 
 **Available Workflows:**
+
 - `resume-build`: Resume → Assistant → LaTeX
 - `expert-research`: Agent-tool → Data-processing → Assistant
 - `conversation-context`: Single assistant with context
@@ -68,6 +70,7 @@ Submit a workflow orchestration request. Returns immediately with a request ID f
 Get the current status and result of an orchestration request.
 
 **Response:** `200 OK`
+
 ```json
 {
   "requestId": "req_789",
@@ -103,6 +106,7 @@ Get the current status and result of an orchestration request.
 ```
 
 **Status Values:**
+
 - `pending`: Request created, not yet processing
 - `processing`: Request is being processed by workers
 - `completed`: All workers completed successfully
@@ -131,6 +135,7 @@ All proxy endpoints forward requests directly to worker services:
 Returns service health status.
 
 **Response:** `200 OK`
+
 ```json
 {
   "status": "ok"
@@ -203,13 +208,14 @@ All errors follow this format:
 ## Rate Limiting
 
 Rate limiting is applied per IP address and endpoint:
+
 - Default: 60 requests per minute
 - WebSocket and SSE connections are exempt
 
 ## WebSocket Support
 
 WebSocket connections are proxied to worker services:
+
 - `/api/assistants/*` → Assistant Worker WebSocket
 - `/api/interview/*` → Interview Worker WebSocket
 - Authentication required via Bearer token in `Authorization` header or `?token=...` query parameter
-

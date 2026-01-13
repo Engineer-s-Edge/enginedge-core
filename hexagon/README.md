@@ -20,22 +20,22 @@
 
 ## Overview
 
-The **Control Plane** serves as the API gateway and orchestration layer for the entire EnginEdge platform. It receives incoming requests, routes them to appropriate worker nodes via Apache Kafka, and manages the complete request/response lifecycle.
+The **Control Plane (Hexagon)** acts as the **Asynchronous Orchestration Layer** for the EnginEdge platform. While the [API Gateway](../api-gateway) handles synchronous routing, the Hexagon manages complex, long-running, and multi-worker workflows via Apache Kafka.
 
 ### Key Responsibilities
 
-- **Request Routing**: Intelligent routing based on task type and worker availability
-- **Load Balancing**: Distribute work across multiple instances of worker nodes
-- **Health Monitoring**: Track worker node status and performance metrics
-- **Authentication**: API key validation and request authorization
-- **Response Aggregation**: Combine results from multiple workers when needed
-- **Error Handling**: Graceful degradation and comprehensive error reporting
+- **Workflow Orchestration**: Coordinating complex multi-step workflows across workers.
+- **State Management**: Managing the state of long-running processes.
+- **Asynchronous Communication**: Using Kafka to distribute tasks to workers.
+- **Result Aggregation**: combining results from multiple async workers.
+
+_Note: Legacy HTTP proxying functionality still exists within Hexagon but is superseded by the `api-gateway` service for standard synchronous traffic._
 
 ### Communication Patterns
 
-- **HTTP/REST**: Client-facing API (port 3000)
-- **Kafka**: Asynchronous communication with worker nodes
-- **Health Checks**: Periodic worker node health verification
+- **Kafka**: Primary communication channel for worker coordination (Asynchronous).
+- **HTTP/REST**: Internal control API and legacy proxy endpoints (Port 3000).
+- **Health Checks**: Periodic worker node health verification.
 
 ## Architecture
 
@@ -84,6 +84,7 @@ src/
 ### Core Entities
 
 #### Request Entity
+
 ```typescript
 interface Request {
   id: string;
@@ -97,6 +98,7 @@ interface Request {
 ```
 
 #### Worker Entity
+
 ```typescript
 interface Worker {
   id: string;
@@ -110,6 +112,7 @@ interface Worker {
 ```
 
 #### Message Entity
+
 ```typescript
 interface Message {
   id: string;
@@ -137,6 +140,7 @@ interface Message {
 ### Orchestration API
 
 #### Submit Request
+
 ```http
 POST /api/orchestrate
 Content-Type: application/json
@@ -162,6 +166,7 @@ Authorization: Bearer <api-key>
 ```
 
 **Response:**
+
 ```json
 {
   "requestId": "req_123456",
@@ -173,11 +178,13 @@ Authorization: Bearer <api-key>
 ```
 
 #### Get Request Status
+
 ```http
 GET /api/requests/{requestId}
 ```
 
 **Response:**
+
 ```json
 {
   "requestId": "req_123456",
@@ -193,6 +200,7 @@ GET /api/requests/{requestId}
 ```
 
 #### Batch Requests
+
 ```http
 POST /api/orchestrate/batch
 Content-Type: application/json
@@ -216,11 +224,13 @@ Content-Type: application/json
 ### Health & Monitoring API
 
 #### System Health
+
 ```http
 GET /health
 ```
 
 **Response:**
+
 ```json
 {
   "status": "healthy",
@@ -239,11 +249,13 @@ GET /health
 ```
 
 #### Worker Status
+
 ```http
 GET /health/workers
 ```
 
 **Response:**
+
 ```json
 {
   "workers": [
@@ -261,6 +273,7 @@ GET /health/workers
 ```
 
 #### Metrics
+
 ```http
 GET /metrics
 ```
@@ -328,22 +341,26 @@ const staticWorkers = [
 ### Local Setup
 
 1. **Install dependencies:**
+
    ```bash
    npm install
    ```
 
 2. **Start infrastructure:**
+
    ```bash
    docker-compose -f ../../EnginEdge-monorepo/docker-compose.dev.yml up -d
    ```
 
 3. **Configure environment:**
+
    ```bash
    cp .env.example .env
    # Edit .env with your configuration
    ```
 
 4. **Start development server:**
+
    ```bash
    npm run start:dev
    ```
@@ -417,27 +434,27 @@ spec:
         app: enginedge-main-hexagon
     spec:
       containers:
-      - name: main-hexagon
-        image: enginedge-main-hexagon:latest
-        ports:
-        - containerPort: 3000
-        envFrom:
-        - configMapRef:
-            name: enginedge-config
-        - secretRef:
-            name: enginedge-secrets
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 3000
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /health/ready
-            port: 3000
-          initialDelaySeconds: 5
-          periodSeconds: 5
+        - name: main-hexagon
+          image: enginedge-main-hexagon:latest
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - configMapRef:
+                name: enginedge-config
+            - secretRef:
+                name: enginedge-secrets
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
 ```
 
 ### Helm Chart
@@ -507,6 +524,7 @@ Key alerts configured:
 ### Common Issues
 
 #### Worker Not Responding
+
 ```bash
 # Check worker health
 curl http://localhost:3001/health
@@ -519,6 +537,7 @@ curl http://localhost:3000/health/workers
 ```
 
 #### High Latency
+
 ```bash
 # Check metrics
 curl http://localhost:3000/metrics | grep orchestration_request_duration
@@ -531,6 +550,7 @@ kubectl exec -it kafka-pod -- kafka-consumer-groups --describe --group orchestra
 ```
 
 #### Memory Issues
+
 ```bash
 # Check heap usage
 curl http://localhost:3000/metrics | grep nodejs_heap

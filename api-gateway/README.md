@@ -3,6 +3,7 @@
 ## Overview
 
 The API Gateway is the central entry point for all EnginEdge services, providing:
+
 - **Authentication & Authorization** (JWT + Role-Based Access Control)
 - **Request Proxying** to worker services
 - **Rate Limiting** per IP/route
@@ -22,11 +23,11 @@ The API Gateway is the central entry point for all EnginEdge services, providing
     ▼               ▼                  ▼
 Public Routes   Protected Routes   Admin-Only Routes
     │               │                  │
-/auth/login   /assistants/*       /datalake/*
-/auth/register /scheduling/*      (JWT + admin role)
-/health        /resume/*
-               /interview/*
-               /data/*
+/api/auth/login   /api/assistants/* /api/datalake/*
+/api/auth/register /api/scheduling/* (JWT + admin role)
+/api/health       /api/resume/*
+                  /api/interview/*
+                  /api/data/*
 ```
 
 ## Features
@@ -34,13 +35,17 @@ Public Routes   Protected Routes   Admin-Only Routes
 ### 1. Authentication & Authorization
 
 #### JWT Authentication
+
 All protected routes require a valid JWT token:
+
 ```bash
 Authorization: Bearer <token>
 ```
 
 #### Role-Based Access Control (RBAC)
+
 Admin-only routes require the `admin` role in the JWT payload:
+
 ```json
 {
   "userId": "123",
@@ -51,18 +56,36 @@ Admin-only routes require the `admin` role in the JWT payload:
 
 ### 2. Service Proxying
 
-The gateway proxies requests to worker services:
+The gateway proxies requests to worker services.
 
-| Route | Target Service | Auth Required | Admin Only |
-|-------|---------------|---------------|------------|
-| `/assistants/*` | assistant-worker:3000 | ❌ | ❌ |
-| `/scheduling/*` | scheduling-worker:3000 | ❌ | ❌ |
-| `/resume/*` | resume-worker:3000 | ❌ | ❌ |
-| `/interview/*` | interview-worker:3000 | ❌ | ❌ |
-| `/data/*` | data-processing-worker:3003 | ❌ | ❌ |
-| `/latex/*` | latex-worker:3000 | ❌ | ❌ |
-| `/tools/*` | agent-tool-worker:3000 | ❌ | ❌ |
-| `/datalake/*` | Various datalake services | ✅ | ✅ |
+**HTTP Routes (Port 3001)**
+Most HTTP routes are proxied directly without authentication checks at the gateway level (authentication is handled by the worker if needed), except for `datalake` routes which are admin-only.
+
+| Route               | Target Service            | Default Port | Auth Enforced by Gateway |
+| ------------------- | ------------------------- | ------------ | ------------------------ |
+| `/api/assistants/*` | assistant-worker          | 3001         | ❌                       |
+| `/api/interview/*`  | interview-worker          | 3004         | ❌                       |
+| `/api/data/*`       | data-processing-worker    | 3003         | ❌                       |
+| `/api/scheduling/*` | scheduling-worker         | 3000         | ❌                       |
+| `/api/calendar/*`   | scheduling-worker         | 3000         | ❌                       |
+| `/api/latex/*`      | latex-worker              | 3005         | ❌                       |
+| `/api/resume/*`     | resume-worker             | 3006         | ❌                       |
+| `/api/tools/*`      | agent-tool-worker         | 3002         | ❌                       |
+| `/api/datalake/*`   | Various datalake services | N/A          | ✅ (Admin Only)          |
+
+**WebSocket Routes**
+The gateway also proxies WebSocket connections. **Authentication is enforced at the gateway for all specific WebSocket routes.**
+
+| Route Prefix        | Target Service              | Auth Required |
+| ------------------- | --------------------------- | ------------- |
+| `/api/assistants/*` | assistant-worker:3001       | ✅            |
+| `/api/interview/*`  | interview-worker:3004       | ✅            |
+| `/api/data/*`       | data-processing-worker:3003 | ✅            |
+| `/api/scheduling/*` | scheduling-worker:3000      | ✅            |
+| `/api/calendar/*`   | scheduling-worker:3000      | ✅            |
+| `/api/latex/*`      | latex-worker:3005           | ✅            |
+| `/api/resume/*`     | resume-worker:3006          | ✅            |
+| `/api/tools/*`      | agent-tool-worker:3002      | ✅            |
 
 ### 3. Datalake Admin-Only Access
 
@@ -74,26 +97,27 @@ All datalake UI routes are protected by JWT + admin role:
 @Roles('admin')
 export class DatalakeProxyController {
   // MinIO Console
-  @All('minio/*') forwardMinio() { }
-  
+  @All('minio/*') forwardMinio() {}
+
   // Trino Query UI
-  @All('trino/*') forwardTrino() { }
-  
+  @All('trino/*') forwardTrino() {}
+
   // Airflow Orchestration UI
-  @All('airflow/*') forwardAirflow() { }
-  
+  @All('airflow/*') forwardAirflow() {}
+
   // Jupyter Analytics
-  @All('jupyter/*') forwardJupyter() { }
-  
+  @All('jupyter/*') forwardJupyter() {}
+
   // Spark Master UI
-  @All('spark/*') forwardSpark() { }
-  
+  @All('spark/*') forwardSpark() {}
+
   // Marquez Lineage UI
-  @All('marquez/*') forwardMarquez() { }
+  @All('marquez/*') forwardMarquez() {}
 }
 ```
 
 **Why Admin-Only?**
+
 - These UIs expose sensitive data lake infrastructure
 - Allow direct data access and query execution
 - Can modify ETL pipelines and workflows
@@ -102,17 +126,20 @@ export class DatalakeProxyController {
 ### 4. Rate Limiting
 
 Rate limiting is applied per IP address and route:
+
 - **Default**: 100 requests per 60 seconds
 - **Configurable** via `RATE_LIMIT_TTL` and `RATE_LIMIT_MAX` env vars
 
 ### 5. Health Monitoring
 
 Health endpoint checks gateway status:
+
 ```bash
 GET /health
 ```
 
 Response:
+
 ```json
 {
   "status": "ok",
@@ -125,6 +152,7 @@ Response:
 ### JwtAuthGuard
 
 Validates JWT tokens and attaches user to request:
+
 ```typescript
 @UseGuards(JwtAuthGuard)
 @Get('profile')
@@ -136,6 +164,7 @@ getProfile(@Req() req) {
 ### RolesGuard
 
 Checks if user has required roles:
+
 ```typescript
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('admin')
@@ -157,6 +186,7 @@ curl -X POST http://localhost:3001/auth/login \
 ```
 
 Response:
+
 ```json
 {
   "accessToken": "eyJhbGciOiJIUzI1NiIs...",
@@ -191,6 +221,7 @@ curl http://localhost:3001/datalake/minio/login \
 ```
 
 Response (non-admin):
+
 ```json
 {
   "statusCode": 403,
@@ -239,7 +270,7 @@ RATE_LIMIT_MAX=100
 api-gateway:
   build: ./api-gateway
   ports:
-    - "3001:3001"
+    - '3001:3001'
   environment:
     - PORT=3001
     - JWT_SECRET=${JWT_SECRET}
@@ -282,16 +313,19 @@ npm start
 ## Testing
 
 ### Unit Tests
+
 ```bash
 npm test
 ```
 
 ### Integration Tests
+
 ```bash
 npm run test:e2e
 ```
 
 ### Test Admin Access
+
 ```bash
 # Create test script
 cat > test-admin.sh << 'EOF'
@@ -330,12 +364,14 @@ chmod +x test-admin.sh
 ## Monitoring
 
 ### Prometheus Metrics
+
 ```bash
 # Endpoint
 GET /metrics
 ```
 
 ### Health Checks
+
 ```bash
 # Liveness
 GET /health
@@ -345,7 +381,9 @@ GET /health/ready
 ```
 
 ### Logging
+
 All requests are logged with:
+
 - Request ID
 - User ID (if authenticated)
 - Route
@@ -366,21 +404,25 @@ All requests are logged with:
 ## Troubleshooting
 
 ### 401 Unauthorized
+
 - Token expired or invalid
 - Missing `Authorization` header
 - Check JWT_SECRET matches between services
 
 ### 403 Forbidden
+
 - User lacks required role (e.g., `admin`)
 - Check JWT payload contains correct roles
 - Verify RolesGuard is working properly
 
 ### 429 Too Many Requests
+
 - Rate limit exceeded
 - Adjust `RATE_LIMIT_MAX` or wait for cooldown
 - Consider implementing per-user rate limiting
 
 ### 502 Bad Gateway
+
 - Target service is down
 - Check worker service health
 - Verify service URLs in environment variables

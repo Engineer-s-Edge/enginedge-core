@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Hexagon is the central orchestration layer of the EnginEdge platform, built using hexagonal architecture (ports and adapters pattern). It handles both synchronous HTTP proxying (API Gateway functionality) and asynchronous Kafka-based workflow orchestration.
+The Hexagon is the central **Asynchronous Orchestration Layer** of the EnginEdge platform, built using hexagonal architecture (ports and adapters pattern). It manages complex multi-worker workflows and persistent state.
 
 ## Architecture Layers
 
@@ -13,6 +13,7 @@ The Hexagon is the central orchestration layer of the EnginEdge platform, built 
 **Purpose:** Core business logic, entities, and domain services. No dependencies on infrastructure.
 
 **Components:**
+
 - **Entities:**
   - `OrchestrationRequest` - Tracks orchestration requests
   - `Workflow` - Manages workflow state and steps
@@ -37,6 +38,7 @@ The Hexagon is the central orchestration layer of the EnginEdge platform, built 
 **Purpose:** Use cases and application services. Depends on domain layer and ports.
 
 **Components:**
+
 - **Ports:**
   - `IRequestRepository` - Request persistence interface
   - `IWorkflowRepository` - Workflow state persistence interface
@@ -62,6 +64,7 @@ The Hexagon is the central orchestration layer of the EnginEdge platform, built 
 **Purpose:** Technical implementations, adapters, and external integrations.
 
 **Components:**
+
 - **Adapters:**
   - `KafkaProducerAdapter` - Kafka producer implementation
   - `KafkaConsumerAdapter` - Kafka consumer implementation
@@ -72,28 +75,25 @@ The Hexagon is the central orchestration layer of the EnginEdge platform, built 
 - **Controllers:**
   - `OrchestrationController` - Orchestration HTTP endpoints
   - `HealthController` - Health check endpoints
-  - Proxy controllers (AssistantProxyController, etc.) - HTTP proxying
+  - _Proxy controllers (AssistantProxyController, etc.) - Legacy HTTP proxying (Deprecated)_
 
 - **Modules:**
-  - `ProxyModule` - HTTP proxy functionality
   - `OrchestrationModule` - Orchestration functionality
   - `DatabaseModule` - MongoDB connection
   - `RedisModule` - Redis caching
   - `KafkaModule` - Kafka messaging
   - `WorkerRegistryModule` - Worker discovery
+  - `ProxyModule` - Legacy HTTP proxy functionality
 
 ## Communication Patterns
 
-### Synchronous (HTTP Proxy)
+### Synchronous (HTTP Proxy) - _Legacy_
+
+_Note: Primary synchronous routing is now handled by the API Gateway service._
 
 ```
 Client → Hexagon → Worker (HTTP) → Hexagon → Client
 ```
-
-Used for:
-- Direct worker API calls
-- Simple request/response patterns
-- Real-time interactions
 
 ### Asynchronous (Kafka Orchestration)
 
@@ -102,6 +102,7 @@ Client → Hexagon → Kafka → Workers → Kafka → Hexagon → Client (poll)
 ```
 
 Used for:
+
 - Multi-worker workflows
 - Long-running jobs
 - Complex business logic coordination
@@ -130,6 +131,7 @@ Used for:
 ### Sequential Workflow
 
 Example: Resume Build
+
 ```
 Resume Worker → Assistant Worker → LaTeX Worker
 ```
@@ -139,6 +141,7 @@ Each step waits for the previous step to complete.
 ### Parallel Workflow
 
 Example: Expert Research
+
 ```
 Agent-Tool Worker ──┐
                     ├─→ Data-Processing Worker → Assistant Worker
@@ -177,4 +180,3 @@ All configuration via environment variables (see `.env.example`):
 - Messaging: `KAFKA_BROKERS`
 - Worker Discovery: `WORKER_DISCOVERY_MODE`
 - Workflow: `WORKFLOW_MAX_DURATION`, `WORKFLOW_RETRY_ATTEMPTS`
-

@@ -17,13 +17,19 @@ Both run in the same Kubernetes cluster but can be deployed independently.
 │  ┌──────────────────────────────────────────────────────────────┐  │
 │  │                    CORE PLATFORM                             │  │
 │  │                                                              │  │
-│  │  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐  │  │
-│  │  │ API Gateway  │───▶│   Hexagon    │───▶│  Workers     │  │  │
-│  │  │  (Port 8080) │    │ (Orchestrator)│    │  (Multiple)  │  │  │
-│  │  └──────────────┘    └──────────────┘    └──────────────┘  │  │
-│  │         │                   │                    │            │  │
-│  │         │                   │                    │            │  │
-│  │  ┌──────▼───────────────────▼───────────────────▼──────┐   │  │
+│  │  ┌──────────────┐         ┌──────────────┐                   │  │
+│  │  │ API Gateway  │────────▶│  Workers     │                   │  │
+│  │  │  (Port 3001) │(Sync)   │  (Multiple)  │                   │  │
+│  │  └──────────────┘         └──────▲───────┘                   │  │
+│  │                                  │                           │  │
+│  │                       (Async via Kafka)                      │  │
+│  │                                  │                           │  │
+│  │                           ┌──────▼───────┐                   │  │
+│  │                           │   Hexagon    │                   │  │
+│  │                           │ (Orchestrator)│                  │  │
+│  │                           └──────────────┘                   │  │
+│  │                                  │                           │  │
+│  │  ┌──────▼───────────────────▼────▼──────────────────────▼──┐   │  │
 │  │  │              Infrastructure Services                 │   │  │
 │  │  │  • MongoDB (Application Data)                       │   │  │
 │  │  │  • Kafka (Message Broker)                           │   │  │
@@ -64,16 +70,16 @@ Both run in the same Kubernetes cluster but can be deployed independently.
 ## Core Platform Components
 
 ### Entry Point
-- **API Gateway** (Port 8080)
-  - Routes requests to appropriate services
-  - Handles authentication/authorization
+- **API Gateway** (Port 3001 internal)
+  - Routes HTTP requests to appropriate worker services (Synchronous)
+  - Handles authentication/authorization for WebSocket connections and administrative routes
   - Proxies datalake services (admin-only)
 
 ### Orchestration Layer
-- **Hexagon** (Main Node)
-  - Central orchestrator
-  - Manages workflows
-  - Coordinates worker services
+- **Hexagon** (Orchestrator)
+  - Central asynchronous, event-driven orchestrator
+  - Manages complex multi-worker workflows via Kafka
+  - Manages persistent workflow state
   - Connects to MongoDB, Kafka, Redis
 
 ### Worker Services

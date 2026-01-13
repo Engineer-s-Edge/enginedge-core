@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: spark-config-cm
+  namespace: default
+data:
+  spark-defaults.conf: |
+    spark.master                     spark://spark-master:7077
+    spark.eventLog.enabled           true
+    spark.eventLog.dir               /opt/spark/spark-events
+    spark.history.fs.logDirectory    /opt/spark/spark-events
+    # S3 Integration
+    spark.hadoop.fs.s3a.endpoint     http://minio:9000
+    spark.hadoop.fs.s3a.access.key   minioadmin
+    spark.hadoop.fs.s3a.secret.key   minioadmin123
+    spark.hadoop.fs.s3a.path.style.access true
+    spark.hadoop.fs.s3a.impl         org.apache.hadoop.fs.s3a.S3AFileSystem
