@@ -1,103 +1,303 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="jest tests" tests="44" failures="0" errors="0" time="76.444">
-  <testsuite name="Section 6 — E2E: Agents lifecycle with mongodb-memory-server" errors="0" failures="0" skipped="0" timestamp="2025-09-19T00:53:29" time="35.262" tests="12">
-    <testcase classname="Section 6 — E2E: Agents lifecycle with mongodb-memory-server 1) Boot and readiness should ensure app readiness and basic health check" name="Section 6 — E2E: Agents lifecycle with mongodb-memory-server 1) Boot and readiness should ensure app readiness and basic health check" time="0.121">
+<testsuites name="jest tests" tests="21" failures="8" errors="0" time="34.152">
+  <testsuite name="RequestRouter" errors="0" failures="0" skipped="0" timestamp="2026-01-14T04:12:18" time="24.989" tests="3">
+    <testcase classname="RequestRouter route should route resume-build workflow to resume, assistant, and latex workers" name="RequestRouter route should route resume-build workflow to resume, assistant, and latex workers" time="0.013">
     </testcase>
-    <testcase classname="Section 6 — E2E: Agents lifecycle with mongodb-memory-server 2) Create agent returns 201 and normalized shape should create agent with 201 and normalized response" name="Section 6 — E2E: Agents lifecycle with mongodb-memory-server 2) Create agent returns 201 and normalized shape should create agent with 201 and normalized response" time="0.061">
+    <testcase classname="RequestRouter route should route expert-research workflow to agent-tool, data-processing, and assistant workers" name="RequestRouter route should route expert-research workflow to agent-tool, data-processing, and assistant workers" time="0.002">
     </testcase>
-    <testcase classname="Section 6 — E2E: Agents lifecycle with mongodb-memory-server 3) Get agent by id returns the same normalized agent should return the same agent when retrieved by ID" name="Section 6 — E2E: Agents lifecycle with mongodb-memory-server 3) Get agent by id returns the same normalized agent should return the same agent when retrieved by ID" time="0.018">
-    </testcase>
-    <testcase classname="Section 6 — E2E: Agents lifecycle with mongodb-memory-server 4) List agents scoped by userId should return only user1 agents when filtered by userId" name="Section 6 — E2E: Agents lifecycle with mongodb-memory-server 4) List agents scoped by userId should return only user1 agents when filtered by userId" time="0.027">
-    </testcase>
-    <testcase classname="Section 6 — E2E: Agents lifecycle with mongodb-memory-server 5) Update (reconfigure) merges settings and preserves defaults should merge settings while preserving defaults" name="Section 6 — E2E: Agents lifecycle with mongodb-memory-server 5) Update (reconfigure) merges settings and preserves defaults should merge settings while preserving defaults" time="0.029">
-    </testcase>
-    <testcase classname="Section 6 — E2E: Agents lifecycle with mongodb-memory-server 6) Execute (non-stream) returns 200 and success payload should execute agent and return deterministic response" name="Section 6 — E2E: Agents lifecycle with mongodb-memory-server 6) Execute (non-stream) returns 200 and success payload should execute agent and return deterministic response" time="0.021">
-    </testcase>
-    <testcase classname="Section 6 — E2E: Agents lifecycle with mongodb-memory-server 7) Delete is idempotent should delete agent successfully twice without throwing 404" name="Section 6 — E2E: Agents lifecycle with mongodb-memory-server 7) Delete is idempotent should delete agent successfully twice without throwing 404" time="0.037">
-    </testcase>
-    <testcase classname="Section 6 — E2E: Agents lifecycle with mongodb-memory-server 8) Model/provider info endpoints should return Groq llama models from models endpoint" name="Section 6 — E2E: Agents lifecycle with mongodb-memory-server 8) Model/provider info endpoints should return Groq llama models from models endpoint" time="0.012">
-    </testcase>
-    <testcase classname="Section 6 — E2E: Agents lifecycle with mongodb-memory-server 8) Model/provider info endpoints should return providers list" name="Section 6 — E2E: Agents lifecycle with mongodb-memory-server 8) Model/provider info endpoints should return providers list" time="0.014">
-    </testcase>
-    <testcase classname="Section 6 — E2E: Agents lifecycle with mongodb-memory-server 9) Error handling: missing fields and invalid combos should return 400 for missing required fields" name="Section 6 — E2E: Agents lifecycle with mongodb-memory-server 9) Error handling: missing fields and invalid combos should return 400 for missing required fields" time="0.014">
-    </testcase>
-    <testcase classname="Section 6 — E2E: Agents lifecycle with mongodb-memory-server 9) Error handling: missing fields and invalid combos should return error for invalid model-provider combo" name="Section 6 — E2E: Agents lifecycle with mongodb-memory-server 9) Error handling: missing fields and invalid combos should return error for invalid model-provider combo" time="0.014">
-    </testcase>
-    <testcase classname="Section 6 — E2E: Agents lifecycle with mongodb-memory-server 9) Error handling: missing fields and invalid combos should return 400 for malformed execute payload" name="Section 6 — E2E: Agents lifecycle with mongodb-memory-server 9) Error handling: missing fields and invalid combos should return 400 for malformed execute payload" time="0.017">
+    <testcase classname="RequestRouter route should route single-worker workflow to assistant when prompt is present" name="RequestRouter route should route single-worker workflow to assistant when prompt is present" time="0.001">
     </testcase>
   </testsuite>
-  <testsuite name="Assistants API Direct Test" errors="0" failures="0" skipped="0" timestamp="2025-09-19T00:54:04" time="3.303" tests="7">
-    <testcase classname="Assistants API Direct Test Agent and Assistant E2E Workflow should complete full lifecycle - create assistant with Groq/Llama" name="Assistants API Direct Test Agent and Assistant E2E Workflow should complete full lifecycle - create assistant with Groq/Llama" time="0.074">
+  <testsuite name="OrchestrationRequest" errors="0" failures="1" skipped="0" timestamp="2026-01-14T04:12:18" time="25.596" tests="8">
+    <testcase classname="OrchestrationRequest updateStatus should update status and set completedAt when completed" name="OrchestrationRequest updateStatus should update status and set completedAt when completed" time="0.019">
+      <failure>Error: expect(received).toBe(expected) // Object.is equality
+
+Expected: &quot;test&quot;
+Received: {&quot;result&quot;: &quot;test&quot;}
+    at Object.&lt;anonymous&gt; (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/src/domain/entities/orchestration-request.entity.spec.ts:23:30)
+    at Promise.then.completed (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-circus/build/utils.js:298:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-circus/build/utils.js:231:10)
+    at _callCircusTest (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-circus/build/run.js:316:40)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at _runTest (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-circus/build/run.js:252:3)
+    at _runTestsForDescribeBlock (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-circus/build/run.js:126:9)
+    at _runTestsForDescribeBlock (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-circus/build/run.js:121:9)
+    at _runTestsForDescribeBlock (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-circus/build/run.js:121:9)
+    at run (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-circus/build/run.js:71:3)
+    at runAndTransformResultsToJestFormat (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+    at jestAdapter (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+    at runTestInternal (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-runner/build/runTest.js:367:16)
+    at runTest (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-runner/build/runTest.js:444:34)
+    at Object.worker (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-runner/build/testWorker.js:108:12)</failure>
     </testcase>
-    <testcase classname="Assistants API Direct Test Agent and Assistant E2E Workflow should verify Groq model availability and configuration" name="Assistants API Direct Test Agent and Assistant E2E Workflow should verify Groq model availability and configuration" time="0.017">
+    <testcase classname="OrchestrationRequest updateStatus should update status and set error when failed" name="OrchestrationRequest updateStatus should update status and set error when failed" time="0.006">
     </testcase>
-    <testcase classname="Assistants API Direct Test Agent and Assistant E2E Workflow should handle multiple concurrent conversations" name="Assistants API Direct Test Agent and Assistant E2E Workflow should handle multiple concurrent conversations" time="0.042">
+    <testcase classname="OrchestrationRequest addWorkerAssignment should add worker assignment to workers array" name="OrchestrationRequest addWorkerAssignment should add worker assignment to workers array" time="0.003">
     </testcase>
-    <testcase classname="Assistants API Direct Test Agent and Assistant E2E Workflow should monitor infrastructure status during agent execution" name="Assistants API Direct Test Agent and Assistant E2E Workflow should monitor infrastructure status during agent execution" time="0.071">
+    <testcase classname="OrchestrationRequest isComplete should return true when status is completed" name="OrchestrationRequest isComplete should return true when status is completed" time="0.001">
     </testcase>
-    <testcase classname="Assistants API Direct Test Agent and Assistant E2E Workflow should handle error scenarios gracefully" name="Assistants API Direct Test Agent and Assistant E2E Workflow should handle error scenarios gracefully" time="0.031">
+    <testcase classname="OrchestrationRequest isComplete should return true when status is failed" name="OrchestrationRequest isComplete should return true when status is failed" time="0.002">
     </testcase>
-    <testcase classname="Assistants API Direct Test Agent Configuration Validation should validate Groq/Llama model configuration" name="Assistants API Direct Test Agent Configuration Validation should validate Groq/Llama model configuration" time="0.023">
+    <testcase classname="OrchestrationRequest isComplete should return false when status is pending" name="OrchestrationRequest isComplete should return false when status is pending" time="0.001">
     </testcase>
-    <testcase classname="Assistants API Direct Test Agent Configuration Validation should test memory configuration options" name="Assistants API Direct Test Agent Configuration Validation should test memory configuration options" time="0.029">
+    <testcase classname="OrchestrationRequest allWorkersComplete should return true when all workers are completed" name="OrchestrationRequest allWorkersComplete should return true when all workers are completed" time="0.002">
     </testcase>
-  </testsuite>
-  <testsuite name="Assistants Streaming E2E" errors="0" failures="0" skipped="0" timestamp="2025-09-19T00:54:08" time="0.63" tests="1">
-    <testcase classname="Assistants Streaming E2E should stream assistant execution chunks and complete" name="Assistants Streaming E2E should stream assistant execution chunks and complete" time="0.097">
-    </testcase>
-  </testsuite>
-  <testsuite name="Assistants Basic E2E Test" errors="0" failures="0" skipped="0" timestamp="2025-09-19T00:54:09" time="31.007" tests="5">
-    <testcase classname="Assistants Basic E2E Test Basic Assistant Operations should create an assistant with Groq configuration" name="Assistants Basic E2E Test Basic Assistant Operations should create an assistant with Groq configuration" time="0.28">
-    </testcase>
-    <testcase classname="Assistants Basic E2E Test Basic Assistant Operations should execute assistant and get response" name="Assistants Basic E2E Test Basic Assistant Operations should execute assistant and get response" time="0.174">
-    </testcase>
-    <testcase classname="Assistants Basic E2E Test Basic Assistant Operations should list assistants" name="Assistants Basic E2E Test Basic Assistant Operations should list assistants" time="0.031">
-    </testcase>
-    <testcase classname="Assistants Basic E2E Test Basic Assistant Operations should retrieve Groq models" name="Assistants Basic E2E Test Basic Assistant Operations should retrieve Groq models" time="0.016">
-    </testcase>
-    <testcase classname="Assistants Basic E2E Test Error Handling should handle non-existent assistant gracefully" name="Assistants Basic E2E Test Error Handling should handle non-existent assistant gracefully" time="0.028">
-    </testcase>
-  </testsuite>
-  <testsuite name="Agents E2E Streaming" errors="0" failures="0" skipped="0" timestamp="2025-09-19T00:54:40" time="2.415" tests="7">
-    <testcase classname="Agents E2E Streaming 1) streams with correct headers and 200 OK should return correct streaming headers and 200 status" name="Agents E2E Streaming 1) streams with correct headers and 200 OK should return correct streaming headers and 200 status" time="0.093">
-    </testcase>
-    <testcase classname="Agents E2E Streaming 2) chunks arrive in order and without buffering should receive chunks incrementally in correct order" name="Agents E2E Streaming 2) chunks arrive in order and without buffering should receive chunks incrementally in correct order" time="0.172">
-    </testcase>
-    <testcase classname="Agents E2E Streaming 3) finalization metadata is emitted should emit final event with usage and stop reason" name="Agents E2E Streaming 3) finalization metadata is emitted should emit final event with usage and stop reason" time="0.081">
-    </testcase>
-    <testcase classname="Agents E2E Streaming 4) client abort stops server stream quickly should handle client connection close gracefully" name="Agents E2E Streaming 4) client abort stops server stream quickly should handle client connection close gracefully" time="0.47">
-    </testcase>
-    <testcase classname="Agents E2E Streaming 5) server-side abort during run should handle server-initiated abort cleanly" name="Agents E2E Streaming 5) server-side abort during run should handle server-initiated abort cleanly" time="0.069">
-    </testcase>
-    <testcase classname="Agents E2E Streaming 6) error mid-stream provides error event and closes should handle provider errors during streaming" name="Agents E2E Streaming 6) error mid-stream provides error event and closes should handle provider errors during streaming" time="0.086">
-    </testcase>
-    <testcase classname="Agents E2E Streaming 7) slow producer/backpressure tolerance should handle slow streaming without connection reset" name="Agents E2E Streaming 7) slow producer/backpressure tolerance should handle slow streaming without connection reset" time="0.658">
+    <testcase classname="OrchestrationRequest allWorkersComplete should return false when any worker is pending" name="OrchestrationRequest allWorkersComplete should return false when any worker is pending" time="0.001">
     </testcase>
   </testsuite>
-  <testsuite name="Agents and Assistants E2E Tests - Complete Workflow" errors="0" failures="0" skipped="0" timestamp="2025-09-19T00:54:42" time="1.28" tests="12">
-    <testcase classname="Agents and Assistants E2E Tests - Complete Workflow 🚀 Complete Agent Lifecycle with Groq/Llama Models should create a ReAct assistant with Groq Llama configuration" name="Agents and Assistants E2E Tests - Complete Workflow 🚀 Complete Agent Lifecycle with Groq/Llama Models should create a ReAct assistant with Groq Llama configuration" time="0.049">
+  <testsuite name="WorkflowOrchestrationService" errors="0" failures="1" skipped="0" timestamp="2026-01-14T04:12:18" time="28.936" tests="1">
+    <testcase classname="WorkflowOrchestrationService orchestrateWorkflow should orchestrate resume-build workflow" name="WorkflowOrchestrationService orchestrateWorkflow should orchestrate resume-build workflow" time="0.028">
+      <failure>Error: Nest can&apos;t resolve dependencies of the WorkflowOrchestrationService (OrchestrateRequestUseCase, ManageWorkflowStateUseCase, ?). Please make sure that the argument WorkflowDefinitionService at index [2] is available in the RootTestModule context.
+
+Potential solutions:
+- Is RootTestModule a valid NestJS module?
+- If WorkflowDefinitionService is a provider, is it part of the current RootTestModule?
+- If WorkflowDefinitionService is exported from a separate @Module, is that module imported within RootTestModule?
+  @Module({
+    imports: [ /* the Module containing WorkflowDefinitionService */ ]
+  })
+
+    at TestingInjector.lookupComponentInParentModules (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/injector.js:262:19)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at TestingInjector.resolveComponentInstance (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/injector.js:215:33)
+    at TestingInjector.resolveComponentInstance (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/testing/testing-injector.js:19:45)
+    at resolveParam (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/injector.js:129:38)
+    at async Promise.all (index 2)
+    at TestingInjector.resolveConstructorParams (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/injector.js:144:27)
+    at TestingInjector.loadInstance (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/injector.js:70:13)
+    at TestingInjector.loadProvider (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/injector.js:98:9)
+    at /mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/instance-loader.js:56:13
+    at async Promise.all (index 3)
+    at TestingInstanceLoader.createInstancesOfProviders (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+    at /mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/instance-loader.js:40:13
+    at async Promise.all (index 1)
+    at TestingInstanceLoader.createInstances (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+    at TestingInstanceLoader.createInstancesOfDependencies (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+    at TestingInstanceLoader.createInstancesOfDependencies (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+    at TestingModuleBuilder.createInstancesOfDependencies (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+    at TestingModuleBuilder.compile (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+    at Object.&lt;anonymous&gt; (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/src/application/services/workflow-orchestration.service.spec.ts:21:35)</failure>
     </testcase>
-    <testcase classname="Agents and Assistants E2E Tests - Complete Workflow 🚀 Complete Agent Lifecycle with Groq/Llama Models should execute ReAct agent and receive intelligent response" name="Agents and Assistants E2E Tests - Complete Workflow 🚀 Complete Agent Lifecycle with Groq/Llama Models should execute ReAct agent and receive intelligent response" time="0.058">
+  </testsuite>
+  <testsuite name="KafkaProducerAdapter" errors="0" failures="2" skipped="0" timestamp="2026-01-14T04:12:19" time="28.587" tests="2">
+    <testcase classname="KafkaProducerAdapter publish should publish message to Kafka topic" name="KafkaProducerAdapter publish should publish message to Kafka topic" time="0.033">
+      <failure>Error: Nest can&apos;t resolve dependencies of the KafkaProducerAdapter (ConfigService, ?). Please make sure that the argument RequestContextService at index [1] is available in the RootTestModule context.
+
+Potential solutions:
+- Is RootTestModule a valid NestJS module?
+- If RequestContextService is a provider, is it part of the current RootTestModule?
+- If RequestContextService is exported from a separate @Module, is that module imported within RootTestModule?
+  @Module({
+    imports: [ /* the Module containing RequestContextService */ ]
+  })
+
+    at TestingInjector.lookupComponentInParentModules (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/injector.js:262:19)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at TestingInjector.resolveComponentInstance (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/injector.js:215:33)
+    at TestingInjector.resolveComponentInstance (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/testing/testing-injector.js:19:45)
+    at resolveParam (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/injector.js:129:38)
+    at async Promise.all (index 1)
+    at TestingInjector.resolveConstructorParams (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/injector.js:144:27)
+    at TestingInjector.loadInstance (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/injector.js:70:13)
+    at TestingInjector.loadProvider (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/injector.js:98:9)
+    at /mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/instance-loader.js:56:13
+    at async Promise.all (index 3)
+    at TestingInstanceLoader.createInstancesOfProviders (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+    at /mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/instance-loader.js:40:13
+    at async Promise.all (index 1)
+    at TestingInstanceLoader.createInstances (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+    at TestingInstanceLoader.createInstancesOfDependencies (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+    at TestingInstanceLoader.createInstancesOfDependencies (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+    at TestingModuleBuilder.createInstancesOfDependencies (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+    at TestingModuleBuilder.compile (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+    at Object.&lt;anonymous&gt; (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/src/infrastructure/kafka/kafka-producer.adapter.spec.ts:34:35)</failure>
+      <failure>TypeError: Cannot read properties of undefined (reading &apos;onModuleDestroy&apos;)
+    at Object.&lt;anonymous&gt; (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/src/infrastructure/kafka/kafka-producer.adapter.spec.ts:49:19)
+    at Promise.then.completed (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-circus/build/utils.js:298:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-circus/build/utils.js:231:10)
+    at _callCircusHook (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-circus/build/run.js:281:40)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at _runTest (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-circus/build/run.js:254:5)
+    at _runTestsForDescribeBlock (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-circus/build/run.js:126:9)
+    at _runTestsForDescribeBlock (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-circus/build/run.js:121:9)
+    at _runTestsForDescribeBlock (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-circus/build/run.js:121:9)
+    at run (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-circus/build/run.js:71:3)
+    at runAndTransformResultsToJestFormat (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+    at jestAdapter (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+    at runTestInternal (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-runner/build/runTest.js:367:16)
+    at runTest (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-runner/build/runTest.js:444:34)
+    at Object.worker (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-runner/build/testWorker.js:108:12)</failure>
     </testcase>
-    <testcase classname="Agents and Assistants E2E Tests - Complete Workflow 🚀 Complete Agent Lifecycle with Groq/Llama Models should handle complex reasoning tasks step-by-step" name="Agents and Assistants E2E Tests - Complete Workflow 🚀 Complete Agent Lifecycle with Groq/Llama Models should handle complex reasoning tasks step-by-step" time="0.044">
+    <testcase classname="KafkaProducerAdapter publish should throw error when producer not connected" name="KafkaProducerAdapter publish should throw error when producer not connected" time="0.009">
+      <failure>Error: Nest can&apos;t resolve dependencies of the KafkaProducerAdapter (ConfigService, ?). Please make sure that the argument RequestContextService at index [1] is available in the RootTestModule context.
+
+Potential solutions:
+- Is RootTestModule a valid NestJS module?
+- If RequestContextService is a provider, is it part of the current RootTestModule?
+- If RequestContextService is exported from a separate @Module, is that module imported within RootTestModule?
+  @Module({
+    imports: [ /* the Module containing RequestContextService */ ]
+  })
+
+    at TestingInjector.lookupComponentInParentModules (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/injector.js:262:19)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at TestingInjector.resolveComponentInstance (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/injector.js:215:33)
+    at TestingInjector.resolveComponentInstance (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/testing/testing-injector.js:19:45)
+    at resolveParam (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/injector.js:129:38)
+    at async Promise.all (index 1)
+    at TestingInjector.resolveConstructorParams (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/injector.js:144:27)
+    at TestingInjector.loadInstance (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/injector.js:70:13)
+    at TestingInjector.loadProvider (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/injector.js:98:9)
+    at /mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/instance-loader.js:56:13
+    at async Promise.all (index 3)
+    at TestingInstanceLoader.createInstancesOfProviders (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+    at /mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/instance-loader.js:40:13
+    at async Promise.all (index 1)
+    at TestingInstanceLoader.createInstances (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+    at TestingInstanceLoader.createInstancesOfDependencies (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+    at TestingInstanceLoader.createInstancesOfDependencies (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+    at TestingModuleBuilder.createInstancesOfDependencies (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+    at TestingModuleBuilder.compile (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+    at Object.&lt;anonymous&gt; (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/src/infrastructure/kafka/kafka-producer.adapter.spec.ts:34:35)</failure>
+      <failure>TypeError: Cannot read properties of undefined (reading &apos;onModuleDestroy&apos;)
+    at Object.&lt;anonymous&gt; (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/src/infrastructure/kafka/kafka-producer.adapter.spec.ts:49:19)
+    at Promise.then.completed (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-circus/build/utils.js:298:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-circus/build/utils.js:231:10)
+    at _callCircusHook (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-circus/build/run.js:281:40)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at _runTest (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-circus/build/run.js:254:5)
+    at _runTestsForDescribeBlock (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-circus/build/run.js:126:9)
+    at _runTestsForDescribeBlock (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-circus/build/run.js:121:9)
+    at _runTestsForDescribeBlock (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-circus/build/run.js:121:9)
+    at run (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-circus/build/run.js:71:3)
+    at runAndTransformResultsToJestFormat (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+    at jestAdapter (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+    at runTestInternal (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-runner/build/runTest.js:367:16)
+    at runTest (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-runner/build/runTest.js:444:34)
+    at Object.worker (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/jest-runner/build/testWorker.js:108:12)</failure>
     </testcase>
-    <testcase classname="Agents and Assistants E2E Tests - Complete Workflow 🚀 Complete Agent Lifecycle with Groq/Llama Models should maintain conversation context across multiple interactions" name="Agents and Assistants E2E Tests - Complete Workflow 🚀 Complete Agent Lifecycle with Groq/Llama Models should maintain conversation context across multiple interactions" time="0.07">
+  </testsuite>
+  <testsuite name="OrchestrationController" errors="0" failures="3" skipped="0" timestamp="2026-01-14T04:12:19" time="28.187" tests="3">
+    <testcase classname="OrchestrationController orchestrate should create orchestration request" name="OrchestrationController orchestrate should create orchestration request" time="0.033">
+      <failure>Error: Nest can&apos;t resolve dependencies of the JwtAuthGuard (?). Please make sure that the argument JwtService at index [0] is available in the RootTestModule context.
+
+Potential solutions:
+- Is RootTestModule a valid NestJS module?
+- If JwtService is a provider, is it part of the current RootTestModule?
+- If JwtService is exported from a separate @Module, is that module imported within RootTestModule?
+  @Module({
+    imports: [ /* the Module containing JwtService */ ]
+  })
+
+    at TestingInjector.lookupComponentInParentModules (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/injector.js:262:19)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at TestingInjector.resolveComponentInstance (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/injector.js:215:33)
+    at TestingInjector.resolveComponentInstance (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/testing/testing-injector.js:19:45)
+    at resolveParam (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/injector.js:129:38)
+    at async Promise.all (index 0)
+    at TestingInjector.resolveConstructorParams (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/injector.js:144:27)
+    at TestingInjector.loadInstance (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/injector.js:70:13)
+    at TestingInjector.loadInjectable (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/injector.js:94:9)
+    at /mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/instance-loader.js:80:13
+    at async Promise.all (index 0)
+    at TestingInstanceLoader.createInstancesOfInjectables (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/instance-loader.js:79:9)
+    at /mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/instance-loader.js:41:13
+    at async Promise.all (index 1)
+    at TestingInstanceLoader.createInstances (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+    at TestingInstanceLoader.createInstancesOfDependencies (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+    at TestingInstanceLoader.createInstancesOfDependencies (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+    at TestingModuleBuilder.createInstancesOfDependencies (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+    at TestingModuleBuilder.compile (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+    at Object.&lt;anonymous&gt; (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/src/infrastructure/orchestration/orchestration.controller.spec.ts:22:35)</failure>
     </testcase>
-    <testcase classname="Agents and Assistants E2E Tests - Complete Workflow 🚀 Complete Agent Lifecycle with Groq/Llama Models should handle concurrent conversations without interference" name="Agents and Assistants E2E Tests - Complete Workflow 🚀 Complete Agent Lifecycle with Groq/Llama Models should handle concurrent conversations without interference" time="0.05">
+    <testcase classname="OrchestrationController getStatus should return request status" name="OrchestrationController getStatus should return request status" time="0.005">
+      <failure>Error: Nest can&apos;t resolve dependencies of the JwtAuthGuard (?). Please make sure that the argument JwtService at index [0] is available in the RootTestModule context.
+
+Potential solutions:
+- Is RootTestModule a valid NestJS module?
+- If JwtService is a provider, is it part of the current RootTestModule?
+- If JwtService is exported from a separate @Module, is that module imported within RootTestModule?
+  @Module({
+    imports: [ /* the Module containing JwtService */ ]
+  })
+
+    at TestingInjector.lookupComponentInParentModules (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/injector.js:262:19)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at TestingInjector.resolveComponentInstance (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/injector.js:215:33)
+    at TestingInjector.resolveComponentInstance (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/testing/testing-injector.js:19:45)
+    at resolveParam (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/injector.js:129:38)
+    at async Promise.all (index 0)
+    at TestingInjector.resolveConstructorParams (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/injector.js:144:27)
+    at TestingInjector.loadInstance (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/injector.js:70:13)
+    at TestingInjector.loadInjectable (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/injector.js:94:9)
+    at /mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/instance-loader.js:80:13
+    at async Promise.all (index 0)
+    at TestingInstanceLoader.createInstancesOfInjectables (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/instance-loader.js:79:9)
+    at /mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/instance-loader.js:41:13
+    at async Promise.all (index 1)
+    at TestingInstanceLoader.createInstances (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+    at TestingInstanceLoader.createInstancesOfDependencies (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+    at TestingInstanceLoader.createInstancesOfDependencies (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+    at TestingModuleBuilder.createInstancesOfDependencies (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+    at TestingModuleBuilder.compile (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+    at Object.&lt;anonymous&gt; (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/src/infrastructure/orchestration/orchestration.controller.spec.ts:22:35)</failure>
     </testcase>
-    <testcase classname="Agents and Assistants E2E Tests - Complete Workflow 🔍 Infrastructure Monitoring and Error Detection should monitor agent infrastructure during execution" name="Agents and Assistants E2E Tests - Complete Workflow 🔍 Infrastructure Monitoring and Error Detection should monitor agent infrastructure during execution" time="0.096">
+    <testcase classname="OrchestrationController getStatus should throw error when request not found" name="OrchestrationController getStatus should throw error when request not found" time="0.004">
+      <failure>Error: Nest can&apos;t resolve dependencies of the JwtAuthGuard (?). Please make sure that the argument JwtService at index [0] is available in the RootTestModule context.
+
+Potential solutions:
+- Is RootTestModule a valid NestJS module?
+- If JwtService is a provider, is it part of the current RootTestModule?
+- If JwtService is exported from a separate @Module, is that module imported within RootTestModule?
+  @Module({
+    imports: [ /* the Module containing JwtService */ ]
+  })
+
+    at TestingInjector.lookupComponentInParentModules (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/injector.js:262:19)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at TestingInjector.resolveComponentInstance (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/injector.js:215:33)
+    at TestingInjector.resolveComponentInstance (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/testing/testing-injector.js:19:45)
+    at resolveParam (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/injector.js:129:38)
+    at async Promise.all (index 0)
+    at TestingInjector.resolveConstructorParams (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/injector.js:144:27)
+    at TestingInjector.loadInstance (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/injector.js:70:13)
+    at TestingInjector.loadInjectable (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/injector.js:94:9)
+    at /mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/instance-loader.js:80:13
+    at async Promise.all (index 0)
+    at TestingInstanceLoader.createInstancesOfInjectables (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/instance-loader.js:79:9)
+    at /mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/instance-loader.js:41:13
+    at async Promise.all (index 1)
+    at TestingInstanceLoader.createInstances (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+    at TestingInstanceLoader.createInstancesOfDependencies (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+    at TestingInstanceLoader.createInstancesOfDependencies (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+    at TestingModuleBuilder.createInstancesOfDependencies (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+    at TestingModuleBuilder.compile (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+    at Object.&lt;anonymous&gt; (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/src/infrastructure/orchestration/orchestration.controller.spec.ts:22:35)</failure>
     </testcase>
-    <testcase classname="Agents and Assistants E2E Tests - Complete Workflow 🔍 Infrastructure Monitoring and Error Detection should detect and handle error scenarios gracefully" name="Agents and Assistants E2E Tests - Complete Workflow 🔍 Infrastructure Monitoring and Error Detection should detect and handle error scenarios gracefully" time="0.075">
+  </testsuite>
+  <testsuite name="MongoDbRequestRepository" errors="0" failures="1" skipped="0" timestamp="2026-01-14T04:12:19" time="29.194" tests="4">
+    <testcase classname="MongoDbRequestRepository save should save request to database" name="MongoDbRequestRepository save should save request to database" time="0.042">
     </testcase>
-    <testcase classname="Agents and Assistants E2E Tests - Complete Workflow ⚙️  Groq Model Configuration and Validation should retrieve and validate available Groq models" name="Agents and Assistants E2E Tests - Complete Workflow ⚙️  Groq Model Configuration and Validation should retrieve and validate available Groq models" time="0.015">
+    <testcase classname="MongoDbRequestRepository findById should find request by id" name="MongoDbRequestRepository findById should find request by id" time="0.006">
     </testcase>
-    <testcase classname="Agents and Assistants E2E Tests - Complete Workflow ⚙️  Groq Model Configuration and Validation should validate different Llama model configurations" name="Agents and Assistants E2E Tests - Complete Workflow ⚙️  Groq Model Configuration and Validation should validate different Llama model configurations" time="0.041">
+    <testcase classname="MongoDbRequestRepository findById should return null when request not found" name="MongoDbRequestRepository findById should return null when request not found" time="0.01">
     </testcase>
-    <testcase classname="Agents and Assistants E2E Tests - Complete Workflow ⚙️  Groq Model Configuration and Validation should test memory configurations for ReAct agents" name="Agents and Assistants E2E Tests - Complete Workflow ⚙️  Groq Model Configuration and Validation should test memory configurations for ReAct agents" time="0.065">
-    </testcase>
-    <testcase classname="Agents and Assistants E2E Tests - Complete Workflow ⚙️  Groq Model Configuration and Validation should verify provider availability" name="Agents and Assistants E2E Tests - Complete Workflow ⚙️  Groq Model Configuration and Validation should verify provider availability" time="0.013">
-    </testcase>
-    <testcase classname="Agents and Assistants E2E Tests - Complete Workflow 🎯 End-to-End Agent Workflow Validation should complete comprehensive agent creation-to-execution pipeline" name="Agents and Assistants E2E Tests - Complete Workflow 🎯 End-to-End Agent Workflow Validation should complete comprehensive agent creation-to-execution pipeline" time="0.077">
+    <testcase classname="MongoDbRequestRepository updateStatus should update request status" name="MongoDbRequestRepository updateStatus should update request status" time="0.01">
+      <failure>Error: expect(jest.fn()).toHaveBeenCalledWith(...expected)
+
+- Expected
++ Received
+
+  {&quot;id&quot;: &quot;req-1&quot;},
+  {&quot;completedAt&quot;: 2026-01-14T04:12:48.825Z, &quot;result&quot;: {&quot;result&quot;: &quot;test&quot;}, &quot;status&quot;: &quot;completed&quot;, &quot;updatedAt&quot;: 2026-01-14T04:12:48.825Z},
+- Any&lt;Object&gt;,
+
+Number of calls: 1
+    at Object.&lt;anonymous&gt; (/mnt/windows/Users/chris/Engineering/EnginEdge/enginedge-core/hexagon/src/infrastructure/repositories/mongodb-request.repository.spec.ts:97:42)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)</failure>
     </testcase>
   </testsuite>
 </testsuites>
