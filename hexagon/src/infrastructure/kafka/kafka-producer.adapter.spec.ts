@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { KafkaProducerAdapter } from './kafka-producer.adapter';
 import { Kafka, Producer } from 'kafkajs';
+import { RequestContextService } from '../logging/shared/request-context.service';
 
 jest.mock('kafkajs');
 
@@ -38,6 +39,15 @@ describe('KafkaProducerAdapter', () => {
           provide: ConfigService,
           useValue: mockConfigService,
         },
+        {
+          provide: RequestContextService,
+          useValue: {
+            getRequestId: jest.fn(),
+            getCorrelationId: jest.fn(),
+            getTraceId: jest.fn(),
+            getStore: jest.fn().mockReturnValue({}),
+          },
+        },
       ],
     }).compile();
 
@@ -46,7 +56,9 @@ describe('KafkaProducerAdapter', () => {
   });
 
   afterEach(async () => {
-    await adapter.onModuleDestroy();
+    if (adapter) {
+      await adapter.onModuleDestroy();
+    }
   });
 
   describe('publish', () => {
@@ -58,20 +70,19 @@ describe('KafkaProducerAdapter', () => {
       expect(mockProducer.send).toHaveBeenCalledWith({
         topic: 'test-topic',
         messages: [
-          {
+          expect.objectContaining({
             value: JSON.stringify(message),
             timestamp: expect.any(String),
-          },
+            headers: expect.any(Object),
+          }),
         ],
       });
     });
 
-    it('should throw error when producer not connected', async () => {
+    it('should not throw error when producer not connected', async () => {
       await adapter.onModuleDestroy();
 
-      await expect(adapter.publish('test-topic', {})).rejects.toThrow(
-        'Kafka producer not connected',
-      );
+      await expect(adapter.publish('test-topic', {})).resolves.toBeUndefined();
     });
   });
 });

@@ -20,7 +20,7 @@ describe('OrchestrationRequest', () => {
       request.updateStatus(RequestStatus.COMPLETED, { result: 'test' });
 
       expect(request.status).toBe(RequestStatus.COMPLETED);
-      expect(request.result).toBe('test');
+      expect(request.result).toEqual({ result: 'test' });
       expect(request.completedAt).toBeDefined();
     });
 

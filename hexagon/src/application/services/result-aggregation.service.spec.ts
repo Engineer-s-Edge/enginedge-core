@@ -121,7 +121,7 @@ describe('ResultAggregationService', () => {
       const result = service.aggregate(request);
 
       expect(result.resume).toBeDefined();
-      expect(result.resume.error).toBe('Worker error');
+      expect((result.resume as any).error).toBe('Worker error');
       expect(result.errors).toBeUndefined(); // No errors array when only one fails
     });
   });

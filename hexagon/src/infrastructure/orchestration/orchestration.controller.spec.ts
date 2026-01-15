@@ -4,6 +4,7 @@ import { OrchestrateRequestUseCase } from '@application/use-cases/orchestrate-re
 import { IRequestRepository } from '@application/ports/request-repository.port';
 import { OrchestrationRequest } from '@domain/entities/orchestration-request.entity';
 import { WorkflowType } from '@domain/types/workflow.types';
+import { JwtService } from '../auth/jwt.service';
 
 describe('OrchestrationController', () => {
   let controller: OrchestrationController;
@@ -29,6 +30,12 @@ describe('OrchestrationController', () => {
         {
           provide: 'IRequestRepository',
           useValue: requestRepository,
+        },
+        {
+          provide: JwtService,
+          useValue: {
+            verify: jest.fn(),
+          },
         },
       ],
     }).compile();

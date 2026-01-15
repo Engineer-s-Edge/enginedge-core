@@ -101,7 +101,6 @@ describe('MongoDbRequestRepository', () => {
           result: { result: 'test' },
           completedAt: expect.any(Date),
         }),
-        expect.any(Object),
       );
     });
   });

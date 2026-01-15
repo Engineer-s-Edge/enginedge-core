@@ -3,11 +3,13 @@ import { WorkflowOrchestrationService } from './workflow-orchestration.service';
 import { OrchestrateRequestUseCase } from '../use-cases/orchestrate-request.use-case';
 import { ManageWorkflowStateUseCase } from '../use-cases/manage-workflow-state.use-case';
 import { WorkflowType } from '@domain/types/workflow.types';
+import { WorkflowDefinitionService } from '@domain/services/workflow-definition.service';
 
 describe('WorkflowOrchestrationService', () => {
   let service: WorkflowOrchestrationService;
   let orchestrateUseCase: jest.Mocked<OrchestrateRequestUseCase>;
   let manageWorkflowState: jest.Mocked<ManageWorkflowStateUseCase>;
+  let workflowDefinitionService: jest.Mocked<WorkflowDefinitionService>;
 
   beforeEach(async () => {
     orchestrateUseCase = {
@@ -16,6 +18,16 @@ describe('WorkflowOrchestrationService', () => {
 
     manageWorkflowState = {
       createWorkflow: jest.fn(),
+    } as any;
+
+    workflowDefinitionService = {
+      getWorkflowSteps: jest
+        .fn()
+        .mockReturnValue([
+          { workerType: 'resume' },
+          { workerType: 'assistant' },
+          { workerType: 'latex' },
+        ]),
     } as any;
 
     const module: TestingModule = await Test.createTestingModule({
@@ -28,6 +40,10 @@ describe('WorkflowOrchestrationService', () => {
         {
           provide: ManageWorkflowStateUseCase,
           useValue: manageWorkflowState,
+        },
+        {
+          provide: WorkflowDefinitionService,
+          useValue: workflowDefinitionService,
         },
       ],
     }).compile();
