@@ -3,7 +3,7 @@ module.exports = {
   rootDir: 'src',
   testRegex: '.*\\.spec\\.ts$',
   transform: {
-    '^.+\\.(t|j)s$': 'ts-jest',
+    '^.+\\.(t|j)s$': ['ts-jest', { tsconfig: { allowJs: true } }],
   },
   collectCoverageFrom: [
     '**/*.(t|j)s',
@@ -18,6 +18,8 @@ module.exports = {
     '^@application/(.*)$': '<rootDir>/application/$1',
     '^@infrastructure/(.*)$': '<rootDir>/infrastructure/$1',
     '^@common/(.*)$': '<rootDir>/common/$1',
+    '^@kubernetes/client-node$':
+      '<rootDir>/../test/mocks/kubernetes-client-node.mock.ts',
   },
+  transformIgnorePatterns: ['/node_modules/'],
 };
-

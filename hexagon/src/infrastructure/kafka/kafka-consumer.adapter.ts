@@ -107,6 +107,7 @@ export class KafkaConsumerAdapter
         }
       } catch (error) {
         // Silently retry - connection failed, will try again
+        this.logger.warn('Reconnection failed, retrying...');
       }
     }, 10000); // Check every 10 seconds
   }
