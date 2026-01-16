@@ -19,12 +19,20 @@ spec:
             - /bin/bash
             - -c
             - |
-              apt-get update && apt-get install -y curl python3-pip &&
-              pip3 install boto3 &&
-              cd /opt/spark/jars &&
-              curl -sO https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.3.4/hadoop-aws-3.3.4.jar &&
-              curl -sO https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-bundle/1.12.367/aws-java-sdk-bundle-1.12.367.jar &&
-              /master.sh
+              # Download required JARs if curl is available (Alpine-based image)
+              if command -v curl > /dev/null 2>&1; then
+                cd /spark/jars 2>/dev/null || cd /opt/spark/jars 2>/dev/null || true
+                curl -sO https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.3.4/hadoop-aws-3.3.4.jar || true
+                curl -sO https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-bundle/1.12.367/aws-java-sdk-bundle-1.12.367.jar || true
+              fi
+              # Start Spark master - try both common paths
+              if [ -f /spark/bin/spark-class ]; then
+                exec /spark/bin/spark-class org.apache.spark.deploy.master.Master --host 0.0.0.0
+              elif [ -f /opt/spark/bin/spark-class ]; then
+                exec /opt/spark/bin/spark-class org.apache.spark.deploy.master.Master --host 0.0.0.0
+              else
+                exec /master.sh
+              fi
           ports:
             - containerPort: 8080
             - containerPort: 7077
@@ -90,12 +98,20 @@ spec:
             - /bin/bash
             - -c
             - |
-              apt-get update && apt-get install -y curl python3-pip &&
-              pip3 install boto3 &&
-              cd /opt/spark/jars &&
-              curl -sO https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.3.4/hadoop-aws-3.3.4.jar &&
-              curl -sO https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-bundle/1.12.367/aws-java-sdk-bundle-1.12.367.jar &&
-              /worker.sh
+              # Download required JARs if curl is available (Alpine-based image)
+              if command -v curl > /dev/null 2>&1; then
+                cd /spark/jars 2>/dev/null || cd /opt/spark/jars 2>/dev/null || true
+                curl -sO https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.3.4/hadoop-aws-3.3.4.jar || true
+                curl -sO https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-bundle/1.12.367/aws-java-sdk-bundle-1.12.367.jar || true
+              fi
+              # Start Spark worker - try both common paths
+              if [ -f /spark/bin/spark-class ]; then
+                exec /spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077
+              elif [ -f /opt/spark/bin/spark-class ]; then
+                exec /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077
+              else
+                exec /worker.sh
+              fi
           ports:
             - containerPort: 8081
           env:

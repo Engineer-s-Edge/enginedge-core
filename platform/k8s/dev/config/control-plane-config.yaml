@@ -9,5 +9,5 @@ data:
   REDIS_URL: "redis://redis:6379/0"
   REDIS_KEY_PREFIX: "hexagon:"
   S3_ENDPOINT: "http://minio:9000"
-  WOLFRAM_LOCAL_URL: "http://wolfram-kernel:5000"
-  SCHEDULING_MODEL_URL: "http://scheduling-model:8000"
+  WOLFRAM_LOCAL_URL: "http://wolfram-kernel:3011"
+  SCHEDULING_MODEL_URL: "http://scheduling-model:3009"

@@ -8,8 +8,8 @@ metadata:
     component: scheduling-model
 spec:
   ports:
-  - port: 8000
-    targetPort: 8000
+  - port: 3009
+    targetPort: 3009
   selector:
     app: enginedge
     component: scheduling-model
@@ -39,11 +39,14 @@ spec:
         image: ghcr.io/chris-alexander-pop/scheduling-model:latest
         imagePullPolicy: Always
         ports:
-        - containerPort: 8000
+        - containerPort: 3009
         # Load all environment variables from the ConfigMap
         envFrom:
         - configMapRef:
             name: scheduling-model-config
+        env:
+        - name: PORT
+          value: "3009"
         # Define resource limits for the ML model
         resources:
           limits:
@@ -55,13 +58,13 @@ spec:
         livenessProbe:
           httpGet:
             path: /health
-            port: 8000
+            port: 3009
           initialDelaySeconds: 60
           periodSeconds: 10
         readinessProbe:
           httpGet:
             path: /health
-            port: 8000
+            port: 3009
           initialDelaySeconds: 30
           periodSeconds: 10
 

@@ -9,8 +9,8 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-  - port: 8001
-    targetPort: 8001
+  - port: 3008
+    targetPort: 3008
     name: http
   selector:
     app: enginedge
@@ -53,7 +53,7 @@ spec:
         image: ghcr.io/chris-alexander-pop/spacy-service:latest
         imagePullPolicy: Always
         ports:
-        - containerPort: 8001
+        - containerPort: 3008
         envFrom:
         - configMapRef:
             name: worker-config
@@ -61,7 +61,7 @@ spec:
             name: spacy-service-config
         env:
         - name: PORT
-          value: "8001"
+          value: "3008"
         - name: WORKERS
           value: "4"
         - name: LOG_LEVEL
@@ -82,7 +82,7 @@ spec:
         livenessProbe:
           httpGet:
             path: /health
-            port: 8001
+            port: 3008
           initialDelaySeconds: 120
           periodSeconds: 10
           timeoutSeconds: 5
@@ -90,7 +90,7 @@ spec:
         readinessProbe:
           httpGet:
             path: /health
-            port: 8001
+            port: 3008
           initialDelaySeconds: 60
           periodSeconds: 5
           timeoutSeconds: 5

@@ -14,41 +14,6 @@ spec:
     app: enginedge
     component: mongodb
 ---
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: mongodb-init-scripts
-  namespace: default
-data:
-  init-users.sh: |
-    #!/bin/bash
-    set -euo pipefail
-
-    echo "Initializing MongoDB users (docker-entrypoint-initdb.d)..."
-
-    mongosh admin --eval "
-    const adminDb = db.getSiblingDB('admin');
-
-    // Create application user if it doesn't exist
-    const existing = adminDb.getUser('$MONGODB_APP_USERNAME');
-    if (!existing) {
-      adminDb.createUser({
-        user: '$MONGODB_APP_USERNAME',
-        pwd: '$MONGODB_APP_PASSWORD',
-        roles: [
-          { role: 'readWrite', db: 'enginedge-hexagon' },
-          { role: 'readWrite', db: 'admin' },
-          { role: 'dbAdmin', db: 'enginedge-hexagon' }
-        ]
-      });
-      print('Application user created successfully');
-    } else {
-      print('Application user already exists');
-    }
-    "
-
-    echo "MongoDB user initialization complete!"
----
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -86,11 +51,24 @@ spec:
             secretKeyRef:
               name: mongodb-secret
               key: mongodb-root-password
+        - name: MONGODB_APP_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: mongodb-app-username
+        - name: MONGODB_APP_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: mongodb-app-password
+        command:
+        - mongod
+        args:
+        - --bind_ip_all
+        - --auth
         volumeMounts:
         - name: mongodb-persistent-storage
           mountPath: /data/db
-        - name: init-scripts
-          mountPath: /docker-entrypoint-initdb.d
         securityContext:
           runAsUser: 999
           runAsGroup: 999
@@ -116,11 +94,58 @@ spec:
             port: 27017
           initialDelaySeconds: 5
           periodSeconds: 10
-      volumes:
-      - name: init-scripts
-        configMap:
-          name: mongodb-init-scripts
-          defaultMode: 0755
+        lifecycle:
+          postStart:
+            exec:
+              command:
+              - /bin/bash
+              - -c
+              - |
+                sleep 5
+                until mongosh --eval "db.adminCommand('ping')" mongodb://localhost:27017/admin &>/dev/null; do
+                  sleep 2
+                done
+                mongosh mongodb://localhost:27017/admin --username $MONGO_INITDB_ROOT_USERNAME --password $MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase admin --eval "
+                try {
+                  const adminDb = db.getSiblingDB('admin');
+                  const existing = adminDb.getUser('$MONGODB_APP_USERNAME');
+                  if (!existing) {
+                    adminDb.createUser({
+                      user: '$MONGODB_APP_USERNAME',
+                      pwd: '$MONGODB_APP_PASSWORD',
+                      roles: [
+                        { role: 'readWriteAnyDatabase', db: 'admin' },
+                        { role: 'dbAdminAnyDatabase', db: 'admin' },
+                        { role: 'readWrite', db: 'enginedge-hexagon' },
+                        { role: 'readWrite', db: 'interview_worker' },
+                        { role: 'readWrite', db: 'scheduling_worker' },
+                        { role: 'dbAdmin', db: 'enginedge-hexagon' },
+                        { role: 'dbAdmin', db: 'interview_worker' },
+                        { role: 'dbAdmin', db: 'scheduling_worker' }
+                      ]
+                    });
+                    print('Application user created successfully');
+                  } else {
+                    print('Application user already exists, updating roles and password...');
+                    adminDb.changeUserPassword('$MONGODB_APP_USERNAME', '$MONGODB_APP_PASSWORD');
+                    adminDb.updateUser('$MONGODB_APP_USERNAME', {
+                      roles: [
+                        { role: 'readWriteAnyDatabase', db: 'admin' },
+                        { role: 'dbAdminAnyDatabase', db: 'admin' },
+                        { role: 'readWrite', db: 'enginedge-hexagon' },
+                        { role: 'readWrite', db: 'interview_worker' },
+                        { role: 'readWrite', db: 'scheduling_worker' },
+                        { role: 'dbAdmin', db: 'enginedge-hexagon' },
+                        { role: 'dbAdmin', db: 'interview_worker' },
+                        { role: 'dbAdmin', db: 'scheduling_worker' }
+                      ]
+                    });
+                    print('Application user password and roles updated');
+                  }
+                } catch (e) {
+                  print('Error ensuring user exists: ' + e);
+                }
+                "
   volumeClaimTemplates:
   - metadata:
       name: mongodb-persistent-storage

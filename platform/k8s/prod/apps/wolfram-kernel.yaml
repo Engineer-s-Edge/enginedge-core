@@ -8,8 +8,8 @@ metadata:
     component: wolfram-kernel
 spec:
   ports:
-  - port: 5000
-    targetPort: 5000
+  - port: 3011
+    targetPort: 3011
   selector:
     app: enginedge
     component: wolfram-kernel
@@ -47,15 +47,18 @@ spec:
       - name: fix-permissions
         image: busybox:1.36.1
         command: ["sh", "-c", "mkdir -p /app/logs && chown -R 1000:1000 /app/logs"]
+        securityContext:
+          runAsUser: 0
+          runAsGroup: 0
         volumeMounts:
         - name: app-logs
           mountPath: /app/logs
       containers:
       - name: wolfram-kernel
-        image: ghcr.io/chris-alexander-pop/wolfram-kernel:latest
-        imagePullPolicy: Always
+        image: wolfram-kernel:latest
+        imagePullPolicy: Never
         ports:
-        - containerPort: 5000
+        - containerPort: 3011
         volumeMounts:
         - name: wolfram-state
           mountPath: /home/appuser/.WolframEngine
@@ -68,6 +71,10 @@ spec:
           value: /home/appuser
         - name: WOLFRAM_USERBASE
           value: /home/appuser/.WolframEngine
+        - name: PORT
+          value: "3011"
+        - name: KAFKA_BROKERS
+          value: "kafka:9092"
         # Define resource limits for the Wolfram computation engine
         resources:
           limits:
@@ -80,7 +87,7 @@ spec:
         readinessProbe:
           httpGet:
             path: /health
-            port: 5000
+            port: 3011
           initialDelaySeconds: 10
           periodSeconds: 5
           timeoutSeconds: 5
@@ -88,7 +95,7 @@ spec:
         livenessProbe:
           httpGet:
             path: /health
-            port: 5000
+            port: 3011
           initialDelaySeconds: 600
           periodSeconds: 30
           timeoutSeconds: 5

@@ -12,8 +12,8 @@ data:
   # Note: MONGODB_URI is removed as the database strategy has changed.
   # This will likely need to be replaced with a PostgreSQL connection string.
   COMMANDER_NODE_URL: "http://main-node:3000" # Self-reference for certain tasks
-  WOLFRAM_KERNEL_URL: "http://wolfram-kernel:5000"
-  SCHEDULING_MODEL_URL: "http://scheduling-model:8000"
+  WOLFRAM_KERNEL_URL: "http://wolfram-kernel:3011"
+  SCHEDULING_MODEL_URL: "http://scheduling-model:3009"
 
   # Kafka Configuration
   # The Bitnami chart exposes Kafka at this service name and port.

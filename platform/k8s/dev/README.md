@@ -96,7 +96,7 @@ Edit `resume-services-configmap.yaml` and `resume-worker-deployment.yaml`:
 
 Edit `resume-services-configmap.yaml` and `spacy-service-deployment.yaml`:
 
-- `PORT` - Service port (default: 8001)
+- `PORT` - Service port (default: 3008)
 - `WORKERS` - Number of uvicorn workers (default: 4)
 - `KAFKA_BROKERS` - Kafka broker addresses
 - `SPACY_MODEL` - spaCy model name (default: en_core_web_sm)
@@ -248,7 +248,7 @@ docker build -t spacy-service:latest .
 kubectl get svc spacy-service -n enginedge
 
 # Test connectivity from resume-worker
-kubectl exec -it deployment/resume-worker -n enginedge -- curl http://spacy-service:8001/health
+kubectl exec -it deployment/resume-worker -n enginedge -- curl http://spacy-service:3008/health
 ```
 
 **Issue: High memory usage**

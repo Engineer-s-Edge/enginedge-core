@@ -47,7 +47,7 @@ spec:
         env:
         # ML Service URL
         - name: ML_SERVICE_URL
-          value: "http://scheduling-model:8000"
+          value: "http://scheduling-model:3009"
         
         # MongoDB Connection
         - name: MONGODB_URI

@@ -59,7 +59,7 @@ spec:
           component: spacy-service
     ports:
     - protocol: TCP
-      port: 8001
+      port: 3008
   - to:
     - podSelector:
         matchLabels:
