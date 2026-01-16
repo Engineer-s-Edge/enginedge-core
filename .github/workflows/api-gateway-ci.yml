@@ -4,7 +4,7 @@ on:
   push:
     paths:
       - 'enginedge-core/api-gateway/**'
-      - '.github/workflows/api-gateway-ci.yml'
+      - 'enginedge-core/.github/workflows/api-gateway-ci.yml'
   pull_request:
     paths:
       - 'enginedge-core/api-gateway/**'
@@ -45,7 +45,7 @@ jobs:
           docker build -t $IMAGE .
           docker push $IMAGE
       - name: Helm deploy
-        if: github.ref == 'refs/heads/main' && secrets.KUBECONFIG_B64 != ''
+        if: github.ref == 'refs/heads/main' && secrets.KUBECONFIG_B64
         env:
           KUBECONFIG_B64: ${{ secrets.KUBECONFIG_B64 }}
         run: |

@@ -10,7 +10,7 @@ jobs:
     runs-on: self-hosted
     env:
       SERVICE_NAME: api-gateway
-      DOCKERFILE_PATH: ./api-gateway
+      DOCKERFILE_PATH: enginedge-core/api-gateway
       DEPLOYMENT_NAME: api-gateway
       CONTAINER_NAME: api-gateway
       GITHUB_USER: chris-alexander-pop
