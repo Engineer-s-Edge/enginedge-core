@@ -10,7 +10,7 @@ jobs:
     runs-on: self-hosted
     env:
       SERVICE_NAME: hexagon
-      DOCKERFILE_PATH: enginedge-core/hexagon
+      DOCKERFILE_PATH: ./hexagon
       DEPLOYMENT_NAME: hexagon
       CONTAINER_NAME: hexagon
       GITHUB_USER: chris-alexander-pop

@@ -3,11 +3,11 @@ name: api-gateway-ci
 on:
   push:
     paths:
-      - 'enginedge-core/api-gateway/**'
-      - 'enginedge-core/.github/workflows/api-gateway-ci.yml'
+      - 'api-gateway/**'
+      - '.github/workflows/api-gateway-ci.yml'
   pull_request:
     paths:
-      - 'enginedge-core/api-gateway/**'
+      - 'api-gateway/**'
 
 jobs:
   build-test:
@@ -18,19 +18,19 @@ jobs:
         with:
           node-version: 20
       - name: Install deps
-        working-directory: enginedge-core/api-gateway
+        working-directory: api-gateway
         run: npm ci
       - name: Format check
-        working-directory: enginedge-core/api-gateway
+        working-directory: api-gateway
         run: npm run format:check || (echo "Formatting check failed. Run 'npm run format' to fix." && exit 1)
       - name: Lint check
-        working-directory: enginedge-core/api-gateway
+        working-directory: api-gateway
         run: npm run lint:check || (echo "Linting check failed. Run 'npm run lint' to fix." && exit 1)
       - name: Test
-        working-directory: enginedge-core/api-gateway
+        working-directory: api-gateway
         run: npm test --if-present
       - name: Build
-        working-directory: enginedge-core/api-gateway
+        working-directory: api-gateway
         run: npm run build
       - name: Docker login
         if: github.ref == 'refs/heads/main'
@@ -39,22 +39,10 @@ jobs:
           CR_PAT: ${{ secrets.REGISTRY_TOKEN }}
       - name: Docker build & push
         if: github.ref == 'refs/heads/main'
-        working-directory: enginedge-core/api-gateway
+        working-directory: api-gateway
         run: |
           IMAGE=ghcr.io/${{ github.repository_owner }}/api-gateway:${{ github.sha }}
           docker build -t $IMAGE .
           docker push $IMAGE
-      - name: Helm deploy
-        if: github.ref == 'refs/heads/main' && secrets.KUBECONFIG_B64
-        env:
-          KUBECONFIG_B64: ${{ secrets.KUBECONFIG_B64 }}
-        run: |
-          echo "$KUBECONFIG_B64" | base64 -d > kubeconfig
-          export KUBECONFIG=$PWD/kubeconfig
-          IMAGE=ghcr.io/${{ github.repository_owner }}/api-gateway:${{ github.sha }}
-          helm upgrade --install api-gateway enginedge-core/platform/k8s/dev/charts/api-gateway \
-            --namespace default \
-            --set image.repository=${IMAGE%:*} \
-            --set image.tag=${IMAGE##*:}
 
 

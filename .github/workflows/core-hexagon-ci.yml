@@ -3,11 +3,11 @@ name: core-hexagon-ci
 on:
   push:
     paths:
-      - 'enginedge-core/hexagon/**'
-      - 'enginedge-core/.github/workflows/core-hexagon-ci.yml'
+      - 'hexagon/**'
+      - '.github/workflows/core-hexagon-ci.yml'
   pull_request:
     paths:
-      - 'enginedge-core/hexagon/**'
+      - 'hexagon/**'
 
 jobs:
   build-test:
@@ -18,17 +18,17 @@ jobs:
         with:
           node-version: 20
       - name: Install deps
-        working-directory: enginedge-core/hexagon
+        working-directory: hexagon
         run: npm ci || npm install
       - name: Format check
-        working-directory: enginedge-core/hexagon
+        working-directory: hexagon
         run: npm run format:check || (echo "Formatting check failed. Run 'npm run format' to fix." && exit 1)
       - name: Lint check
-        working-directory: enginedge-core/hexagon
+        working-directory: hexagon
         run: npm run lint:check || (echo "Linting check failed. Run 'npm run lint' to fix." && exit 1)
       - name: Test
-        working-directory: enginedge-core/hexagon
+        working-directory: hexagon
         run: npm test --if-present
       - name: Build
-        working-directory: enginedge-core/hexagon
+        working-directory: hexagon
         run: npm run build --if-present
