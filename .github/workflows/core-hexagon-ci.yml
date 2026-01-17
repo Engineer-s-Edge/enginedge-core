@@ -2,12 +2,19 @@ name: core-hexagon-ci
 
 on:
   push:
+    branches:
+      - dev
+      - main
     paths:
       - 'hexagon/**'
       - '.github/workflows/core-hexagon-ci.yml'
   pull_request:
+    branches:
+      - dev
+      - main
     paths:
       - 'hexagon/**'
+      - '.github/workflows/core-hexagon-ci.yml'
 
 jobs:
   build-test:
