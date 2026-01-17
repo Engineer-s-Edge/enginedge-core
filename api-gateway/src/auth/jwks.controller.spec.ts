@@ -22,7 +22,7 @@ describe('JwksController', () => {
       const result = await controller.getJwks();
       expect(result).toEqual({ keys: [] });
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringContaining('.well-known/jwks.json')
+        expect.stringContaining('.well-known/jwks.json'),
       );
     });
   });

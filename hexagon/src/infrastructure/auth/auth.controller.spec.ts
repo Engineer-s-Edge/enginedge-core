@@ -66,7 +66,9 @@ describe('AuthController', () => {
 
   it('should throw unauthorized if user id missing in profile', async () => {
     const req = { user: {} };
-    await expect(controller.profile(req)).rejects.toThrow(UnauthorizedException);
+    await expect(controller.profile(req)).rejects.toThrow(
+      UnauthorizedException,
+    );
   });
 
   it('should refresh token', async () => {

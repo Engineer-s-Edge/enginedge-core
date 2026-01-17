@@ -23,7 +23,14 @@ export class DatalakeProxyController {
   forwardMinio(@Req() req: any) {
     const base = process.env.MINIO_CONSOLE_URL || 'http://minio:9001';
     const path = req.params?.[0] || '';
-    return this.proxy.forward(base, path, req.method, req.body, req.headers, req.query);
+    return this.proxy.forward(
+      base,
+      path,
+      req.method,
+      req.body,
+      req.headers,
+      req.query,
+    );
   }
 
   /**
@@ -33,7 +40,14 @@ export class DatalakeProxyController {
   forwardTrino(@Req() req: any) {
     const base = process.env.TRINO_URL || 'http://trino:8080';
     const path = req.params?.[0] || '';
-    return this.proxy.forward(base, path, req.method, req.body, req.headers, req.query);
+    return this.proxy.forward(
+      base,
+      path,
+      req.method,
+      req.body,
+      req.headers,
+      req.query,
+    );
   }
 
   /**
@@ -43,7 +57,14 @@ export class DatalakeProxyController {
   forwardAirflow(@Req() req: any) {
     const base = process.env.AIRFLOW_URL || 'http://airflow:8080';
     const path = req.params?.[0] || '';
-    return this.proxy.forward(base, path, req.method, req.body, req.headers, req.query);
+    return this.proxy.forward(
+      base,
+      path,
+      req.method,
+      req.body,
+      req.headers,
+      req.query,
+    );
   }
 
   /**
@@ -53,7 +74,14 @@ export class DatalakeProxyController {
   forwardJupyter(@Req() req: any) {
     const base = process.env.JUPYTER_URL || 'http://jupyter:8888';
     const path = req.params?.[0] || '';
-    return this.proxy.forward(base, path, req.method, req.body, req.headers, req.query);
+    return this.proxy.forward(
+      base,
+      path,
+      req.method,
+      req.body,
+      req.headers,
+      req.query,
+    );
   }
 
   /**
@@ -63,7 +91,14 @@ export class DatalakeProxyController {
   forwardSpark(@Req() req: any) {
     const base = process.env.SPARK_MASTER_URL || 'http://spark-master:8080';
     const path = req.params?.[0] || '';
-    return this.proxy.forward(base, path, req.method, req.body, req.headers, req.query);
+    return this.proxy.forward(
+      base,
+      path,
+      req.method,
+      req.body,
+      req.headers,
+      req.query,
+    );
   }
 
   /**
@@ -73,6 +108,13 @@ export class DatalakeProxyController {
   forwardMarquez(@Req() req: any) {
     const base = process.env.MARQUEZ_WEB_URL || 'http://marquez-web:3000';
     const path = req.params?.[0] || '';
-    return this.proxy.forward(base, path, req.method, req.body, req.headers, req.query);
+    return this.proxy.forward(
+      base,
+      path,
+      req.method,
+      req.body,
+      req.headers,
+      req.query,
+    );
   }
 }

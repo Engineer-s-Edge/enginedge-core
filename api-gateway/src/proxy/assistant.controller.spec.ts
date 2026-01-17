@@ -29,7 +29,7 @@ describe('AssistantProxyController', () => {
       'POST',
       req.body,
       req.headers,
-      req.query
+      req.query,
     );
   });
 });

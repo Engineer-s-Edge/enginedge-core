@@ -10,7 +10,12 @@ describe('PatternDetector', () => {
   });
 
   it('should return existing workflow if set', () => {
-    const req = new OrchestrationRequest('1', 'u1', WorkflowType.RESUME_BUILD, {});
+    const req = new OrchestrationRequest(
+      '1',
+      'u1',
+      WorkflowType.RESUME_BUILD,
+      {},
+    );
     expect(detector.detectPattern(req)).toBe(WorkflowType.RESUME_BUILD);
   });
 

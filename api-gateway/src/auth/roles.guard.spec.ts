@@ -37,7 +37,9 @@ describe('RolesGuard', () => {
   });
 
   it('should allow access when user has one of multiple required roles', () => {
-    jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(['admin', 'moderator']);
+    jest
+      .spyOn(reflector, 'getAllAndOverride')
+      .mockReturnValue(['admin', 'moderator']);
     const context = createMockContext({ userId: '123', roles: ['moderator'] });
 
     expect(guard.canActivate(context)).toBe(true);
@@ -48,7 +50,9 @@ describe('RolesGuard', () => {
     const context = createMockContext({ userId: '123', roles: ['user'] });
 
     expect(() => guard.canActivate(context)).toThrow(ForbiddenException);
-    expect(() => guard.canActivate(context)).toThrow('Insufficient permissions');
+    expect(() => guard.canActivate(context)).toThrow(
+      'Insufficient permissions',
+    );
   });
 
   it('should deny access when user has no roles', () => {

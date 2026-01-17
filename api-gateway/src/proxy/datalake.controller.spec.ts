@@ -26,7 +26,7 @@ describe('DatalakeProxyController', () => {
       'GET',
       req.body,
       req.headers,
-      req.query
+      req.query,
     );
   });
 
@@ -38,7 +38,7 @@ describe('DatalakeProxyController', () => {
       'GET',
       req.body,
       req.headers,
-      req.query
+      req.query,
     );
   });
 
@@ -50,7 +50,7 @@ describe('DatalakeProxyController', () => {
       'GET',
       req.body,
       req.headers,
-      req.query
+      req.query,
     );
   });
 
@@ -62,7 +62,7 @@ describe('DatalakeProxyController', () => {
       'GET',
       req.body,
       req.headers,
-      req.query
+      req.query,
     );
   });
 
@@ -74,7 +74,7 @@ describe('DatalakeProxyController', () => {
       'GET',
       req.body,
       req.headers,
-      req.query
+      req.query,
     );
   });
 
@@ -86,7 +86,7 @@ describe('DatalakeProxyController', () => {
       'GET',
       req.body,
       req.headers,
-      req.query
+      req.query,
     );
   });
 });

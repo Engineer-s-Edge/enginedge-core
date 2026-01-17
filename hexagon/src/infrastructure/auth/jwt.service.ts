@@ -8,7 +8,8 @@ export class JwtService {
   private jwks: any;
 
   constructor() {
-    const baseUrl = process.env.IDENTITY_SERVICE_URL || 'http://identity-worker:3000';
+    const baseUrl =
+      process.env.IDENTITY_SERVICE_URL || 'http://identity-worker:3000';
     this.jwksUrl = `${baseUrl}/.well-known/jwks.json`;
   }
 

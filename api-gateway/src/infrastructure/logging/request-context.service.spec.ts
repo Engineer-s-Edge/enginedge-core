@@ -20,7 +20,10 @@ describe('RequestContextService', () => {
     service.runWith({ requestId: 'req-1', userId: 'user-1' }, () => {
       expect(service.getRequestId()).toBe('req-1');
       expect(service.getUserId()).toBe('user-1');
-      expect(service.getStore()).toEqual({ requestId: 'req-1', userId: 'user-1' });
+      expect(service.getStore()).toEqual({
+        requestId: 'req-1',
+        userId: 'user-1',
+      });
     });
   });
 

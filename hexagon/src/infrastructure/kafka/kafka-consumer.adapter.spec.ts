@@ -78,7 +78,9 @@ describe('KafkaConsumerAdapter', () => {
 
       await adapter.onModuleInit();
 
-      expect(mockLogger.warn).toHaveBeenCalledWith(expect.stringContaining('not available'));
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        expect.stringContaining('not available'),
+      );
 
       // Succeed next time
       mockConsumer.connect.mockResolvedValueOnce(undefined);
@@ -87,7 +89,9 @@ describe('KafkaConsumerAdapter', () => {
       await jest.advanceTimersByTimeAsync(11000);
 
       expect(mockConsumer.connect).toHaveBeenCalledTimes(2);
-      expect(mockLogger.log).toHaveBeenCalledWith('Kafka consumer reconnected successfully');
+      expect(mockLogger.log).toHaveBeenCalledWith(
+        'Kafka consumer reconnected successfully',
+      );
 
       jest.useRealTimers();
     });
@@ -97,7 +101,7 @@ describe('KafkaConsumerAdapter', () => {
       await adapter.onModuleInit();
       expect(mockLogger.error).toHaveBeenCalledWith(
         'Failed to connect Kafka consumer',
-        expect.any(Error)
+        expect.any(Error),
       );
     });
   });
@@ -130,7 +134,9 @@ describe('KafkaConsumerAdapter', () => {
       await adapter.subscribe('test-topic', handler);
       await adapter.subscribe('test-topic', handler);
       expect(mockConsumer.subscribe).toHaveBeenCalledTimes(1);
-      expect(mockLogger.warn).toHaveBeenCalledWith(expect.stringContaining('Already subscribed'));
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        expect.stringContaining('Already subscribed'),
+      );
     });
 
     it('should warn if not connected', async () => {
@@ -139,7 +145,7 @@ describe('KafkaConsumerAdapter', () => {
       await adapter.subscribe('test-topic', jest.fn());
       expect(mockConsumer.subscribe).not.toHaveBeenCalled();
       expect(mockLogger.warn).toHaveBeenCalledWith(
-        expect.stringContaining('consumer not connected')
+        expect.stringContaining('consumer not connected'),
       );
     });
 
@@ -149,7 +155,7 @@ describe('KafkaConsumerAdapter', () => {
       await adapter.subscribe('test-topic', jest.fn());
       expect(mockConsumer.subscribe).not.toHaveBeenCalled();
       expect(mockLogger.error).toHaveBeenCalledWith(
-        expect.stringContaining('consumer is already running')
+        expect.stringContaining('consumer is already running'),
       );
     });
   });
@@ -162,7 +168,9 @@ describe('KafkaConsumerAdapter', () => {
     it('should start consumer run loop', async () => {
       await adapter.startConsumer();
       expect(mockConsumer.run).toHaveBeenCalled();
-      expect(mockLogger.log).toHaveBeenCalledWith('Kafka consumer started and running');
+      expect(mockLogger.log).toHaveBeenCalledWith(
+        'Kafka consumer started and running',
+      );
     });
 
     it('should warn if already running', async () => {
@@ -170,7 +178,9 @@ describe('KafkaConsumerAdapter', () => {
       adapter.consumerRunning = true;
       await adapter.startConsumer();
       expect(mockConsumer.run).not.toHaveBeenCalled();
-      expect(mockLogger.warn).toHaveBeenCalledWith('Consumer is already running');
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        'Consumer is already running',
+      );
     });
 
     it('should warn if not connected', async () => {
@@ -178,7 +188,9 @@ describe('KafkaConsumerAdapter', () => {
       adapter.connected = false;
       await adapter.startConsumer();
       expect(mockConsumer.run).not.toHaveBeenCalled();
-      expect(mockLogger.warn).toHaveBeenCalledWith('Cannot start consumer - not connected');
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        'Cannot start consumer - not connected',
+      );
     });
 
     it('should process messages correctly via run eachMessage handler', async () => {
@@ -254,7 +266,7 @@ describe('KafkaConsumerAdapter', () => {
 
       expect(mockLogger.error).toHaveBeenCalledWith(
         expect.stringContaining('Error processing message'),
-        expect.any(Error)
+        expect.any(Error),
       );
     });
   });

@@ -14,14 +14,20 @@ export class KafkaLoggerService implements LoggerService {
   private bufferFilePath: string;
   private connectionWarningShown = false;
   private levelOrder = ['debug', 'log', 'warn', 'error', 'fatal'] as const;
-  private levelMap: Record<string, number> = { debug: 0, log: 1, warn: 2, error: 3, fatal: 4 };
+  private levelMap: Record<string, number> = {
+    debug: 0,
+    log: 1,
+    warn: 2,
+    error: 3,
+    fatal: 4,
+  };
   private minLevel: string;
   private serviceName: string;
   private enableConsole: boolean;
 
   constructor(
     private readonly config: ConfigService,
-    private readonly requestContext: RequestContextService
+    private readonly requestContext: RequestContextService,
   ) {
     const brokers = (process.env.KAFKA_BROKERS || 'localhost:9092').split(',');
     const clientId = process.env.KAFKA_CLIENT_ID || 'enginedge-api-gateway';
@@ -70,7 +76,14 @@ export class KafkaLoggerService implements LoggerService {
   }
 
   private should(level: string): boolean {
-    const map: Record<string, number> = { debug: 0, info: 1, log: 1, warn: 2, error: 3, fatal: 4 };
+    const map: Record<string, number> = {
+      debug: 0,
+      info: 1,
+      log: 1,
+      warn: 2,
+      error: 3,
+      fatal: 4,
+    };
     const current = map[this.minLevel] ?? 1;
     return (map[level] ?? 1) >= current;
   }
@@ -90,7 +103,7 @@ export class KafkaLoggerService implements LoggerService {
         console.warn(
           `[KafkaLogger] Cannot connect to Kafka at ${process.env.KAFKA_BROKERS || 'localhost:9092'}. ` +
             `Logs will be buffered to disk. Connection retries will be silent. ` +
-            `Set KAFKA_LOG_LEVEL=ERROR to see retry attempts.`
+            `Set KAFKA_LOG_LEVEL=ERROR to see retry attempts.`,
         );
         this.connectionWarningShown = true;
       }
@@ -110,7 +123,7 @@ export class KafkaLoggerService implements LoggerService {
     level: string,
     message: any,
     meta?: Record<string, unknown>,
-    logToConsole = true
+    logToConsole = true,
   ) {
     if (!this.should(level)) return;
     const ctx = this.requestContext.getStore() || {};
@@ -137,12 +150,20 @@ export class KafkaLoggerService implements LoggerService {
       await this.producer.send({
         topic,
         messages: [
-          { key: this.serviceName, value: JSON.stringify(entry), timestamp: Date.now().toString() },
+          {
+            key: this.serviceName,
+            value: JSON.stringify(entry),
+            timestamp: Date.now().toString(),
+          },
         ],
       });
     } catch {
       try {
-        fs.appendFileSync(this.bufferFilePath, JSON.stringify(entry) + '\n', 'utf-8');
+        fs.appendFileSync(
+          this.bufferFilePath,
+          JSON.stringify(entry) + '\n',
+          'utf-8',
+        );
       } catch {}
       this.scheduleReconnect();
     }
@@ -165,8 +186,11 @@ export class KafkaLoggerService implements LoggerService {
     this.emit(
       'error',
       message,
-      this.meta([trace ? { trace } : undefined, context ? { context } : undefined]),
-      false // false = don't log to console again
+      this.meta([
+        trace ? { trace } : undefined,
+        context ? { context } : undefined,
+      ]),
+      false, // false = don't log to console again
     );
   }
   warn(message: any, ...optionalParams: any[]) {

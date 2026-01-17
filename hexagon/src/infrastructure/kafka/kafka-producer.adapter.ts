@@ -1,11 +1,18 @@
-import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleInit,
+  OnModuleDestroy,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Kafka, Producer } from 'kafkajs';
 import { IKafkaProducer } from '@application/ports/kafka-producer.port';
 import { RequestContextService } from '../logging/shared/request-context.service';
 
 @Injectable()
-export class KafkaProducerAdapter implements IKafkaProducer, OnModuleInit, OnModuleDestroy {
+export class KafkaProducerAdapter
+  implements IKafkaProducer, OnModuleInit, OnModuleDestroy
+{
   private readonly logger = new Logger(KafkaProducerAdapter.name);
   private kafka: Kafka;
   private producer: Producer;
@@ -13,12 +20,15 @@ export class KafkaProducerAdapter implements IKafkaProducer, OnModuleInit, OnMod
 
   constructor(
     private readonly configService: ConfigService,
-    private readonly requestContext?: RequestContextService
+    private readonly requestContext?: RequestContextService,
   ) {
-    const brokers = (this.configService.get<string>('KAFKA_BROKERS') || 'localhost:9092').split(
-      ','
+    const brokers = (
+      this.configService.get<string>('KAFKA_BROKERS') || 'localhost:9092'
+    ).split(',');
+    const clientId = this.configService.get<string>(
+      'KAFKA_CLIENT_ID',
+      'enginedge-hexagon',
     );
-    const clientId = this.configService.get<string>('KAFKA_CLIENT_ID', 'enginedge-hexagon');
 
     this.kafka = new Kafka({
       clientId,
@@ -49,9 +59,15 @@ export class KafkaProducerAdapter implements IKafkaProducer, OnModuleInit, OnMod
       this.logger.log('Kafka producer connected');
     } catch (error) {
       // Log connection failure but don't throw - allow app to start without Kafka
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      if (errorMessage.includes('ECONNREFUSED') || errorMessage.includes('Connection')) {
-        this.logger.warn('Kafka producer not available - will retry periodically');
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      if (
+        errorMessage.includes('ECONNREFUSED') ||
+        errorMessage.includes('Connection')
+      ) {
+        this.logger.warn(
+          'Kafka producer not available - will retry periodically',
+        );
         // Start periodic reconnection attempts
         this.startReconnectionAttempts();
       } else {
@@ -106,7 +122,9 @@ export class KafkaProducerAdapter implements IKafkaProducer, OnModuleInit, OnMod
   async publish(topic: string, message: any): Promise<void> {
     if (!this.connected) {
       // Don't throw - just log warning if Kafka is not available
-      this.logger.warn(`Kafka producer not connected - message to ${topic} not sent`);
+      this.logger.warn(
+        `Kafka producer not connected - message to ${topic} not sent`,
+      );
       return;
     }
 
@@ -122,7 +140,10 @@ export class KafkaProducerAdapter implements IKafkaProducer, OnModuleInit, OnMod
               'x-request-id': (ctx.requestId as any) || '',
               'x-correlation-id': (ctx.correlationId as any) || '',
               'x-user-id': (ctx.userId as any) || '',
-              'x-service-name': (ctx.serviceName as any) || process.env.SERVICE_NAME || 'hexagon',
+              'x-service-name':
+                (ctx.serviceName as any) ||
+                process.env.SERVICE_NAME ||
+                'hexagon',
             },
           },
         ],

@@ -1,6 +1,9 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
-import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
+import {
+  FastifyAdapter,
+  NestFastifyApplication,
+} from '@nestjs/platform-fastify';
 import { AppModule } from './app.module';
 import { KafkaLoggerService } from './infrastructure/logging/kafka-logger.service';
 import { ValidationPipe } from '@nestjs/common';
@@ -9,7 +12,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
-    new FastifyAdapter({ trustProxy: true })
+    new FastifyAdapter({ trustProxy: true }),
   );
   // Use Kafka-backed logger
   app.useLogger(app.get(KafkaLoggerService));
@@ -17,7 +20,11 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.enableShutdownHooks();
   app.useGlobalPipes(
-    new ValidationPipe({ whitelist: true, transform: true, forbidUnknownValues: true })
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+      forbidUnknownValues: true,
+    }),
   );
 
   // metrics endpoint is served by MetricsModule controller
@@ -26,7 +33,10 @@ async function bootstrap() {
     .setTitle('EnginEdge API Gateway')
     .setDescription('Gateway API')
     .setVersion('0.1.0')
-    .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' }, 'jwt')
+    .addBearerAuth(
+      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
+      'jwt',
+    )
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document, {

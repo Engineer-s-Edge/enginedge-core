@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { KubernetesWorkerRegistryAdapter, InfraWorker } from './kubernetes-worker-registry.adapter';
+import {
+  KubernetesWorkerRegistryAdapter,
+  InfraWorker,
+} from './kubernetes-worker-registry.adapter';
 
 @Injectable()
 export class WorkerLoadBalancer {
@@ -8,7 +11,9 @@ export class WorkerLoadBalancer {
   async selectWorker(type: string): Promise<InfraWorker | null> {
     // Access internal workers map for load balancing
     const workers = (this.registry as any).workers.get(type) || [];
-    const healthyWorkers = workers.filter((w: InfraWorker) => w.status === 'healthy');
+    const healthyWorkers = workers.filter(
+      (w: InfraWorker) => w.status === 'healthy',
+    );
 
     if (healthyWorkers.length === 0) {
       // Fallback to any worker if no healthy ones

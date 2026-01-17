@@ -30,12 +30,21 @@ describe('OAuthController', () => {
     it('should handle callback and redirect', async () => {
       const res = { redirect: jest.fn() };
       await controller.handleCallback('google', 'code', 'state', res as any);
-      expect(mockIdentity.oauthCallback).toHaveBeenCalledWith('google', 'code', 'state');
+      expect(mockIdentity.oauthCallback).toHaveBeenCalledWith(
+        'google',
+        'code',
+        'state',
+      );
       expect(res.redirect).toHaveBeenCalledWith('http://success');
     });
 
     it('should return result if no res provided', async () => {
-      const result = await controller.handleCallback('google', 'code', 'state', undefined);
+      const result = await controller.handleCallback(
+        'google',
+        'code',
+        'state',
+        undefined,
+      );
       expect(result).toEqual({ url: 'http://success' });
     });
   });

@@ -13,7 +13,9 @@ describe('ProxyService', () => {
     // Manual instantiation since @nestjs/testing is not available
     service = new ProxyService();
 
-    mockedAxios.request = jest.fn().mockResolvedValue({ data: { success: true } });
+    mockedAxios.request = jest
+      .fn()
+      .mockResolvedValue({ data: { success: true } });
   });
 
   it('should be defined', () => {
@@ -26,10 +28,20 @@ describe('ProxyService', () => {
       const path = '/api/v1/resource';
       const method = 'POST';
       const body = { foo: 'bar' };
-      const headers = { authorization: 'Bearer token', 'custom-header': 'ignored' };
+      const headers = {
+        authorization: 'Bearer token',
+        'custom-header': 'ignored',
+      };
       const query = { limit: 10 };
 
-      const result = await service.forward(baseUrl, path, method, body, headers, query);
+      const result = await service.forward(
+        baseUrl,
+        path,
+        method,
+        body,
+        headers,
+        query,
+      );
 
       expect(result).toEqual({ success: true });
       expect(mockedAxios.request).toHaveBeenCalledWith({
@@ -49,14 +61,14 @@ describe('ProxyService', () => {
       expect(mockedAxios.request).toHaveBeenCalledWith(
         expect.objectContaining({
           url: 'http://base/path',
-        })
+        }),
       );
 
       await service.forward('http://base', 'path', 'GET', {}, {}, {});
       expect(mockedAxios.request).toHaveBeenCalledWith(
         expect.objectContaining({
           url: 'http://base/path',
-        })
+        }),
       );
     });
 
@@ -81,9 +93,9 @@ describe('ProxyService', () => {
     it('should handle axios errors', async () => {
       mockedAxios.request.mockRejectedValue(new Error('Network Error'));
 
-      await expect(service.forward('http://a', 'b', 'GET', {}, {}, {})).rejects.toThrow(
-        'Network Error'
-      );
+      await expect(
+        service.forward('http://a', 'b', 'GET', {}, {}, {}),
+      ).rejects.toThrow('Network Error');
     });
   });
 });

@@ -10,7 +10,7 @@ export class CoordinateMultiWorkerUseCase {
   constructor(
     @Inject('IRequestRepository')
     private readonly requestRepository: IRequestRepository,
-    private readonly resultAggregationService: ResultAggregationService
+    private readonly resultAggregationService: ResultAggregationService,
   ) {}
 
   async execute(requestId: string): Promise<void> {
@@ -34,10 +34,14 @@ export class CoordinateMultiWorkerUseCase {
         requestId,
         'failed',
         null,
-        'One or more workers failed'
+        'One or more workers failed',
       );
     } else {
-      await this.requestRepository.updateStatus(requestId, 'completed', aggregatedResult);
+      await this.requestRepository.updateStatus(
+        requestId,
+        'completed',
+        aggregatedResult,
+      );
     }
 
     this.logger.log(`Request ${requestId} completed with aggregated result`);

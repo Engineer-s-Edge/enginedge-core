@@ -9,8 +9,10 @@ import Redis from 'ioredis';
     {
       provide: 'REDIS_CLIENT',
       useFactory: (configService: ConfigService) => {
-        const redisUrl = configService.get<string>('REDIS_URL') || 'redis://localhost:6379/0';
-        const keyPrefix = configService.get<string>('REDIS_KEY_PREFIX') || 'hexagon:';
+        const redisUrl =
+          configService.get<string>('REDIS_URL') || 'redis://localhost:6379/0';
+        const keyPrefix =
+          configService.get<string>('REDIS_KEY_PREFIX') || 'hexagon:';
 
         let reconnectInterval: NodeJS.Timeout | null = null;
         let isConnected = false;
@@ -44,7 +46,9 @@ import Redis from 'ioredis';
         // Handle disconnection
         redisClient.on('close', () => {
           if (isConnected) {
-            console.log('[Redis] Connection closed - will attempt to reconnect');
+            console.log(
+              '[Redis] Connection closed - will attempt to reconnect',
+            );
             isConnected = false;
             startReconnectAttempts();
           }
@@ -61,7 +65,8 @@ import Redis from 'ioredis';
             (err instanceof AggregateError &&
               err.errors?.some(
                 (e: any) =>
-                  String(e).includes('ECONNREFUSED') || e.message?.includes('ECONNREFUSED')
+                  String(e).includes('ECONNREFUSED') ||
+                  e.message?.includes('ECONNREFUSED'),
               ));
 
           if (isConnectionRefused) {
@@ -77,7 +82,10 @@ import Redis from 'ioredis';
             return;
           }
           // Log other errors that might be important (but only once per error type)
-          console.warn('[Redis] Connection error:', errorMessage || errorString);
+          console.warn(
+            '[Redis] Connection error:',
+            errorMessage || errorString,
+          );
         });
 
         // Function to start periodic reconnection attempts

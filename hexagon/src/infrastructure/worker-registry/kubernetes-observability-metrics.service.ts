@@ -1,4 +1,9 @@
-import { Injectable, OnModuleInit, OnModuleDestroy, Inject } from '@nestjs/common';
+import {
+  Injectable,
+  OnModuleInit,
+  OnModuleDestroy,
+  Inject,
+} from '@nestjs/common';
 import { Registry, Counter, Gauge, Histogram } from 'prom-client';
 import { KubernetesObservabilityService } from '@application/services/kubernetes-observability.service';
 import { ConfigService } from '@nestjs/config';
@@ -8,7 +13,9 @@ import { ConfigService } from '@nestjs/config';
  * Tracks pod health, status, and worker type metrics
  */
 @Injectable()
-export class KubernetesObservabilityMetricsService implements OnModuleInit, OnModuleDestroy {
+export class KubernetesObservabilityMetricsService
+  implements OnModuleInit, OnModuleDestroy
+{
   private readonly registry: Registry;
 
   // Metrics for pod health
@@ -47,7 +54,7 @@ export class KubernetesObservabilityMetricsService implements OnModuleInit, OnMo
     private readonly observabilityService: KubernetesObservabilityService,
     private readonly configService: ConfigService,
     @Inject('PrometheusRegistry')
-    registry: Registry
+    registry: Registry,
   ) {
     this.registry = registry;
 
@@ -137,7 +144,7 @@ export class KubernetesObservabilityMetricsService implements OnModuleInit, OnMo
     // Start periodic metric updates
     const interval = this.configService.get<number>(
       'KUBERNETES_OBSERVABILITY_METRICS_INTERVAL',
-      30000 // Default: 30 seconds
+      30000, // Default: 30 seconds
     );
 
     // Initial update
@@ -146,7 +153,10 @@ export class KubernetesObservabilityMetricsService implements OnModuleInit, OnMo
     // Schedule periodic updates
     this.updateInterval = setInterval(() => {
       this.updateMetrics().catch((error) => {
-        console.error('Failed to update Kubernetes observability metrics:', error);
+        console.error(
+          'Failed to update Kubernetes observability metrics:',
+          error,
+        );
       });
     }, interval);
   }
@@ -155,27 +165,46 @@ export class KubernetesObservabilityMetricsService implements OnModuleInit, OnMo
    * Update all metrics by querying Kubernetes API
    */
   private async updateMetrics(): Promise<void> {
-    const namespace = this.configService.get<string>('KUBERNETES_NAMESPACE', 'default');
+    const namespace = this.configService.get<string>(
+      'KUBERNETES_NAMESPACE',
+      'default',
+    );
 
     for (const workerType of this.workerTypes) {
       try {
-        const health = await this.observabilityService.getWorkerTypeHealth(workerType, namespace);
+        const health = await this.observabilityService.getWorkerTypeHealth(
+          workerType,
+          namespace,
+        );
 
         // Update worker type aggregated metrics
-        this.workerTypeTotalPods.set({ worker_type: workerType, namespace }, health.totalPods);
-        this.workerTypeReadyPods.set({ worker_type: workerType, namespace }, health.readyPods);
-        this.workerTypeHealthyPods.set({ worker_type: workerType, namespace }, health.healthyPods);
+        this.workerTypeTotalPods.set(
+          { worker_type: workerType, namespace },
+          health.totalPods,
+        );
+        this.workerTypeReadyPods.set(
+          { worker_type: workerType, namespace },
+          health.readyPods,
+        );
+        this.workerTypeHealthyPods.set(
+          { worker_type: workerType, namespace },
+          health.healthyPods,
+        );
         this.workerTypeUnhealthyPods.set(
           { worker_type: workerType, namespace },
-          health.unhealthyPods
+          health.unhealthyPods,
         );
 
         // Update worker type health status (1 = healthy, 0.5 = degraded, 0 = unhealthy)
         const statusValue =
-          health.status === 'healthy' ? 1 : health.status === 'degraded' ? 0.5 : 0;
+          health.status === 'healthy'
+            ? 1
+            : health.status === 'degraded'
+              ? 0.5
+              : 0;
         this.workerTypeHealthStatus.set(
           { worker_type: workerType, namespace, status: health.status },
-          statusValue
+          statusValue,
         );
 
         // Update pod-level metrics
@@ -189,7 +218,7 @@ export class KubernetesObservabilityMetricsService implements OnModuleInit, OnMo
               namespace: pod.namespace,
               worker_type: workerType,
             },
-            isHealthy
+            isHealthy,
           );
 
           this.podReadyStatus.set(
@@ -198,11 +227,17 @@ export class KubernetesObservabilityMetricsService implements OnModuleInit, OnMo
               namespace: pod.namespace,
               worker_type: workerType,
             },
-            isReady
+            isReady,
           );
 
           // Set phase metric (1 for current phase, 0 for others)
-          const phases = ['Pending', 'Running', 'Succeeded', 'Failed', 'Unknown'];
+          const phases = [
+            'Pending',
+            'Running',
+            'Succeeded',
+            'Failed',
+            'Unknown',
+          ];
           for (const phase of phases) {
             this.podPhaseStatus.set(
               {
@@ -211,7 +246,7 @@ export class KubernetesObservabilityMetricsService implements OnModuleInit, OnMo
                 worker_type: workerType,
                 phase,
               },
-              phase === pod.phase ? 1 : 0
+              phase === pod.phase ? 1 : 0,
             );
           }
         }
@@ -229,7 +264,12 @@ export class KubernetesObservabilityMetricsService implements OnModuleInit, OnMo
   /**
    * Record an observability operation
    */
-  recordOperation(operation: string, workerType: string, duration: number, success: boolean): void {
+  recordOperation(
+    operation: string,
+    workerType: string,
+    duration: number,
+    success: boolean,
+  ): void {
     this.observabilityOperationsTotal.inc({
       operation,
       worker_type: workerType,
@@ -238,7 +278,7 @@ export class KubernetesObservabilityMetricsService implements OnModuleInit, OnMo
 
     this.observabilityOperationsDuration.observe(
       { operation, worker_type: workerType },
-      duration / 1000 // Convert to seconds
+      duration / 1000, // Convert to seconds
     );
 
     if (!success) {

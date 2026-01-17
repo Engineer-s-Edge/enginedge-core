@@ -35,7 +35,10 @@ export class UsersController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  async getUserByEmail(@Query('email') email?: string, @Req() req?: RequestWithUser) {
+  async getUserByEmail(
+    @Query('email') email?: string,
+    @Req() req?: RequestWithUser,
+  ) {
     if (email) {
       return this.identity.getUserByEmail(email);
     }

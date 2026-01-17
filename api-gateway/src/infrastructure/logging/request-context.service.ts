@@ -16,7 +16,9 @@ export class RequestContextService {
     return this.storage.run(store, callback);
   }
 
-  get<K extends keyof RequestContextStore>(key: K): RequestContextStore[K] | undefined {
+  get<K extends keyof RequestContextStore>(
+    key: K,
+  ): RequestContextStore[K] | undefined {
     const store = this.storage.getStore();
     return store ? (store[key] as any) : undefined;
   }

@@ -9,8 +9,12 @@ describe('UsersController', () => {
 
   beforeEach(async () => {
     mockIdentity = {
-      getUserById: jest.fn().mockResolvedValue({ id: '1', email: 'test@example.com' }),
-      getUserByEmail: jest.fn().mockResolvedValue({ id: '2', email: 'email@example.com' }),
+      getUserById: jest
+        .fn()
+        .mockResolvedValue({ id: '1', email: 'test@example.com' }),
+      getUserByEmail: jest
+        .fn()
+        .mockResolvedValue({ id: '2', email: 'email@example.com' }),
       listUsers: jest.fn().mockResolvedValue([{ id: '1' }, { id: '2' }]),
       updateUser: jest.fn().mockResolvedValue({ id: '1', updated: true }),
       createUser: jest.fn().mockResolvedValue({ id: '3', created: true }),
@@ -35,7 +39,9 @@ describe('UsersController', () => {
       user: { roles: [] },
     } as any);
     expect(result).toEqual({ id: '2', email: 'email@example.com' });
-    expect(mockIdentity.getUserByEmail).toHaveBeenCalledWith('email@example.com');
+    expect(mockIdentity.getUserByEmail).toHaveBeenCalledWith(
+      'email@example.com',
+    );
   });
 
   it('should list users if admin', async () => {
@@ -66,7 +72,9 @@ describe('UsersController', () => {
   it('should create user', async () => {
     const result = await controller.createUser({ email: 'new@example.com' });
     expect(result).toEqual({ id: '3', created: true });
-    expect(mockIdentity.createUser).toHaveBeenCalledWith({ email: 'new@example.com' });
+    expect(mockIdentity.createUser).toHaveBeenCalledWith({
+      email: 'new@example.com',
+    });
   });
 
   it('should delete user', async () => {

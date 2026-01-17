@@ -3,7 +3,9 @@ import { jwtVerify } from 'jose';
 
 @Injectable()
 export class JwtService {
-  private secret = new TextEncoder().encode(process.env.JWT_SECRET || 'dev-secret');
+  private secret = new TextEncoder().encode(
+    process.env.JWT_SECRET || 'dev-secret',
+  );
 
   async verify(token: string): Promise<any> {
     try {

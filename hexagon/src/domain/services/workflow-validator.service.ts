@@ -4,7 +4,10 @@ import { WorkflowType } from '../types/workflow.types';
 export class WorkflowValidator {
   validate(request: OrchestrationRequest): { valid: boolean; error?: string } {
     // Validate workflow type
-    if (!request.workflow || !Object.values(WorkflowType).includes(request.workflow)) {
+    if (
+      !request.workflow ||
+      !Object.values(WorkflowType).includes(request.workflow)
+    ) {
       return { valid: false, error: 'Invalid workflow type' };
     }
 

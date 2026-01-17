@@ -7,9 +7,14 @@ describe('OrchestrationRequest', () => {
   let request: OrchestrationRequest;
 
   beforeEach(() => {
-    request = new OrchestrationRequest('req-1', 'user-1', WorkflowType.RESUME_BUILD, {
-      test: 'data',
-    });
+    request = new OrchestrationRequest(
+      'req-1',
+      'user-1',
+      WorkflowType.RESUME_BUILD,
+      {
+        test: 'data',
+      },
+    );
   });
 
   describe('updateStatus', () => {
@@ -36,7 +41,7 @@ describe('OrchestrationRequest', () => {
         'assign-1',
         'worker-1',
         WorkerType.ASSISTANT,
-        'req-1'
+        'req-1',
       );
 
       request.addWorkerAssignment(assignment);
@@ -68,9 +73,14 @@ describe('OrchestrationRequest', () => {
         'assign-1',
         'worker-1',
         WorkerType.ASSISTANT,
-        'req-1'
+        'req-1',
       );
-      const assignment2 = new WorkerAssignment('assign-2', 'worker-2', WorkerType.RESUME, 'req-1');
+      const assignment2 = new WorkerAssignment(
+        'assign-2',
+        'worker-2',
+        WorkerType.RESUME,
+        'req-1',
+      );
 
       assignment1.complete({ result: 'test1' });
       assignment2.complete({ result: 'test2' });
@@ -86,9 +96,14 @@ describe('OrchestrationRequest', () => {
         'assign-1',
         'worker-1',
         WorkerType.ASSISTANT,
-        'req-1'
+        'req-1',
       );
-      const assignment2 = new WorkerAssignment('assign-2', 'worker-2', WorkerType.RESUME, 'req-1');
+      const assignment2 = new WorkerAssignment(
+        'assign-2',
+        'worker-2',
+        WorkerType.RESUME,
+        'req-1',
+      );
 
       assignment1.complete({ result: 'test1' });
       // assignment2 is still pending

@@ -25,7 +25,7 @@ interface RequestDocument {
 export class MongoDbRequestRepository implements IRequestRepository {
   constructor(
     @InjectModel('OrchestrationRequest')
-    private readonly requestModel: Model<RequestDocument>
+    private readonly requestModel: Model<RequestDocument>,
   ) {}
 
   async save(request: OrchestrationRequest): Promise<void> {
@@ -74,7 +74,12 @@ export class MongoDbRequestRepository implements IRequestRepository {
     return docs.map((doc) => this.mapToEntity(doc));
   }
 
-  async updateStatus(id: string, status: string, result?: unknown, error?: string): Promise<void> {
+  async updateStatus(
+    id: string,
+    status: string,
+    result?: unknown,
+    error?: string,
+  ): Promise<void> {
     const update: any = { status, updatedAt: new Date() };
     if (result !== undefined) update.result = result;
     if (error) update.error = error;
@@ -85,7 +90,12 @@ export class MongoDbRequestRepository implements IRequestRepository {
   }
 
   private mapToEntity(doc: RequestDocument): OrchestrationRequest {
-    const request = new OrchestrationRequest(doc.id, doc.userId, doc.workflow as any, doc.data);
+    const request = new OrchestrationRequest(
+      doc.id,
+      doc.userId,
+      doc.workflow as any,
+      doc.data,
+    );
     request.status = doc.status as any;
     request.createdAt = doc.createdAt;
     request.updatedAt = doc.updatedAt;
@@ -101,7 +111,7 @@ export class MongoDbRequestRepository implements IRequestRepository {
         w.workerId,
         w.workerType,
         w.requestId,
-        w.maxRetries
+        w.maxRetries,
       );
       assignment.status = w.status;
       assignment.response = w.response;

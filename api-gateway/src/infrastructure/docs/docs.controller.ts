@@ -3,17 +3,22 @@ import axios from 'axios';
 
 @Controller('docs')
 export class DocsProxyController {
-  private readonly identityBase = process.env.IDENTITY_SERVICE_URL || 'http://identity-worker:3000';
+  private readonly identityBase =
+    process.env.IDENTITY_SERVICE_URL || 'http://identity-worker:3000';
   private readonly assistantBase =
     process.env.ASSISTANT_WORKER_URL || 'http://assistant-worker:3001';
   private readonly schedulingBase =
     process.env.SCHEDULING_WORKER_URL || 'http://scheduling-worker:3000';
-  private readonly resumeBase = process.env.RESUME_WORKER_URL || 'http://resume-worker:3006';
+  private readonly resumeBase =
+    process.env.RESUME_WORKER_URL || 'http://resume-worker:3006';
   private readonly interviewBase =
     process.env.INTERVIEW_WORKER_URL || 'http://interview-worker:3004';
-  private readonly dataBase = process.env.DATA_WORKER_URL || 'http://data-processing-worker:3003';
-  private readonly latexBase = process.env.LATEX_WORKER_URL || 'http://latex-worker:3005';
-  private readonly toolsBase = process.env.TOOLS_WORKER_URL || 'http://agent-tool-worker:3002';
+  private readonly dataBase =
+    process.env.DATA_WORKER_URL || 'http://data-processing-worker:3003';
+  private readonly latexBase =
+    process.env.LATEX_WORKER_URL || 'http://latex-worker:3005';
+  private readonly toolsBase =
+    process.env.TOOLS_WORKER_URL || 'http://agent-tool-worker:3002';
 
   @Get('/identity/docs-json')
   async identityDocs() {

@@ -1,4 +1,7 @@
-import { SchedulingProxyController, CalendarProxyController } from './scheduling.controller';
+import {
+  SchedulingProxyController,
+  CalendarProxyController,
+} from './scheduling.controller';
 import { ProxyService } from './proxy.service';
 
 describe('SchedulingProxyControllers', () => {
@@ -29,7 +32,7 @@ describe('SchedulingProxyControllers', () => {
         'POST',
         req.body,
         req.headers,
-        req.query
+        req.query,
       );
     });
   });
@@ -55,7 +58,7 @@ describe('SchedulingProxyControllers', () => {
         'GET',
         req.body,
         req.headers,
-        req.query
+        req.query,
       );
     });
   });

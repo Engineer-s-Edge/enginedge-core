@@ -28,7 +28,9 @@ describe('HandleWorkerResponseUseCase', () => {
       ],
     }).compile();
 
-    useCase = module.get<HandleWorkerResponseUseCase>(HandleWorkerResponseUseCase);
+    useCase = module.get<HandleWorkerResponseUseCase>(
+      HandleWorkerResponseUseCase,
+    );
   });
 
   it('should be defined', () => {
@@ -37,7 +39,12 @@ describe('HandleWorkerResponseUseCase', () => {
 
   it('should successfully update assignment status on completion', async () => {
     const req = new OrchestrationRequest('req1', 'u1', WorkflowType.CUSTOM, {});
-    const assignment = new WorkerAssignment('assign1', 'w1', WorkerType.RESUME, 'req1');
+    const assignment = new WorkerAssignment(
+      'assign1',
+      'w1',
+      WorkerType.RESUME,
+      'req1',
+    );
     req.addWorkerAssignment(assignment);
     (mockRepo.findById as jest.Mock).mockResolvedValue(req);
 
@@ -51,7 +58,12 @@ describe('HandleWorkerResponseUseCase', () => {
 
   it('should update assignment with error on failure', async () => {
     const req = new OrchestrationRequest('req1', 'u1', WorkflowType.CUSTOM, {});
-    const assignment = new WorkerAssignment('assign1', 'w1', WorkerType.RESUME, 'req1');
+    const assignment = new WorkerAssignment(
+      'assign1',
+      'w1',
+      WorkerType.RESUME,
+      'req1',
+    );
     req.addWorkerAssignment(assignment);
     (mockRepo.findById as jest.Mock).mockResolvedValue(req);
 

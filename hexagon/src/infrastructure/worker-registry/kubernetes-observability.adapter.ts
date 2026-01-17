@@ -14,16 +14,24 @@ import {
 } from '@application/ports/kubernetes-observability.port';
 
 @Injectable()
-export class KubernetesObservabilityAdapter implements IKubernetesObservabilityPort {
+export class KubernetesObservabilityAdapter
+  implements IKubernetesObservabilityPort
+{
   private readonly logger = new Logger(KubernetesObservabilityAdapter.name);
   private k8sApi: CoreV1Api | null = null;
   private metricsApi: MetricsV1beta1Api | null = null;
   private readonly namespace: string;
 
   constructor(private readonly configService: ConfigService) {
-    this.namespace = this.configService.get<string>('KUBERNETES_NAMESPACE', 'default');
+    this.namespace = this.configService.get<string>(
+      'KUBERNETES_NAMESPACE',
+      'default',
+    );
 
-    const discoveryMode = this.configService.get<string>('WORKER_DISCOVERY_MODE', 'kubernetes');
+    const discoveryMode = this.configService.get<string>(
+      'WORKER_DISCOVERY_MODE',
+      'kubernetes',
+    );
     if (discoveryMode === 'kubernetes') {
       try {
         const kc = new KubeConfig();
@@ -33,7 +41,8 @@ export class KubernetesObservabilityAdapter implements IKubernetesObservabilityP
         // Try to initialize metrics API (may not be available in all clusters or client versions)
         try {
           // Metrics API might not be exported - check if available
-          const MetricsApi = (require('@kubernetes/client-node') as any).MetricsV1beta1Api;
+          const MetricsApi = (require('@kubernetes/client-node') as any)
+            .MetricsV1beta1Api;
           if (MetricsApi) {
             this.metricsApi = kc.makeApiClient(MetricsApi);
           } else {
@@ -42,12 +51,15 @@ export class KubernetesObservabilityAdapter implements IKubernetesObservabilityP
           }
         } catch (error) {
           this.logger.debug(
-            'Metrics API not available (metrics-server may not be installed or API not in client)'
+            'Metrics API not available (metrics-server may not be installed or API not in client)',
           );
           this.metricsApi = null;
         }
       } catch (error) {
-        this.logger.warn('Kubernetes client not available for observability', error);
+        this.logger.warn(
+          'Kubernetes client not available for observability',
+          error,
+        );
         this.k8sApi = null;
       }
     }
@@ -57,7 +69,7 @@ export class KubernetesObservabilityAdapter implements IKubernetesObservabilityP
     podName: string,
     namespace?: string,
     container?: string,
-    tailLines = 500
+    tailLines = 500,
   ): Promise<string> {
     if (!this.k8sApi) {
       throw new Error('Kubernetes API client not available');
@@ -77,7 +89,10 @@ export class KubernetesObservabilityAdapter implements IKubernetesObservabilityP
       return typeof body === 'string' ? body : (body?.body ?? '');
     } catch (error: unknown) {
       const e = error instanceof Error ? error : new Error(String(error));
-      this.logger.error(`Failed to get logs for pod ${podName}: ${e.message}`, e.stack);
+      this.logger.error(
+        `Failed to get logs for pod ${podName}: ${e.message}`,
+        e.stack,
+      );
       throw e;
     }
   }
@@ -110,7 +125,9 @@ export class KubernetesObservabilityAdapter implements IKubernetesObservabilityP
         })) || [];
 
       // Determine if pod is ready (all containers ready)
-      const ready = containerStatuses.length > 0 && containerStatuses.every((cs: any) => cs.ready);
+      const ready =
+        containerStatuses.length > 0 &&
+        containerStatuses.every((cs: any) => cs.ready);
 
       return {
         name: pod.metadata?.name || podName,
@@ -124,17 +141,26 @@ export class KubernetesObservabilityAdapter implements IKubernetesObservabilityP
           message: c.message,
         })),
         containerStatuses,
-        startTime: pod.status?.startTime ? new Date(pod.status.startTime) : undefined,
+        startTime: pod.status?.startTime
+          ? new Date(pod.status.startTime)
+          : undefined,
         nodeName: pod.spec?.nodeName,
       };
     } catch (error: unknown) {
       const e = error instanceof Error ? error : new Error(String(error));
-      this.logger.error(`Failed to get status for pod ${podName}: ${e.message}`, e.stack);
+      this.logger.error(
+        `Failed to get status for pod ${podName}: ${e.message}`,
+        e.stack,
+      );
       throw e;
     }
   }
 
-  async getPodEvents(podName: string, namespace?: string, limit = 50): Promise<PodEvent[]> {
+  async getPodEvents(
+    podName: string,
+    namespace?: string,
+    limit = 50,
+  ): Promise<PodEvent[]> {
     if (!this.k8sApi) {
       throw new Error('Kubernetes API client not available');
     }
@@ -153,19 +179,29 @@ export class KubernetesObservabilityAdapter implements IKubernetesObservabilityP
           type: event.type || 'Normal',
           reason: event.reason || '',
           message: event.message || '',
-          firstTimestamp: event.firstTimestamp ? new Date(event.firstTimestamp) : undefined,
-          lastTimestamp: event.lastTimestamp ? new Date(event.lastTimestamp) : undefined,
+          firstTimestamp: event.firstTimestamp
+            ? new Date(event.firstTimestamp)
+            : undefined,
+          lastTimestamp: event.lastTimestamp
+            ? new Date(event.lastTimestamp)
+            : undefined,
           count: event.count,
         }))
         .slice(0, limit);
     } catch (error: unknown) {
       const e = error instanceof Error ? error : new Error(String(error));
-      this.logger.error(`Failed to get events for pod ${podName}: ${e.message}`, e.stack);
+      this.logger.error(
+        `Failed to get events for pod ${podName}: ${e.message}`,
+        e.stack,
+      );
       throw e;
     }
   }
 
-  async getPodMetrics(podName: string, namespace?: string): Promise<PodMetrics | null> {
+  async getPodMetrics(
+    podName: string,
+    namespace?: string,
+  ): Promise<PodMetrics | null> {
     if (!this.metricsApi) {
       this.logger.debug('Metrics API not available, returning null');
       return null;
@@ -224,13 +260,16 @@ export class KubernetesObservabilityAdapter implements IKubernetesObservabilityP
     } catch (error: unknown) {
       // Metrics API may not be available, return null instead of throwing
       this.logger.debug(
-        `Metrics not available for pod ${podName}: ${error instanceof Error ? error.message : String(error)}`
+        `Metrics not available for pod ${podName}: ${error instanceof Error ? error.message : String(error)}`,
       );
       return null;
     }
   }
 
-  async getPodsByWorkerType(workerType: string, namespace?: string): Promise<PodInfo[]> {
+  async getPodsByWorkerType(
+    workerType: string,
+    namespace?: string,
+  ): Promise<PodInfo[]> {
     if (!this.k8sApi) {
       throw new Error('Kubernetes API client not available');
     }
@@ -247,7 +286,8 @@ export class KubernetesObservabilityAdapter implements IKubernetesObservabilityP
       return pods.map((pod: any) => {
         const containerStatuses = pod.status?.containerStatuses || [];
         const ready =
-          containerStatuses.length > 0 && containerStatuses.every((cs: any) => cs.ready);
+          containerStatuses.length > 0 &&
+          containerStatuses.every((cs: any) => cs.ready);
 
         return {
           name: pod.metadata?.name || '',
@@ -256,23 +296,35 @@ export class KubernetesObservabilityAdapter implements IKubernetesObservabilityP
           phase: pod.status?.phase || 'Unknown',
           ready,
           nodeName: pod.spec?.nodeName,
-          startTime: pod.status?.startTime ? new Date(pod.status.startTime) : undefined,
+          startTime: pod.status?.startTime
+            ? new Date(pod.status.startTime)
+            : undefined,
         };
       });
     } catch (error: unknown) {
       const e = error instanceof Error ? error : new Error(String(error));
-      this.logger.error(`Failed to get pods for worker type ${workerType}: ${e.message}`, e.stack);
+      this.logger.error(
+        `Failed to get pods for worker type ${workerType}: ${e.message}`,
+        e.stack,
+      );
       throw e;
     }
   }
 
-  async getWorkerTypeHealth(workerType: string, namespace?: string): Promise<WorkerTypeHealth> {
+  async getWorkerTypeHealth(
+    workerType: string,
+    namespace?: string,
+  ): Promise<WorkerTypeHealth> {
     const pods = await this.getPodsByWorkerType(workerType, namespace);
 
     const totalPods = pods.length;
     const readyPods = pods.filter((p) => p.ready).length;
-    const healthyPods = pods.filter((p) => p.phase === 'Running' && p.ready).length;
-    const unhealthyPods = pods.filter((p) => p.phase !== 'Running' || !p.ready).length;
+    const healthyPods = pods.filter(
+      (p) => p.phase === 'Running' && p.ready,
+    ).length;
+    const unhealthyPods = pods.filter(
+      (p) => p.phase !== 'Running' || !p.ready,
+    ).length;
 
     // Determine overall status
     let status: 'healthy' | 'degraded' | 'unhealthy';

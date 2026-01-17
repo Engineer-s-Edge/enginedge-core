@@ -23,7 +23,8 @@ export class RateLimitInterceptor implements NestInterceptor {
     const req = context.switchToHttp().getRequest();
     const accept = (req.headers['accept'] as string) || '';
     const isSse = accept.includes('text/event-stream');
-    const isWs = (req.headers['upgrade'] as string)?.toLowerCase() === 'websocket';
+    const isWs =
+      (req.headers['upgrade'] as string)?.toLowerCase() === 'websocket';
     if (isSse || isWs) {
       return next.handle();
     }
@@ -35,11 +36,17 @@ export class RateLimitInterceptor implements NestInterceptor {
       lastRefill: now,
     };
     const elapsed = now - bucket.lastRefill;
-    bucket.tokens = Math.min(this.capacity, bucket.tokens + elapsed * this.refillPerMs);
+    bucket.tokens = Math.min(
+      this.capacity,
+      bucket.tokens + elapsed * this.refillPerMs,
+    );
     bucket.lastRefill = now;
 
     if (bucket.tokens < 1) {
-      throw new HttpException('Rate limit exceeded', HttpStatus.TOO_MANY_REQUESTS);
+      throw new HttpException(
+        'Rate limit exceeded',
+        HttpStatus.TOO_MANY_REQUESTS,
+      );
     }
     bucket.tokens -= 1;
     this.buckets.set(key, bucket);

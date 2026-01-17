@@ -16,7 +16,12 @@ export class OrchestrationRequest {
   correlationId?: string;
   idempotencyKey?: string;
 
-  constructor(id: string, userId: string, workflow: WorkflowType, data: Record<string, unknown>) {
+  constructor(
+    id: string,
+    userId: string,
+    workflow: WorkflowType,
+    data: Record<string, unknown>,
+  ) {
     this.id = id;
     this.userId = userId;
     this.workflow = workflow;
@@ -27,7 +32,11 @@ export class OrchestrationRequest {
     this.updatedAt = new Date();
   }
 
-  updateStatus(status: RequestStatus | string, result?: unknown, error?: string): void {
+  updateStatus(
+    status: RequestStatus | string,
+    result?: unknown,
+    error?: string,
+  ): void {
     this.status = status as RequestStatus;
     this.updatedAt = new Date();
     if (result !== undefined) {
@@ -60,6 +69,8 @@ export class OrchestrationRequest {
 
   allWorkersComplete(): boolean {
     if (this.workers.length === 0) return false;
-    return this.workers.every((w) => w.status === 'completed' || w.status === 'failed');
+    return this.workers.every(
+      (w) => w.status === 'completed' || w.status === 'failed',
+    );
   }
 }

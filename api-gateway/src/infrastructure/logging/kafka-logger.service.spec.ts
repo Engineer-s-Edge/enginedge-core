@@ -31,7 +31,9 @@ describe('KafkaLoggerService', () => {
     // Mock Kafka
     mockProducer = {
       connect: jest.fn().mockResolvedValue(undefined),
-      send: jest.fn().mockResolvedValue([{ topicName: 'test', partition: 0, errorCode: 0 }]),
+      send: jest
+        .fn()
+        .mockResolvedValue([{ topicName: 'test', partition: 0, errorCode: 0 }]),
     };
     mockKafka = {
       producer: jest.fn().mockReturnValue(mockProducer),
@@ -45,7 +47,7 @@ describe('KafkaLoggerService', () => {
 
     service = new KafkaLoggerService(
       mockConfigService as ConfigService,
-      mockRequestContextService as RequestContextService
+      mockRequestContextService as RequestContextService,
     );
   });
 
@@ -79,12 +81,14 @@ describe('KafkaLoggerService', () => {
       // Re-instantiate
       service = new KafkaLoggerService(
         mockConfigService as ConfigService,
-        mockRequestContextService as RequestContextService
+        mockRequestContextService as RequestContextService,
       );
 
       await Promise.resolve();
       await Promise.resolve(); // Extra tick for catch block
-      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Cannot connect to Kafka'));
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Cannot connect to Kafka'),
+      );
     });
   });
 
@@ -105,9 +109,11 @@ describe('KafkaLoggerService', () => {
         expect.objectContaining({
           topic: 'enginedge.logs.worker.api-gateway',
           messages: expect.arrayContaining([
-            expect.objectContaining({ value: expect.stringContaining('test message') }),
+            expect.objectContaining({
+              value: expect.stringContaining('test message'),
+            }),
           ]),
-        })
+        }),
       );
     });
 

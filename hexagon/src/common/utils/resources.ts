@@ -119,7 +119,7 @@ export class ResourceLoader {
       encoding?: BufferEncoding;
       parseJson?: boolean;
       subDir?: string;
-    } = {}
+    } = {},
   ): () => T {
     const { encoding = 'utf-8', parseJson = false, subDir = '' } = options;
 
@@ -149,7 +149,7 @@ export class ResourceLoader {
       encoding?: BufferEncoding;
       parseJson?: boolean;
       subDir?: string;
-    } = {}
+    } = {},
   ): T {
     const loader = this.createDefaultLoader<T>(fileName, options);
     return this.getFileFromName<T>(fileName, loader);

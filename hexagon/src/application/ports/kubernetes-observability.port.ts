@@ -15,7 +15,7 @@ export interface IKubernetesObservabilityPort {
     podName: string,
     namespace?: string,
     container?: string,
-    tailLines?: number
+    tailLines?: number,
   ): Promise<string>;
 
   /**
@@ -33,7 +33,11 @@ export interface IKubernetesObservabilityPort {
    * @param limit Maximum number of events to retrieve (default: 50)
    * @returns Array of pod events
    */
-  getPodEvents(podName: string, namespace?: string, limit?: number): Promise<PodEvent[]>;
+  getPodEvents(
+    podName: string,
+    namespace?: string,
+    limit?: number,
+  ): Promise<PodEvent[]>;
 
   /**
    * Get resource metrics for a pod (CPU, memory usage)
@@ -41,7 +45,10 @@ export interface IKubernetesObservabilityPort {
    * @param namespace Kubernetes namespace (optional, defaults to configured namespace)
    * @returns Pod metrics
    */
-  getPodMetrics(podName: string, namespace?: string): Promise<PodMetrics | null>;
+  getPodMetrics(
+    podName: string,
+    namespace?: string,
+  ): Promise<PodMetrics | null>;
 
   /**
    * Get all pods for a worker type
@@ -49,7 +56,10 @@ export interface IKubernetesObservabilityPort {
    * @param namespace Kubernetes namespace (optional, defaults to configured namespace)
    * @returns Array of pod information
    */
-  getPodsByWorkerType(workerType: string, namespace?: string): Promise<PodInfo[]>;
+  getPodsByWorkerType(
+    workerType: string,
+    namespace?: string,
+  ): Promise<PodInfo[]>;
 
   /**
    * Get aggregated health status for all pods of a worker type
@@ -57,7 +67,10 @@ export interface IKubernetesObservabilityPort {
    * @param namespace Kubernetes namespace (optional, defaults to configured namespace)
    * @returns Aggregated health status
    */
-  getWorkerTypeHealth(workerType: string, namespace?: string): Promise<WorkerTypeHealth>;
+  getWorkerTypeHealth(
+    workerType: string,
+    namespace?: string,
+  ): Promise<WorkerTypeHealth>;
 }
 
 /**

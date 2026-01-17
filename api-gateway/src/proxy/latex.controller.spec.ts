@@ -25,7 +25,7 @@ describe('LatexProxyController', () => {
       'POST',
       req.body,
       req.headers,
-      req.query
+      req.query,
     );
   });
 });

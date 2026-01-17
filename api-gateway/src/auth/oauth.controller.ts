@@ -23,7 +23,7 @@ export class OAuthController {
     @Param('provider') provider: string,
     @Query('code') code: string,
     @Query('state') state?: string,
-    @Res() res?: FastifyReply
+    @Res() res?: FastifyReply,
   ) {
     const result = await this.identity.oauthCallback(provider, code, state);
     // If result contains redirect URL, redirect to it
@@ -35,7 +35,10 @@ export class OAuthController {
 
   @Delete(':provider/unlink')
   @HttpCode(HttpStatus.OK)
-  async unlink(@Param('provider') provider: string, @Query('userId') userId: string) {
+  async unlink(
+    @Param('provider') provider: string,
+    @Query('userId') userId: string,
+  ) {
     return this.identity.oauthUnlink(provider, userId);
   }
 }

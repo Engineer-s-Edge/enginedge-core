@@ -18,7 +18,7 @@ export class WorkerAssignment {
     workerId: string,
     workerType: WorkerType,
     requestId: string,
-    maxRetries = 3
+    maxRetries = 3,
   ) {
     this.id = id;
     this.workerId = workerId;

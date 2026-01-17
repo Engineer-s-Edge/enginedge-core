@@ -60,7 +60,12 @@ describe('OrchestrateRequestUseCase', () => {
       data: { resume: 'base64...' },
     };
 
-    const assignment = new WorkerAssignment('1', 'worker-1', WorkerType.RESUME, 'req-id');
+    const assignment = new WorkerAssignment(
+      '1',
+      'worker-1',
+      WorkerType.RESUME,
+      'req-id',
+    );
     (mockRouter.route as jest.Mock).mockReturnValue([assignment]);
 
     const result = await useCase.execute(input);
@@ -72,7 +77,7 @@ describe('OrchestrateRequestUseCase', () => {
       expect.any(String),
       'processing',
       undefined,
-      undefined
+      undefined,
     );
     expect(mockProducer.publish).toHaveBeenCalled();
   });
@@ -105,7 +110,12 @@ describe('OrchestrateRequestUseCase', () => {
       workflow: WorkflowType.EXPERT_RESEARCH,
       data: { q: 'hi' },
     };
-    const assignment = new WorkerAssignment('1', 'worker-assist', WorkerType.ASSISTANT, 'req-id');
+    const assignment = new WorkerAssignment(
+      '1',
+      'worker-assist',
+      WorkerType.ASSISTANT,
+      'req-id',
+    );
     (mockRouter.route as jest.Mock).mockReturnValue([assignment]);
 
     await useCase.execute(input);
@@ -116,7 +126,7 @@ describe('OrchestrateRequestUseCase', () => {
         // Message
         assignmentId: '1',
         data: { q: 'hi' },
-      })
+      }),
     );
   });
 });

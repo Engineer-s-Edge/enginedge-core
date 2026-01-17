@@ -11,13 +11,13 @@ export class WorkflowOrchestrationService {
   constructor(
     private readonly orchestrateRequest: OrchestrateRequestUseCase,
     private readonly manageWorkflowState: ManageWorkflowStateUseCase,
-    private readonly workflowDefinition: WorkflowDefinitionService
+    private readonly workflowDefinition: WorkflowDefinitionService,
   ) {}
 
   async orchestrateWorkflow(
     workflowType: WorkflowType,
     userId: string,
-    data: Record<string, unknown>
+    data: Record<string, unknown>,
   ): Promise<string> {
     const request = await this.orchestrateRequest.execute({
       userId,
@@ -27,7 +27,11 @@ export class WorkflowOrchestrationService {
 
     // Create workflow state
     const steps = this.workflowDefinition.getWorkflowSteps(workflowType);
-    await this.manageWorkflowState.createWorkflow(request.id, workflowType, steps);
+    await this.manageWorkflowState.createWorkflow(
+      request.id,
+      workflowType,
+      steps,
+    );
 
     return request.id;
   }

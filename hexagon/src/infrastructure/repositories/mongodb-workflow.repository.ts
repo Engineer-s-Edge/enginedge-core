@@ -18,7 +18,7 @@ interface WorkflowDocument {
 export class MongoDbWorkflowRepository implements IWorkflowRepository {
   constructor(
     @InjectModel('Workflow')
-    private readonly workflowModel: Model<WorkflowDocument>
+    private readonly workflowModel: Model<WorkflowDocument>,
   ) {}
 
   async save(workflow: Workflow): Promise<void> {
@@ -49,7 +49,10 @@ export class MongoDbWorkflowRepository implements IWorkflowRepository {
   }
 
   async updateState(id: string, state: Record<string, unknown>): Promise<void> {
-    await this.workflowModel.findOneAndUpdate({ id }, { state, updatedAt: new Date() });
+    await this.workflowModel.findOneAndUpdate(
+      { id },
+      { state, updatedAt: new Date() },
+    );
   }
 
   private mapToEntity(doc: WorkflowDocument): Workflow {

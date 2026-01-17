@@ -11,12 +11,16 @@ describe('KubernetesObservabilityAdapter', () => {
   beforeEach(async () => {
     mockK8sApi = {
       readNamespacedPodLog: jest.fn().mockResolvedValue('logs'),
-      readNamespacedPod: jest.fn().mockResolvedValue({ status: { phase: 'Running' } }),
+      readNamespacedPod: jest
+        .fn()
+        .mockResolvedValue({ status: { phase: 'Running' } }),
       listNamespacedEvent: jest.fn().mockResolvedValue({ items: [] }),
       listNamespacedPod: jest.fn().mockResolvedValue({ items: [] }),
     };
 
-    jest.spyOn(KubeConfig.prototype, 'makeApiClient').mockReturnValue(mockK8sApi);
+    jest
+      .spyOn(KubeConfig.prototype, 'makeApiClient')
+      .mockReturnValue(mockK8sApi);
 
     mockConfig = {
       get: jest.fn((key: string, def: any) => {
@@ -26,10 +30,15 @@ describe('KubernetesObservabilityAdapter', () => {
     } as any;
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [KubernetesObservabilityAdapter, { provide: ConfigService, useValue: mockConfig }],
+      providers: [
+        KubernetesObservabilityAdapter,
+        { provide: ConfigService, useValue: mockConfig },
+      ],
     }).compile();
 
-    adapter = module.get<KubernetesObservabilityAdapter>(KubernetesObservabilityAdapter);
+    adapter = module.get<KubernetesObservabilityAdapter>(
+      KubernetesObservabilityAdapter,
+    );
   });
 
   it('should be defined', () => {
@@ -40,7 +49,7 @@ describe('KubernetesObservabilityAdapter', () => {
     const logs = await adapter.getPodLogs('pod1', 'ns');
     expect(logs).toBe('logs');
     expect(mockK8sApi.readNamespacedPodLog).toHaveBeenCalledWith(
-      expect.objectContaining({ name: 'pod1', namespace: 'ns' })
+      expect.objectContaining({ name: 'pod1', namespace: 'ns' }),
     );
   });
 
@@ -64,14 +73,17 @@ describe('KubernetesObservabilityAdapter', () => {
     });
 
     const moduleRef = await Test.createTestingModule({
-      providers: [KubernetesObservabilityAdapter, { provide: ConfigService, useValue: mockConfig }],
+      providers: [
+        KubernetesObservabilityAdapter,
+        { provide: ConfigService, useValue: mockConfig },
+      ],
     }).compile();
     const staticAdapter = moduleRef.get<KubernetesObservabilityAdapter>(
-      KubernetesObservabilityAdapter
+      KubernetesObservabilityAdapter,
     );
 
     await expect(staticAdapter.getPodLogs('p')).rejects.toThrow(
-      'Kubernetes API client not available'
+      'Kubernetes API client not available',
     );
   });
 });

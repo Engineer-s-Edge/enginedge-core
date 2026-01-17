@@ -8,7 +8,12 @@ import { IdentityClientService } from './identity-client.service';
 import { JwtService } from './jwt.service';
 
 @Module({
-  controllers: [AuthController, JwksController, UsersController, OAuthController],
+  controllers: [
+    AuthController,
+    JwksController,
+    UsersController,
+    OAuthController,
+  ],
   providers: [IdentityClientService, JwtService, RolesGuard],
   exports: [JwtService],
 })

@@ -16,7 +16,7 @@ import {
 export class KubernetesObservabilityService {
   constructor(
     @Inject('IKubernetesObservabilityPort')
-    private readonly observabilityPort: IKubernetesObservabilityPort
+    private readonly observabilityPort: IKubernetesObservabilityPort,
   ) {}
 
   /**
@@ -26,9 +26,14 @@ export class KubernetesObservabilityService {
     podName: string,
     namespace?: string,
     container?: string,
-    tailLines?: number
+    tailLines?: number,
   ): Promise<string> {
-    return this.observabilityPort.getPodLogs(podName, namespace, container, tailLines);
+    return this.observabilityPort.getPodLogs(
+      podName,
+      namespace,
+      container,
+      tailLines,
+    );
   }
 
   /**
@@ -41,28 +46,41 @@ export class KubernetesObservabilityService {
   /**
    * Get recent events for a pod
    */
-  async getPodEvents(podName: string, namespace?: string, limit?: number): Promise<PodEvent[]> {
+  async getPodEvents(
+    podName: string,
+    namespace?: string,
+    limit?: number,
+  ): Promise<PodEvent[]> {
     return this.observabilityPort.getPodEvents(podName, namespace, limit);
   }
 
   /**
    * Get resource metrics for a pod
    */
-  async getPodMetrics(podName: string, namespace?: string): Promise<PodMetrics | null> {
+  async getPodMetrics(
+    podName: string,
+    namespace?: string,
+  ): Promise<PodMetrics | null> {
     return this.observabilityPort.getPodMetrics(podName, namespace);
   }
 
   /**
    * Get all pods for a worker type
    */
-  async getPodsByWorkerType(workerType: string, namespace?: string): Promise<PodInfo[]> {
+  async getPodsByWorkerType(
+    workerType: string,
+    namespace?: string,
+  ): Promise<PodInfo[]> {
     return this.observabilityPort.getPodsByWorkerType(workerType, namespace);
   }
 
   /**
    * Get aggregated health status for all pods of a worker type
    */
-  async getWorkerTypeHealth(workerType: string, namespace?: string): Promise<WorkerTypeHealth> {
+  async getWorkerTypeHealth(
+    workerType: string,
+    namespace?: string,
+  ): Promise<WorkerTypeHealth> {
     return this.observabilityPort.getWorkerTypeHealth(workerType, namespace);
   }
 }
