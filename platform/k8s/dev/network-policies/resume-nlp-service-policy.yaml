@@ -1,0 +1,32 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: spacy-service-policy
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      app: enginedge
+      component: spacy-service
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: enginedge
+          component: resume-worker
+    ports:
+    - protocol: TCP
+      port: 3008
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: enginedge
+          component: kafka
+    ports:
+    - protocol: TCP
+      port: 9092
+

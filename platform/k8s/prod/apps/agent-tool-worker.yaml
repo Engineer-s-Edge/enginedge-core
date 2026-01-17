@@ -1,0 +1,89 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: agent-tool-worker
+  namespace: default
+  labels:
+    app: enginedge
+    component: agent-tool-worker
+spec:
+  type: ClusterIP
+  ports:
+  - port: 3002
+    targetPort: 3002
+    name: http
+  selector:
+    app: enginedge
+    component: agent-tool-worker
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agent-tool-worker
+  namespace: default
+  labels:
+    app: enginedge
+    component: agent-tool-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: enginedge
+      component: agent-tool-worker
+  template:
+    metadata:
+      labels:
+        app: enginedge
+        component: agent-tool-worker
+    spec:
+      containers:
+      - name: agent-tool-worker
+        image: ghcr.io/chris-alexander-pop/agent-tool-worker:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3002
+        envFrom:
+        - configMapRef:
+            name: worker-config
+        env:
+        - name: MONGODB_APP_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: mongodb-app-username
+        - name: MONGODB_APP_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: mongodb-app-password
+        - name: MONGODB_URI
+          value: "mongodb://$(MONGODB_APP_USERNAME):$(MONGODB_APP_PASSWORD)@mongodb-service:27017/enginedge-workers?authSource=admin"
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "3002"
+        - name: KAFKA_BROKERS
+          valueFrom:
+            configMapKeyRef:
+              name: worker-config
+              key: KAFKA_BROKERS
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3002
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3002
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "200m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+

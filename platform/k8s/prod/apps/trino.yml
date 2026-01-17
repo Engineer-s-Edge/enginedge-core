@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trino
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: trino
+  template:
+    metadata:
+      labels:
+        app: trino
+    spec:
+      containers:
+        - name: trino
+          image: trinodb/trino:418
+          ports:
+            - containerPort: 8080
+          env:
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-secret
+                  key: access-key
+            - name: MINIO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-secret
+                  key: secret-key
+          volumeMounts:
+            - name: trino-config
+              mountPath: /etc/trino
+            - name: trino-catalog
+              mountPath: /etc/trino/catalog
+      volumes:
+        - name: trino-config
+          configMap:
+            name: trino-config-cm
+        - name: trino-catalog
+          configMap:
+            name: trino-catalog-cm
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: trino
+spec:
+  selector:
+    app: trino
+  ports:
+    - port: 8080
+      targetPort: 8080
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: trino-config-cm
+data:
+  "config.properties": |
+    coordinator=true
+    node-scheduler.include-coordinator=true
+    http-server.http.port=8080
+    query.max-memory=5GB
+    query.max-memory-per-node=1GB
+    discovery.uri=http://localhost:8080
+  "jvm.config": |
+    -server
+    -Xmx16G
+    -XX:+UseG1GC
+    -XX:G1HeapRegionSize=32M
+    -XX:+UseGCOverheadLimit
+    -XX:+ExplicitGCInvokesConcurrent
+    -XX:+HeapDumpOnOutOfMemoryError
+    -XX:+ExitOnOutOfMemoryError
+    -XX:ReservedCodeCacheSize=512M
+  "log.properties": |
+    io.trino=INFO
+  "node.properties": |
+    node.environment=production
+    node.id=ffffffff-ffff-ffff-ffff-ffffffffffff
+    node.data-dir=/data/trino
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: trino-catalog-cm
+data:
+  "iceberg.properties": |
+    connector.name=iceberg
+    iceberg.file-format=PARQUET
+    iceberg.catalog.type=hive_metastore
+    hive.metastore.uri=thrift://hive-metastore:9083
+    hive.s3.endpoint=http://minio:9000
+    hive.s3.path-style-access=true
+    hive.s3.aws-access-key=${ENV:MINIO_ACCESS_KEY}
+    hive.s3.aws-secret-key=${ENV:MINIO_SECRET_KEY}
+    hive.s3.ssl.enabled=false

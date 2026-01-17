@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="119" failures="0" errors="0" time="39.609">
+  <testsuite name="Worker Entity" errors="0" failures="0" skipped="0" timestamp="2026-01-15T23:05:58" time="25.653" tests="6">
+    <testcase classname="Worker Entity should be defined" name="Worker Entity should be defined" time="0.014">
+    </testcase>
+    <testcase classname="Worker Entity should initialize with correct values" name="Worker Entity should initialize with correct values" time="0.006">
+    </testcase>
+    <testcase classname="Worker Entity should default capabilities to empty array if not provided" name="Worker Entity should default capabilities to empty array if not provided" time="0.002">
+    </testcase>
+    <testcase classname="Worker Entity should update health status and timestamp" name="Worker Entity should update health status and timestamp" time="0.011">
+    </testcase>
+    <testcase classname="Worker Entity should check for capabilities correctly" name="Worker Entity should check for capabilities correctly" time="0.002">
+    </testcase>
+    <testcase classname="Worker Entity should report healthy correctly" name="Worker Entity should report healthy correctly" time="0.002">
+    </testcase>
+  </testsuite>
+  <testsuite name="OrchestrationRequest" errors="0" failures="0" skipped="0" timestamp="2026-01-15T23:05:58" time="27.714" tests="8">
+    <testcase classname="OrchestrationRequest updateStatus should update status and set completedAt when completed" name="OrchestrationRequest updateStatus should update status and set completedAt when completed" time="0.014">
+    </testcase>
+    <testcase classname="OrchestrationRequest updateStatus should update status and set error when failed" name="OrchestrationRequest updateStatus should update status and set error when failed" time="0.003">
+    </testcase>
+    <testcase classname="OrchestrationRequest addWorkerAssignment should add worker assignment to workers array" name="OrchestrationRequest addWorkerAssignment should add worker assignment to workers array" time="0.001">
+    </testcase>
+    <testcase classname="OrchestrationRequest isComplete should return true when status is completed" name="OrchestrationRequest isComplete should return true when status is completed" time="0">
+    </testcase>
+    <testcase classname="OrchestrationRequest isComplete should return true when status is failed" name="OrchestrationRequest isComplete should return true when status is failed" time="0.001">
+    </testcase>
+    <testcase classname="OrchestrationRequest isComplete should return false when status is pending" name="OrchestrationRequest isComplete should return false when status is pending" time="0.002">
+    </testcase>
+    <testcase classname="OrchestrationRequest allWorkersComplete should return true when all workers are completed" name="OrchestrationRequest allWorkersComplete should return true when all workers are completed" time="0.002">
+    </testcase>
+    <testcase classname="OrchestrationRequest allWorkersComplete should return false when any worker is pending" name="OrchestrationRequest allWorkersComplete should return false when any worker is pending" time="0">
+    </testcase>
+  </testsuite>
+  <testsuite name="ResultAggregationService" errors="0" failures="0" skipped="0" timestamp="2026-01-15T23:05:58" time="28.751" tests="3">
+    <testcase classname="ResultAggregationService aggregate should aggregate resume-build workflow results" name="ResultAggregationService aggregate should aggregate resume-build workflow results" time="0.015">
+    </testcase>
+    <testcase classname="ResultAggregationService aggregate should aggregate expert-research workflow results" name="ResultAggregationService aggregate should aggregate expert-research workflow results" time="0.004">
+    </testcase>
+    <testcase classname="ResultAggregationService aggregate should include errors in result when workers fail" name="ResultAggregationService aggregate should include errors in result when workers fail" time="0.003">
+    </testcase>
+  </testsuite>
+  <testsuite name="WorkflowValidator" errors="0" failures="0" skipped="0" timestamp="2026-01-15T23:06:27" time="0.13" tests="5">
+    <testcase classname="WorkflowValidator should fail if workflow type is invalid" name="WorkflowValidator should fail if workflow type is invalid" time="0.005">
+    </testcase>
+    <testcase classname="WorkflowValidator should fail if user ID is missing" name="WorkflowValidator should fail if user ID is missing" time="0.001">
+    </testcase>
+    <testcase classname="WorkflowValidator should validate RESUME_BUILD logic" name="WorkflowValidator should validate RESUME_BUILD logic" time="0.001">
+    </testcase>
+    <testcase classname="WorkflowValidator should validate EXPERT_RESEARCH logic" name="WorkflowValidator should validate EXPERT_RESEARCH logic" time="0.001">
+    </testcase>
+    <testcase classname="WorkflowValidator should validate CONVERSATION_CONTEXT logic" name="WorkflowValidator should validate CONVERSATION_CONTEXT logic" time="0.002">
+    </testcase>
+  </testsuite>
+  <testsuite name="WinstonLoggerAdapter" errors="0" failures="0" skipped="0" timestamp="2026-01-15T23:05:58" time="29.602" tests="6">
+    <testcase classname="WinstonLoggerAdapter should be defined" name="WinstonLoggerAdapter should be defined" time="0.062">
+    </testcase>
+    <testcase classname="WinstonLoggerAdapter Logging Methods should log info" name="WinstonLoggerAdapter Logging Methods should log info" time="0.038">
+    </testcase>
+    <testcase classname="WinstonLoggerAdapter Logging Methods should log debug" name="WinstonLoggerAdapter Logging Methods should log debug" time="0.016">
+    </testcase>
+    <testcase classname="WinstonLoggerAdapter Logging Methods should log generic" name="WinstonLoggerAdapter Logging Methods should log generic" time="0.012">
+    </testcase>
+    <testcase classname="WinstonLoggerAdapter Context Handling should include request context" name="WinstonLoggerAdapter Context Handling should include request context" time="0.011">
+    </testcase>
+    <testcase classname="WinstonLoggerAdapter Initialization Logic should create log directory if missing" name="WinstonLoggerAdapter Initialization Logic should create log directory if missing" time="0.008">
+    </testcase>
+  </testsuite>
+  <testsuite name="PatternDetector" errors="0" failures="0" skipped="0" timestamp="2026-01-15T23:06:28" time="0.131" tests="7">
+    <testcase classname="PatternDetector should return existing workflow if set" name="PatternDetector should return existing workflow if set" time="0.002">
+    </testcase>
+    <testcase classname="PatternDetector should detect RESUME_BUILD pattern" name="PatternDetector should detect RESUME_BUILD pattern" time="0.001">
+    </testcase>
+    <testcase classname="PatternDetector should detect EXPERT_RESEARCH pattern" name="PatternDetector should detect EXPERT_RESEARCH pattern" time="0">
+    </testcase>
+    <testcase classname="PatternDetector should detect CONVERSATION_CONTEXT pattern" name="PatternDetector should detect CONVERSATION_CONTEXT pattern" time="0.007">
+    </testcase>
+    <testcase classname="PatternDetector should detect SINGLE_WORKER pattern by explicit workerType" name="PatternDetector should detect SINGLE_WORKER pattern by explicit workerType" time="0.003">
+    </testcase>
+    <testcase classname="PatternDetector should detect SINGLE_WORKER pattern by indicators" name="PatternDetector should detect SINGLE_WORKER pattern by indicators" time="0.001">
+    </testcase>
+    <testcase classname="PatternDetector should default to CUSTOM key" name="PatternDetector should default to CUSTOM key" time="0.002">
+    </testcase>
+  </testsuite>
+  <testsuite name="WorkerManagementService" errors="0" failures="0" skipped="0" timestamp="2026-01-15T23:05:58" time="32.565" tests="7">
+    <testcase classname="WorkerManagementService should be defined" name="WorkerManagementService should be defined" time="0.041">
+    </testcase>
+    <testcase classname="WorkerManagementService getAvailableWorkers should return only healthy workers" name="WorkerManagementService getAvailableWorkers should return only healthy workers" time="0.014">
+    </testcase>
+    <testcase classname="WorkerManagementService checkWorkerHealth should return health status for existing worker" name="WorkerManagementService checkWorkerHealth should return health status for existing worker" time="0.01">
+    </testcase>
+    <testcase classname="WorkerManagementService checkWorkerHealth should throw error for missing worker" name="WorkerManagementService checkWorkerHealth should throw error for missing worker" time="0.073">
+    </testcase>
+    <testcase classname="WorkerManagementService loadBalance should return null if no workers" name="WorkerManagementService loadBalance should return null if no workers" time="0.08">
+    </testcase>
+    <testcase classname="WorkerManagementService loadBalance should return a healthy worker if available" name="WorkerManagementService loadBalance should return a healthy worker if available" time="0.013">
+    </testcase>
+    <testcase classname="WorkerManagementService loadBalance should fallback to unhealthy worker if all unhealthy" name="WorkerManagementService loadBalance should fallback to unhealthy worker if all unhealthy" time="0.018">
+    </testcase>
+  </testsuite>
+  <testsuite name="RequestRouter" errors="0" failures="0" skipped="0" timestamp="2026-01-15T23:06:30" time="0.155" tests="10">
+    <testcase classname="RequestRouter route should route resume-build workflow to resume, assistant, and latex workers" name="RequestRouter route should route resume-build workflow to resume, assistant, and latex workers" time="0.006">
+    </testcase>
+    <testcase classname="RequestRouter route should route expert-research workflow to agent-tool, data-processing, and assistant workers" name="RequestRouter route should route expert-research workflow to agent-tool, data-processing, and assistant workers" time="0.004">
+    </testcase>
+    <testcase classname="RequestRouter route should route conversation-context workflow to assistant" name="RequestRouter route should route conversation-context workflow to assistant" time="0.001">
+    </testcase>
+    <testcase classname="RequestRouter route should route single-worker workflow to assistant when prompt is present" name="RequestRouter route should route single-worker workflow to assistant when prompt is present" time="0.002">
+    </testcase>
+    <testcase classname="RequestRouter route should route single-worker workflow to resume when resume/experiences present" name="RequestRouter route should route single-worker workflow to resume when resume/experiences present" time="0.001">
+    </testcase>
+    <testcase classname="RequestRouter route should route single-worker workflow to latex when tex present" name="RequestRouter route should route single-worker workflow to latex when tex present" time="0.001">
+    </testcase>
+    <testcase classname="RequestRouter route should route single-worker explicitly if workerType provided" name="RequestRouter route should route single-worker explicitly if workerType provided" time="0.001">
+    </testcase>
+    <testcase classname="RequestRouter route should return empty assigned for single worker if no match" name="RequestRouter route should return empty assigned for single worker if no match" time="0.001">
+    </testcase>
+    <testcase classname="RequestRouter route should detect custom workflow steps correctly" name="RequestRouter route should detect custom workflow steps correctly" time="0.003">
+    </testcase>
+    <testcase classname="RequestRouter route should fallback to ASSISTANT for unknown worker type strings in single worker map" name="RequestRouter route should fallback to ASSISTANT for unknown worker type strings in single worker map" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="KafkaConsumerAdapter" errors="0" failures="0" skipped="0" timestamp="2026-01-15T23:05:57" time="33.504" tests="13">
+    <testcase classname="KafkaConsumerAdapter onModuleInit should connect consumer successfully" name="KafkaConsumerAdapter onModuleInit should connect consumer successfully" time="0.044">
+    </testcase>
+    <testcase classname="KafkaConsumerAdapter onModuleInit should handle connection failure gracefully (warn on ECONNREFUSED)" name="KafkaConsumerAdapter onModuleInit should handle connection failure gracefully (warn on ECONNREFUSED)" time="0.074">
+    </testcase>
+    <testcase classname="KafkaConsumerAdapter onModuleInit should handle generic errors" name="KafkaConsumerAdapter onModuleInit should handle generic errors" time="0.007">
+    </testcase>
+    <testcase classname="KafkaConsumerAdapter onModuleDestroy should disconnect if connected" name="KafkaConsumerAdapter onModuleDestroy should disconnect if connected" time="0.005">
+    </testcase>
+    <testcase classname="KafkaConsumerAdapter subscribe should subscribe to topic" name="KafkaConsumerAdapter subscribe should subscribe to topic" time="0.008">
+    </testcase>
+    <testcase classname="KafkaConsumerAdapter subscribe should not subscribe if already subscribed" name="KafkaConsumerAdapter subscribe should not subscribe if already subscribed" time="0.007">
+    </testcase>
+    <testcase classname="KafkaConsumerAdapter subscribe should warn if not connected" name="KafkaConsumerAdapter subscribe should warn if not connected" time="0.005">
+    </testcase>
+    <testcase classname="KafkaConsumerAdapter subscribe should error if consumer already running" name="KafkaConsumerAdapter subscribe should error if consumer already running" time="0.005">
+    </testcase>
+    <testcase classname="KafkaConsumerAdapter startConsumer should start consumer run loop" name="KafkaConsumerAdapter startConsumer should start consumer run loop" time="0.006">
+    </testcase>
+    <testcase classname="KafkaConsumerAdapter startConsumer should warn if already running" name="KafkaConsumerAdapter startConsumer should warn if already running" time="0.006">
+    </testcase>
+    <testcase classname="KafkaConsumerAdapter startConsumer should warn if not connected" name="KafkaConsumerAdapter startConsumer should warn if not connected" time="0.004">
+    </testcase>
+    <testcase classname="KafkaConsumerAdapter startConsumer should process messages correctly via run eachMessage handler" name="KafkaConsumerAdapter startConsumer should process messages correctly via run eachMessage handler" time="0.005">
+    </testcase>
+    <testcase classname="KafkaConsumerAdapter startConsumer should handle JSON parse errors in message processing" name="KafkaConsumerAdapter startConsumer should handle JSON parse errors in message processing" time="0.005">
+    </testcase>
+  </testsuite>
+  <testsuite name="KubernetesWorkerRegistryAdapter" errors="0" failures="0" skipped="0" timestamp="2026-01-15T23:05:57" time="33.935" tests="11">
+    <testcase classname="KubernetesWorkerRegistryAdapter should be defined" name="KubernetesWorkerRegistryAdapter should be defined" time="0.079">
+    </testcase>
+    <testcase classname="KubernetesWorkerRegistryAdapter Initialization should initialize KubeConfig when mode is kubernetes" name="KubernetesWorkerRegistryAdapter Initialization should initialize KubeConfig when mode is kubernetes" time="0.018">
+    </testcase>
+    <testcase classname="KubernetesWorkerRegistryAdapter Initialization should NOT initialize KubeConfig when mode is NOT kubernetes" name="KubernetesWorkerRegistryAdapter Initialization should NOT initialize KubeConfig when mode is NOT kubernetes" time="0.017">
+    </testcase>
+    <testcase classname="KubernetesWorkerRegistryAdapter Initialization should handle KubeConfig initialization errors" name="KubernetesWorkerRegistryAdapter Initialization should handle KubeConfig initialization errors" time="0.017">
+    </testcase>
+    <testcase classname="KubernetesWorkerRegistryAdapter onModuleInit should call discoverWorkers and set interval" name="KubernetesWorkerRegistryAdapter onModuleInit should call discoverWorkers and set interval" time="0.015">
+    </testcase>
+    <testcase classname="KubernetesWorkerRegistryAdapter Worker Discovery (Kubernetes) should discover workers from Kubernetes" name="KubernetesWorkerRegistryAdapter Worker Discovery (Kubernetes) should discover workers from Kubernetes" time="0.01">
+    </testcase>
+    <testcase classname="KubernetesWorkerRegistryAdapter Worker Discovery (Kubernetes) should fallback to static workers if K8s discovery fails" name="KubernetesWorkerRegistryAdapter Worker Discovery (Kubernetes) should fallback to static workers if K8s discovery fails" time="0.016">
+    </testcase>
+    <testcase classname="KubernetesWorkerRegistryAdapter Worker Discovery (Static) should load static workers when K8s api is null" name="KubernetesWorkerRegistryAdapter Worker Discovery (Static) should load static workers when K8s api is null" time="0.009">
+    </testcase>
+    <testcase classname="KubernetesWorkerRegistryAdapter getWorkers lookup logic should return empty if no workers found" name="KubernetesWorkerRegistryAdapter getWorkers lookup logic should return empty if no workers found" time="0.008">
+    </testcase>
+    <testcase classname="KubernetesWorkerRegistryAdapter getWorkers lookup logic should find workers by fuzzy match" name="KubernetesWorkerRegistryAdapter getWorkers lookup logic should find workers by fuzzy match" time="0.006">
+    </testcase>
+    <testcase classname="KubernetesWorkerRegistryAdapter updateWorkerHealth should update worker health" name="KubernetesWorkerRegistryAdapter updateWorkerHealth should update worker health" time="0.004">
+    </testcase>
+  </testsuite>
+  <testsuite name="WorkflowOrchestrationService" errors="0" failures="0" skipped="0" timestamp="2026-01-15T23:05:57" time="33.961" tests="1">
+    <testcase classname="WorkflowOrchestrationService orchestrateWorkflow should orchestrate resume-build workflow" name="WorkflowOrchestrationService orchestrateWorkflow should orchestrate resume-build workflow" time="0.045">
+    </testcase>
+  </testsuite>
+  <testsuite name="OrchestrateRequestUseCase" errors="0" failures="0" skipped="0" timestamp="2026-01-15T23:06:31" time="0.542" tests="5">
+    <testcase classname="OrchestrateRequestUseCase should be defined" name="OrchestrateRequestUseCase should be defined" time="0.007">
+    </testcase>
+    <testcase classname="OrchestrateRequestUseCase should execute successfully with explicitly provided workflow" name="OrchestrateRequestUseCase should execute successfully with explicitly provided workflow" time="0.006">
+    </testcase>
+    <testcase classname="OrchestrateRequestUseCase should detect workflow if not provided" name="OrchestrateRequestUseCase should detect workflow if not provided" time="0.003">
+    </testcase>
+    <testcase classname="OrchestrateRequestUseCase should throw error if validation fails" name="OrchestrateRequestUseCase should throw error if validation fails" time="0.02">
+    </testcase>
+    <testcase classname="OrchestrateRequestUseCase should produce messages to correct topics based on assignments" name="OrchestrateRequestUseCase should produce messages to correct topics based on assignments" time="0.005">
+    </testcase>
+  </testsuite>
+  <testsuite name="OrchestrationController" errors="0" failures="0" skipped="0" timestamp="2026-01-15T23:05:58" time="33.505" tests="3">
+    <testcase classname="OrchestrationController orchestrate should create orchestration request" name="OrchestrationController orchestrate should create orchestration request" time="0.045">
+    </testcase>
+    <testcase classname="OrchestrationController getStatus should return request status" name="OrchestrationController getStatus should return request status" time="0.011">
+    </testcase>
+    <testcase classname="OrchestrationController getStatus should throw error when request not found" name="OrchestrationController getStatus should throw error when request not found" time="0.05">
+    </testcase>
+  </testsuite>
+  <testsuite name="KafkaProducerAdapter" errors="0" failures="0" skipped="0" timestamp="2026-01-15T23:05:57" time="34.892" tests="8">
+    <testcase classname="KafkaProducerAdapter onModuleInit should connect producer successfully" name="KafkaProducerAdapter onModuleInit should connect producer successfully" time="0.037">
+    </testcase>
+    <testcase classname="KafkaProducerAdapter onModuleInit should handle connection failure gracefully (warn on ECONNREFUSED)" name="KafkaProducerAdapter onModuleInit should handle connection failure gracefully (warn on ECONNREFUSED)" time="0.01">
+    </testcase>
+    <testcase classname="KafkaProducerAdapter onModuleInit should handle generic connection failure (error)" name="KafkaProducerAdapter onModuleInit should handle generic connection failure (error)" time="0.007">
+    </testcase>
+    <testcase classname="KafkaProducerAdapter onModuleDestroy should disconnect if connected" name="KafkaProducerAdapter onModuleDestroy should disconnect if connected" time="0.004">
+    </testcase>
+    <testcase classname="KafkaProducerAdapter onModuleDestroy should cleanup reconnection interval if active" name="KafkaProducerAdapter onModuleDestroy should cleanup reconnection interval if active" time="0.006">
+    </testcase>
+    <testcase classname="KafkaProducerAdapter publish should publish message to kafka topic" name="KafkaProducerAdapter publish should publish message to kafka topic" time="0.008">
+    </testcase>
+    <testcase classname="KafkaProducerAdapter publish should not throw when not connected, just log warn" name="KafkaProducerAdapter publish should not throw when not connected, just log warn" time="0.007">
+    </testcase>
+    <testcase classname="KafkaProducerAdapter publish should propagate errors from producer.send" name="KafkaProducerAdapter publish should propagate errors from producer.send" time="0.027">
+    </testcase>
+  </testsuite>
+  <testsuite name="MongoDbRequestRepository" errors="0" failures="0" skipped="0" timestamp="2026-01-15T23:05:58" time="34.249" tests="4">
+    <testcase classname="MongoDbRequestRepository save should save request to database" name="MongoDbRequestRepository save should save request to database" time="0.048">
+    </testcase>
+    <testcase classname="MongoDbRequestRepository findById should find request by id" name="MongoDbRequestRepository findById should find request by id" time="0.009">
+    </testcase>
+    <testcase classname="MongoDbRequestRepository findById should return null when request not found" name="MongoDbRequestRepository findById should return null when request not found" time="0.006">
+    </testcase>
+    <testcase classname="MongoDbRequestRepository updateStatus should update request status" name="MongoDbRequestRepository updateStatus should update request status" time="0.004">
+    </testcase>
+  </testsuite>
+  <testsuite name="KubernetesObservabilityAdapter" errors="0" failures="0" skipped="0" timestamp="2026-01-15T23:06:24" time="8.844" tests="5">
+    <testcase classname="KubernetesObservabilityAdapter should be defined" name="KubernetesObservabilityAdapter should be defined" time="0.024">
+    </testcase>
+    <testcase classname="KubernetesObservabilityAdapter should get pod logs" name="KubernetesObservabilityAdapter should get pod logs" time="0.006">
+    </testcase>
+    <testcase classname="KubernetesObservabilityAdapter should get pod status" name="KubernetesObservabilityAdapter should get pod status" time="0.003">
+    </testcase>
+    <testcase classname="KubernetesObservabilityAdapter should get pod events" name="KubernetesObservabilityAdapter should get pod events" time="0.003">
+    </testcase>
+    <testcase classname="KubernetesObservabilityAdapter should throw error if not in k8s mode" name="KubernetesObservabilityAdapter should throw error if not in k8s mode" time="0.032">
+    </testcase>
+  </testsuite>
+  <testsuite name="KubernetesObservabilityService" errors="0" failures="0" skipped="0" timestamp="2026-01-15T23:06:26" time="6.894" tests="7">
+    <testcase classname="KubernetesObservabilityService should be defined" name="KubernetesObservabilityService should be defined" time="0.029">
+    </testcase>
+    <testcase classname="KubernetesObservabilityService should delegate getPodLogs to port" name="KubernetesObservabilityService should delegate getPodLogs to port" time="0.006">
+    </testcase>
+    <testcase classname="KubernetesObservabilityService should delegate getPodStatus to port" name="KubernetesObservabilityService should delegate getPodStatus to port" time="0.004">
+    </testcase>
+    <testcase classname="KubernetesObservabilityService should delegate getPodEvents to port" name="KubernetesObservabilityService should delegate getPodEvents to port" time="0.004">
+    </testcase>
+    <testcase classname="KubernetesObservabilityService should delegate getPodMetrics to port" name="KubernetesObservabilityService should delegate getPodMetrics to port" time="0.004">
+    </testcase>
+    <testcase classname="KubernetesObservabilityService should delegate getPodsByWorkerType to port" name="KubernetesObservabilityService should delegate getPodsByWorkerType to port" time="0.003">
+    </testcase>
+    <testcase classname="KubernetesObservabilityService should delegate getWorkerTypeHealth to port" name="KubernetesObservabilityService should delegate getWorkerTypeHealth to port" time="0.004">
+    </testcase>
+  </testsuite>
+  <testsuite name="CoordinateMultiWorkerUseCase" errors="0" failures="0" skipped="0" timestamp="2026-01-15T23:06:27" time="6.272" tests="5">
+    <testcase classname="CoordinateMultiWorkerUseCase should be defined" name="CoordinateMultiWorkerUseCase should be defined" time="0.014">
+    </testcase>
+    <testcase classname="CoordinateMultiWorkerUseCase should do nothing if request not found" name="CoordinateMultiWorkerUseCase should do nothing if request not found" time="0.011">
+    </testcase>
+    <testcase classname="CoordinateMultiWorkerUseCase should return early if not all workers complete" name="CoordinateMultiWorkerUseCase should return early if not all workers complete" time="0.004">
+    </testcase>
+    <testcase classname="CoordinateMultiWorkerUseCase should aggregate and complete if all workers successfully finished" name="CoordinateMultiWorkerUseCase should aggregate and complete if all workers successfully finished" time="0.002">
+    </testcase>
+    <testcase classname="CoordinateMultiWorkerUseCase should set status to failed if any worker failed" name="CoordinateMultiWorkerUseCase should set status to failed if any worker failed" time="0.003">
+    </testcase>
+  </testsuite>
+  <testsuite name="HandleWorkerResponseUseCase" errors="0" failures="0" skipped="0" timestamp="2026-01-15T23:06:28" time="5.34" tests="5">
+    <testcase classname="HandleWorkerResponseUseCase should be defined" name="HandleWorkerResponseUseCase should be defined" time="0.008">
+    </testcase>
+    <testcase classname="HandleWorkerResponseUseCase should successfully update assignment status on completion" name="HandleWorkerResponseUseCase should successfully update assignment status on completion" time="0.005">
+    </testcase>
+    <testcase classname="HandleWorkerResponseUseCase should update assignment with error on failure" name="HandleWorkerResponseUseCase should update assignment with error on failure" time="0.003">
+    </testcase>
+    <testcase classname="HandleWorkerResponseUseCase should log warning and abort if request not found" name="HandleWorkerResponseUseCase should log warning and abort if request not found" time="0.004">
+    </testcase>
+    <testcase classname="HandleWorkerResponseUseCase should log warning and abort if assignment not found" name="HandleWorkerResponseUseCase should log warning and abort if assignment not found" time="0.003">
+    </testcase>
+  </testsuite>
+</testsuites>

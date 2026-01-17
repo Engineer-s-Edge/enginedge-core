@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: spacy-service-config
+  namespace: default
+data:
+  SPACY_MODEL: "en_core_web_sm"
+  MAX_CONCURRENT_REQUESTS: "10"
+  REQUEST_TIMEOUT: "30"
+

@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: main-node-config
+  namespace: default
+data:
+  # General
+  NODE_ENV: "production"
+  KUBERNETES_ENABLED: "true"
+
+  # Service URLs
+  # Note: MONGODB_URI is removed as the database strategy has changed.
+  # This will likely need to be replaced with a PostgreSQL connection string.
+  COMMANDER_NODE_URL: "http://main-node:3000" # Self-reference for certain tasks
+  WOLFRAM_KERNEL_URL: "http://wolfram-kernel:3011"
+  SCHEDULING_MODEL_URL: "http://scheduling-model:3009"
+
+  # Kafka Configuration
+  # The Bitnami chart exposes Kafka at this service name and port.
+  KAFKA_BROKERS: "kafka:9092"
+  KAFKA_SECURITY_PROTOCOL: "SASL_PLAINTEXT"
+  KAFKA_SASL_MECHANISM: "plain"
+  KAFKA_SASL_USERNAME: "user1"
+  KAFKA_ENABLED: "true"
+
+  # Frontend origin for CORS (set to your UI URL)
+  FRONTEND_ORIGIN: "http://localhost:9090"
+
+  # Worker Node Configuration
+  WORKER_NODE_PREFIX: "enginedge-worker"
+  WORKER_BASE_IMAGE: "worker-node"
+
+  # Object storage (MinIO/S3)
+  S3_ENDPOINT: "http://minio:9000"
+  S3_FORCE_PATH_STYLE: "true"
+  S3_REGION: "us-east-1"

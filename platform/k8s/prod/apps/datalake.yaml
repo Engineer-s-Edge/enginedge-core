@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: datalake-observability
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: datalake-observability
+  template:
+    metadata:
+      labels:
+        app: datalake-observability
+    spec:
+      containers:
+        - name: datalake-observability
+          image: ghcr.io/chris-alexander-pop/datalake:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3010
+          envFrom:
+            - secretRef:
+                name: datalake-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: datalake-observability
+spec:
+  selector:
+    app: datalake-observability
+  ports:
+    - port: 3010
+      targetPort: 3010

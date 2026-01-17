@@ -1,0 +1,148 @@
+# Prometheus Alerting Rules for EnginEdge Platform
+
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: enginedge-alerts
+  namespace: default
+  labels:
+    app: enginedge
+    prometheus: kube-prometheus
+spec:
+  groups:
+    - name: enginedge.service.alerts
+      interval: 30s
+      rules:
+        # High Error Rate
+        - alert: HighErrorRate
+          expr: |
+            sum(rate(http_requests_total{status=~"5.."}[5m])) by (service, instance)
+            /
+            sum(rate(http_requests_total[5m])) by (service, instance)
+            > 0.05
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "High error rate detected in {{ $labels.service }}"
+            description: "{{ $labels.service }} has error rate above 5% (current: {{ $value | humanizePercentage }})"
+
+        # High Latency (p95)
+        - alert: HighLatency
+          expr: |
+            histogram_quantile(0.95,
+              sum(rate(http_request_duration_seconds_bucket[5m])) by (service, le)
+            ) > 2
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High latency detected in {{ $labels.service }}"
+            description: "{{ $labels.service }} p95 latency is above 2s (current: {{ $value }}s)"
+
+        # Service Down
+        - alert: ServiceDown
+          expr: up{job=~".*-worker|api-gateway"} == 0
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Service {{ $labels.job }} is down"
+            description: "{{ $labels.job }} has been down for more than 2 minutes"
+
+        # High Memory Usage
+        - alert: HighMemoryUsage
+          expr: |
+            (container_memory_usage_bytes{container!="POD"}
+            /
+            container_spec_memory_limit_bytes{container!="POD"})
+            > 0.9
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High memory usage in {{ $labels.pod }}"
+            description: "{{ $labels.pod }} memory usage is above 90% (current: {{ $value | humanizePercentage }})"
+
+        # High CPU Usage
+        - alert: HighCPUUsage
+          expr: |
+            rate(container_cpu_usage_seconds_total{container!="POD"}[5m])
+            > 0.8
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High CPU usage in {{ $labels.pod }}"
+            description: "{{ $labels.pod }} CPU usage is above 80% (current: {{ $value | humanizePercentage }})"
+
+        # Kafka Lag
+        - alert: KafkaConsumerLag
+          expr: kafka_consumer_lag_sum > 1000
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High Kafka consumer lag"
+            description: "Kafka consumer lag is above 1000 messages (current: {{ $value }})"
+
+        # Redis Connection Issues
+        - alert: RedisConnectionIssues
+          expr: redis_connected_clients < 1
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Redis connection issues"
+            description: "Redis has no connected clients"
+
+        # MongoDB Connection Issues
+        - alert: MongoDBConnectionIssues
+          expr: mongodb_connections{state="current"} == 0
+          for: 2m
+          labels:
+            severity: warning
+          annotations:
+            summary: "MongoDB connection issues"
+            description: "MongoDB has no active connections"
+
+    - name: enginedge.worker.alerts
+      interval: 30s
+      rules:
+        # Worker Queue Depth
+        - alert: HighWorkerQueueDepth
+          expr: worker_queue_depth > 100
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High queue depth in {{ $labels.worker }}"
+            description: "{{ $labels.worker }} queue depth is above 100 (current: {{ $value }})"
+
+        # Worker Processing Time
+        - alert: HighWorkerProcessingTime
+          expr: |
+            histogram_quantile(0.95,
+              sum(rate(worker_processing_time_seconds_bucket[5m])) by (worker, le)
+            ) > 60
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High processing time in {{ $labels.worker }}"
+            description: "{{ $labels.worker }} p95 processing time is above 60s (current: {{ $value }}s)"
+
+    - name: enginedge.business.alerts
+      interval: 1m
+      rules:
+        # Low Request Rate (potential issue)
+        - alert: LowRequestRate
+          expr: |
+            sum(rate(http_requests_total[5m])) by (service) < 0.1
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Low request rate in {{ $labels.service }}"
+            description: "{{ $labels.service }} has very low request rate (current: {{ $value }} req/s)"
+

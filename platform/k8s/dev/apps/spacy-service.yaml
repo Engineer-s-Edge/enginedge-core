@@ -1,0 +1,111 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: spacy-service
+  namespace: default
+  labels:
+    app: enginedge
+    component: spacy-service
+spec:
+  type: ClusterIP
+  ports:
+  - port: 3008
+    targetPort: 3008
+    name: http
+  selector:
+    app: enginedge
+    component: spacy-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spacy-service
+  namespace: default
+  labels:
+    app: enginedge
+    component: spacy-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: enginedge
+      component: spacy-service
+  template:
+    metadata:
+      labels:
+        app: enginedge
+        component: spacy-service
+    spec:
+      initContainers:
+      - name: wait-for-kafka
+        image: busybox:1.36.1
+        command: ['sh', '-c']
+        args:
+        - |
+          echo "Waiting for Kafka to be ready..."
+          until nc -z kafka 9092; do
+            echo "Kafka is not ready yet. Waiting..."
+            sleep 5
+          done
+          echo "Kafka is ready!"
+      containers:
+      - name: spacy-service
+        image: spacy-service:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 3008
+        envFrom:
+        - configMapRef:
+            name: worker-config
+        - configMapRef:
+            name: spacy-service-config
+        env:
+        - name: PORT
+          value: "3008"
+        - name: MONGODB_URI
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: mongodb-uri
+        - name: WORKERS
+          value: "4"
+        - name: LOG_LEVEL
+          value: "info"
+        - name: SPACY_MODEL
+          value: "en_core_web_sm"
+        - name: MAX_CONCURRENT_REQUESTS
+          value: "10"
+        - name: REQUEST_TIMEOUT
+          value: "30"
+        securityContext:
+          runAsUser: 1000
+          runAsGroup: 1000
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3008
+          initialDelaySeconds: 120
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3008
+          initialDelaySeconds: 60
+          periodSeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 3
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1000m"
+          limits:
+            memory: "6Gi"
+            cpu: "4000m"
+
+

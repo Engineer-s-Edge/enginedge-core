@@ -1,0 +1,75 @@
+# compiled output
+/dist
+/node_modules
+/build
+/node_modules/@ampproject
+/node_modules/@angular-devkit
+
+# Logs
+logs/*.log
+logs/*.log.gz
+logs/*.log_gz
+*.log
+*-audit.json
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Keep logs directory but ignore log files
+!logs/.gitkeep
+
+# OS
+.DS_Store
+
+# Tests
+/coverage
+/.nyc_output
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+.cursor/
+.cursorrules
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# dotenv environment variable files
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+
+# Kubernetes secrets
+platform/k8s/secrets/*.yaml
+!platform/k8s/secrets/*.yaml.example
+
+# Secret files
+.secrets/
+
+# temp directory
+.temp
+.tmp
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Diagnostic reports (https://nodejs.org/api/report.html)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+.vercel

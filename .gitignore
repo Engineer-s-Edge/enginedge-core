@@ -1,31 +1,5 @@
-# compiled output
-/dist
-/node_modules
-/build
-/node_modules/@ampproject
-/node_modules/@angular-devkit
-
-# Logs
-logs/*.log
-logs/*.log.gz
-logs/*.log_gz
-*.log
-*-audit.json
-npm-debug.log*
-pnpm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-lerna-debug.log*
-
-# Keep logs directory but ignore log files
-!logs/.gitkeep
-
 # OS
 .DS_Store
-
-# Tests
-/coverage
-/.nyc_output
 
 # IDEs and editors
 /.idea
@@ -45,16 +19,35 @@ lerna-debug.log*
 !.vscode/launch.json
 !.vscode/extensions.json
 
-# dotenv environment variable files
-.env
-.env.development.local
-.env.test.local
-.env.production.local
-.env.local
+# Python cache
+__pycache__/
+*.pyc
 
-# Kubernetes secrets
-platform/k8s/secrets/*.yaml
-!platform/k8s/secrets/*.yaml.example
+# Kubernetes secrets (Dev)
+platform/k8s/dev/secrets/*.yaml
+!platform/k8s/dev/secrets/*.yaml.example
+platform/k8s/dev/secrets/mongodb-keyfile
+platform/k8s/dev/secrets/kafka-tls-certs/
+!platform/k8s/dev/secrets/README.md
+
+# Kubernetes secrets (Prod)
+platform/k8s/prod/secrets/*.yaml
+!platform/k8s/prod/secrets/*.yaml.example
+platform/k8s/prod/secrets/mongodb-keyfile
+platform/k8s/prod/secrets/kafka-tls-certs/
+!platform/k8s/prod/secrets/README.md
+
+# Deployment artifacts
+enginedge-deploy.zip
+
+# Local deployment config
+platform/control-center/hexagon.json
+
+# Control Center generated scripts (artifacts)
+platform/control-center/deploy_k8s_*.sh
+platform/control-center/deploy_k8s_*.ps1
+platform/control-center/destroy_k8s_*.sh
+platform/control-center/destroy_k8s_*.ps1
 
 # Secret files
 .secrets/
@@ -73,3 +66,8 @@ pids
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 .vercel
+
+
+
+# Miscellaneous
+enginedge-deploy.zip

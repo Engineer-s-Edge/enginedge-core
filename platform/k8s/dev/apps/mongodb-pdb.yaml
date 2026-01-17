@@ -1,0 +1,15 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: mongodb-pdb
+  namespace: default
+  labels:
+    app: enginedge
+    component: mongodb
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: enginedge
+      component: mongodb
+

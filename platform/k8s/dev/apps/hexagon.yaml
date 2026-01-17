@@ -1,0 +1,122 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hexagon
+  namespace: default
+  labels:
+    app: enginedge
+    component: hexagon
+spec:
+  type: ClusterIP
+  ports:
+  - port: 3000
+    targetPort: 3000
+    name: http
+  selector:
+    app: enginedge
+    component: hexagon
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hexagon
+  namespace: default
+  labels:
+    app: enginedge
+    component: hexagon
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: enginedge
+      component: hexagon
+  template:
+    metadata:
+      labels:
+        app: enginedge
+        component: hexagon
+    spec:
+      volumes:
+      - name: app-logs
+        emptyDir: {}
+      containers:
+      - name: hexagon
+        image: hexagon:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 3000
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "3000"
+        - name: MONGODB_URI
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: mongodb-uri
+        - name: REDIS_URL
+          valueFrom:
+            configMapKeyRef:
+              name: core-config
+              key: REDIS_URL
+        - name: REDIS_KEY_PREFIX
+          value: "hexagon:"
+        - name: KAFKA_BROKERS
+          valueFrom:
+            configMapKeyRef:
+              name: core-config
+              key: KAFKA_BROKERS
+        - name: KAFKA_CLIENT_ID
+          value: "enginedge-hexagon"
+        - name: KAFKA_GROUP_ID
+          value: "hexagon-orchestrator"
+        - name: WORKER_DISCOVERY_MODE
+          value: "kubernetes"
+        - name: WORKER_HEALTH_CHECK_INTERVAL
+          value: "30000"
+        - name: WORKER_REQUEST_TIMEOUT
+          value: "60000"
+        - name: ASSISTANT_WORKER_URL
+          value: "http://assistant-worker:3001"
+        - name: TOOLS_WORKER_URL
+          value: "http://agent-tool-worker:3002"
+        - name: DATA_WORKER_URL
+          value: "http://data-processing-worker:3003"
+        - name: INTERVIEW_WORKER_URL
+          value: "http://interview-worker:3004"
+        - name: LATEX_WORKER_URL
+          value: "http://latex-worker:3005"
+        - name: RESUME_WORKER_URL
+          value: "http://resume-worker:3006"
+        - name: SCHEDULING_WORKER_URL
+          value: "http://scheduling-worker:3000"
+        - name: IDENTITY_SERVICE_URL
+          value: "http://identity-worker:3000"
+        - name: NEWS_WORKER_URL
+          value: "http://news-worker:3007"
+        # Temporarily disabled to diagnose issue
+        # livenessProbe:
+        #   httpGet:
+        #     path: /api/health
+        #     port: 3000
+        #   initialDelaySeconds: 300
+        #   periodSeconds: 10
+        #   failureThreshold: 3
+        # readinessProbe:
+        #   httpGet:
+        #     path: /api/health
+        #     port: 3000
+        #   initialDelaySeconds: 240
+        #   periodSeconds: 5
+        #   failureThreshold: 3
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "200m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        volumeMounts:
+        - name: app-logs
+          mountPath: /app/logs

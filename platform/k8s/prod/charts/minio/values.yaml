@@ -1,0 +1,40 @@
+# Custom values for the official MinIO Helm chart
+# Updated for chart 5.x
+# Documentation: https://github.com/minio/minio/tree/master/helm/minio
+
+# Use an existing secret for credentials.
+# This prevents storing plain-text passwords in the values file.
+existingSecret: "minio-secret"
+accessKey: ""
+secretKey: ""
+
+# We will run MinIO in standalone mode, which is simple and sufficient
+# for a local development environment.
+mode: standalone
+
+# Enable persistence so that data is not lost when the pod restarts.
+persistence:
+  enabled: true
+  size: 10Gi
+
+# Set resource requests and limits for the container.
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "250m"
+  limits:
+    memory: "1Gi"
+    cpu: "500m"
+
+# Expose the MinIO API and Console via a ClusterIP service.
+# Other services will connect to `http://minio-service:9000`.
+service:
+  type: ClusterIP
+  ports:
+    minio: 9000
+
+consoleService:
+  type: ClusterIP
+  ports:
+    console: 9001
+
