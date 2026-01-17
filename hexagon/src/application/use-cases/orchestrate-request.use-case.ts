@@ -28,7 +28,7 @@ export class OrchestrateRequestUseCase {
     @Inject('IRequestRepository')
     private readonly requestRepository: IRequestRepository,
     @Inject('IKafkaProducer')
-    private readonly kafkaProducer: IKafkaProducer,
+    private readonly kafkaProducer: IKafkaProducer
   ) {}
 
   async execute(input: OrchestrateRequestInput): Promise<OrchestrationRequest> {
@@ -41,12 +41,7 @@ export class OrchestrateRequestUseCase {
     }
 
     // Create request with workflow type
-    const request = new OrchestrationRequest(
-      requestId,
-      input.userId,
-      workflowType,
-      input.data,
-    );
+    const request = new OrchestrationRequest(requestId, input.userId, workflowType, input.data);
 
     request.correlationId = input.correlationId || uuidv4();
     request.idempotencyKey = input.idempotencyKey;
@@ -65,9 +60,7 @@ export class OrchestrateRequestUseCase {
 
     // Determine workers needed
     const assignments = this.requestRouter.route(request);
-    assignments.forEach((assignment) =>
-      request.addWorkerAssignment(assignment),
-    );
+    assignments.forEach((assignment) => request.addWorkerAssignment(assignment));
 
     // Save request
     await this.requestRepository.save(request);
@@ -77,12 +70,7 @@ export class OrchestrateRequestUseCase {
 
     // Update status to processing
     request.updateStatus('processing' as any, undefined, undefined);
-    await this.requestRepository.updateStatus(
-      request.id,
-      'processing',
-      undefined,
-      undefined,
-    );
+    await this.requestRepository.updateStatus(request.id, 'processing', undefined, undefined);
 
     this.logger.log(`Orchestration request created: ${requestId}`);
     return request;
@@ -100,9 +88,7 @@ export class OrchestrateRequestUseCase {
     };
 
     for (const assignment of request.workers) {
-      const topic =
-        topicMapping[assignment.workerType] ||
-        `job.requests.${assignment.workerType}`;
+      const topic = topicMapping[assignment.workerType] || `job.requests.${assignment.workerType}`;
       const message = {
         requestId: request.id,
         assignmentId: assignment.id,
@@ -112,9 +98,7 @@ export class OrchestrateRequestUseCase {
       };
 
       await this.kafkaProducer.publish(topic, message);
-      this.logger.debug(
-        `Published to topic ${topic} for request ${request.id}`,
-      );
+      this.logger.debug(`Published to topic ${topic} for request ${request.id}`);
     }
   }
 }

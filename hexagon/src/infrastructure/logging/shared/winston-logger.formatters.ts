@@ -41,13 +41,11 @@ export function makeAttachRequestContextFormat(ctx?: RequestContextService) {
       const userId = ctx.getUserId();
       const serviceName = ctx.getServiceName();
 
-      if (requestId && !(info as any).requestId)
-        (info as any).requestId = requestId;
+      if (requestId && !(info as any).requestId) (info as any).requestId = requestId;
       if (correlationId && !(info as any).correlationId)
         (info as any).correlationId = correlationId;
       if (userId && !(info as any).userId) (info as any).userId = userId;
-      if (serviceName && !(info as any).serviceName)
-        (info as any).serviceName = serviceName;
+      if (serviceName && !(info as any).serviceName) (info as any).serviceName = serviceName;
     }
     return info;
   });
@@ -61,24 +59,16 @@ export function makePrettyConsoleFormat(ctx?: RequestContextService) {
     winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss.SSS' }),
     winston.format.printf((info) => {
       const { timestamp, level, message } = info as any;
-      const requestPart = (info as any).requestId
-        ? ` [req:${(info as any).requestId}]`
-        : '';
+      const requestPart = (info as any).requestId ? ` [req:${(info as any).requestId}]` : '';
 
       let processedMessage = message as string;
       let detailsPart = '';
       let contextLabel = '';
-      const sourceLabel = (info as any).source
-        ? ` (${(info as any).source})`
-        : '';
+      const sourceLabel = (info as any).source ? ` (${(info as any).source})` : '';
 
       if ((info as any).context) {
         const context = (info as any).context;
-        if (
-          typeof context === 'string' &&
-          context.startsWith('{') &&
-          context.endsWith('}')
-        ) {
+        if (typeof context === 'string' && context.startsWith('{') && context.endsWith('}')) {
           try {
             const parsed = JSON.parse(context);
             detailsPart += ` ${humanizeObjectInline(parsed)}`;
@@ -108,12 +98,10 @@ export function makePrettyConsoleFormat(ctx?: RequestContextService) {
       delete (extra as any).line;
       delete (extra as any).column;
       delete (extra as any).function;
-      const restPart = Object.keys(extra).length
-        ? ` ${humanizeObjectInline(extra)}`
-        : '';
+      const restPart = Object.keys(extra).length ? ` ${humanizeObjectInline(extra)}` : '';
       const line = `${timestamp} ${icon} ${level.toUpperCase().padEnd(7)}${requestPart}${contextLabel}${sourceLabel}: ${`${processedMessage}${detailsPart}${restPart}`.trim()}`;
       return `${line}${tracePart}`.trimEnd();
-    }),
+    })
   );
 }
 
@@ -135,6 +123,6 @@ export function makeJsonFileFormat(ctx?: RequestContextService) {
     pruneFileMetaFormat(),
     winston.format.timestamp(),
     winston.format.errors({ stack: true }),
-    winston.format.json(),
+    winston.format.json()
   );
 }

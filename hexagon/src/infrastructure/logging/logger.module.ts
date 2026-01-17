@@ -28,7 +28,7 @@ export interface LogContext {
             format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss.SSS' }),
             format.errors({ stack: true }),
             format.splat(),
-            format.json(),
+            format.json()
           ),
           defaultMeta: {
             service: 'hexagon',
@@ -40,14 +40,12 @@ export interface LogContext {
                 nodeEnv === 'development'
                   ? format.combine(
                       format.colorize(),
-                      format.printf(
-                        ({ timestamp, level, message, ...meta }) => {
-                          const metaStr = Object.keys(meta).length
-                            ? JSON.stringify(meta, null, 2)
-                            : '';
-                          return `${timestamp} [${level}]: ${message} ${metaStr}`;
-                        },
-                      ),
+                      format.printf(({ timestamp, level, message, ...meta }) => {
+                        const metaStr = Object.keys(meta).length
+                          ? JSON.stringify(meta, null, 2)
+                          : '';
+                        return `${timestamp} [${level}]: ${message} ${metaStr}`;
+                      })
                     )
                   : format.json(),
             }),
@@ -66,7 +64,7 @@ export class LoggerModule {}
 export class HexagonLogger {
   constructor(
     private readonly logger: Logger,
-    private context: LogContext = {},
+    private context: LogContext = {}
   ) {}
 
   setContext(context: LogContext): void {
@@ -77,8 +75,7 @@ export class HexagonLogger {
     return {
       ...this.context,
       ...meta,
-      correlationId:
-        meta?.correlationId || this.context.correlationId || uuidv4(),
+      correlationId: meta?.correlationId || this.context.correlationId || uuidv4(),
     };
   }
 

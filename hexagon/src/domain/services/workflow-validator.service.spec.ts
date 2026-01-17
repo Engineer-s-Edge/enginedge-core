@@ -31,48 +31,27 @@ describe('WorkflowValidator', () => {
     });
     expect(validator.validate(req)).toEqual({ valid: true });
 
-    const badReq = new OrchestrationRequest(
-      '1',
-      'u1',
-      WorkflowType.RESUME_BUILD,
-      { other: 'data' },
-    );
+    const badReq = new OrchestrationRequest('1', 'u1', WorkflowType.RESUME_BUILD, {
+      other: 'data',
+    });
     expect(validator.validate(badReq).valid).toBe(false);
   });
 
   it('should validate EXPERT_RESEARCH logic', () => {
-    const req = new OrchestrationRequest(
-      '1',
-      'u1',
-      WorkflowType.EXPERT_RESEARCH,
-      { query: 'q' },
-    );
+    const req = new OrchestrationRequest('1', 'u1', WorkflowType.EXPERT_RESEARCH, { query: 'q' });
     expect(validator.validate(req)).toEqual({ valid: true });
 
-    const badReq = new OrchestrationRequest(
-      '1',
-      'u1',
-      WorkflowType.EXPERT_RESEARCH,
-      {},
-    );
+    const badReq = new OrchestrationRequest('1', 'u1', WorkflowType.EXPERT_RESEARCH, {});
     expect(validator.validate(badReq).valid).toBe(false);
   });
 
   it('should validate CONVERSATION_CONTEXT logic', () => {
-    const req = new OrchestrationRequest(
-      '1',
-      'u1',
-      WorkflowType.CONVERSATION_CONTEXT,
-      { message: 'hi' },
-    );
+    const req = new OrchestrationRequest('1', 'u1', WorkflowType.CONVERSATION_CONTEXT, {
+      message: 'hi',
+    });
     expect(validator.validate(req)).toEqual({ valid: true });
 
-    const badReq = new OrchestrationRequest(
-      '1',
-      'u1',
-      WorkflowType.CONVERSATION_CONTEXT,
-      {},
-    );
+    const badReq = new OrchestrationRequest('1', 'u1', WorkflowType.CONVERSATION_CONTEXT, {});
     expect(validator.validate(badReq).valid).toBe(false);
   });
 });

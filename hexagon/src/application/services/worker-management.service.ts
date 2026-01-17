@@ -12,7 +12,7 @@ export class WorkerManagementService {
   constructor(
     @Inject('IWorkerRegistry')
     private readonly workerRegistry: IWorkerRegistry,
-    private readonly loadBalancer: WorkerLoadBalancer,
+    private readonly loadBalancer: WorkerLoadBalancer
   ) {}
 
   async getAvailableWorkers(workerType: WorkerType): Promise<Worker[]> {
@@ -20,9 +20,7 @@ export class WorkerManagementService {
     return workers.filter((w) => w.isHealthy());
   }
 
-  async checkWorkerHealth(
-    workerId: string,
-  ): Promise<{ healthy: boolean; lastCheck?: Date }> {
+  async checkWorkerHealth(workerId: string): Promise<{ healthy: boolean; lastCheck?: Date }> {
     const allWorkers = await this.workerRegistry.getAllWorkers();
     const worker = allWorkers.find((w) => w.id === workerId);
     if (!worker) {

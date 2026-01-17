@@ -15,7 +15,7 @@ export class RequestContextMiddleware implements NestMiddleware {
 
     this.requestContext.runWith(
       { requestId: reqId, correlationId: corrId, userId, serviceName },
-      () => next(),
+      () => next()
     );
   }
 }

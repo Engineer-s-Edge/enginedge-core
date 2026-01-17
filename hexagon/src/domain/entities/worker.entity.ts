@@ -9,12 +9,7 @@ export class Worker {
   lastHealthCheck?: Date;
   metadata?: Record<string, unknown>;
 
-  constructor(
-    id: string,
-    type: WorkerType,
-    endpoint: string,
-    capabilities: string[] = [],
-  ) {
+  constructor(id: string, type: WorkerType, endpoint: string, capabilities: string[] = []) {
     this.id = id;
     this.type = type;
     this.endpoint = endpoint;

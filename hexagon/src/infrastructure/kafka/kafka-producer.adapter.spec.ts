@@ -83,9 +83,7 @@ describe('KafkaProducerAdapter', () => {
       jest.useFakeTimers();
       await adapter.onModuleInit();
 
-      expect(mockLogger.warn).toHaveBeenCalledWith(
-        expect.stringContaining('not available'),
-      );
+      expect(mockLogger.warn).toHaveBeenCalledWith(expect.stringContaining('not available'));
 
       // Verify reconnection loop starts
       mockProducer.connect.mockResolvedValueOnce(undefined); // succeed next time
@@ -97,13 +95,11 @@ describe('KafkaProducerAdapter', () => {
     });
 
     it('should handle generic connection failure (error)', async () => {
-      mockProducer.connect.mockRejectedValueOnce(
-        new Error('Authorization Failed'),
-      );
+      mockProducer.connect.mockRejectedValueOnce(new Error('Authorization Failed'));
       await adapter.onModuleInit();
       expect(mockLogger.error).toHaveBeenCalledWith(
         'Failed to connect Kafka producer',
-        expect.any(Error),
+        expect.any(Error)
       );
     });
   });
@@ -116,9 +112,7 @@ describe('KafkaProducerAdapter', () => {
 
       await adapter.onModuleDestroy();
       expect(mockProducer.disconnect).toHaveBeenCalled();
-      expect(mockLogger.log).toHaveBeenCalledWith(
-        'Kafka producer disconnected',
-      );
+      expect(mockLogger.log).toHaveBeenCalledWith('Kafka producer disconnected');
     });
 
     it('should cleanup reconnection interval if active', async () => {
@@ -171,9 +165,7 @@ describe('KafkaProducerAdapter', () => {
       await adapter.publish('topic', {});
 
       expect(mockProducer.send).not.toHaveBeenCalled();
-      expect(mockLogger.warn).toHaveBeenCalledWith(
-        expect.stringContaining('not connected'),
-      );
+      expect(mockLogger.warn).toHaveBeenCalledWith(expect.stringContaining('not connected'));
     });
 
     it('should propagate errors from producer.send', async () => {

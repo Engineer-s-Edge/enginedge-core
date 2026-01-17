@@ -30,12 +30,9 @@ describe('MongoDbRequestRepository', () => {
 
   describe('save', () => {
     it('should save request to database', async () => {
-      const request = new OrchestrationRequest(
-        'req-1',
-        'user-1',
-        WorkflowType.RESUME_BUILD,
-        { test: 'data' },
-      );
+      const request = new OrchestrationRequest('req-1', 'user-1', WorkflowType.RESUME_BUILD, {
+        test: 'data',
+      });
 
       mockModel.findOneAndUpdate.mockResolvedValue({});
 
@@ -48,7 +45,7 @@ describe('MongoDbRequestRepository', () => {
           userId: 'user-1',
           workflow: WorkflowType.RESUME_BUILD,
         }),
-        { upsert: true, new: true },
+        { upsert: true, new: true }
       );
     });
   });
@@ -100,7 +97,7 @@ describe('MongoDbRequestRepository', () => {
           status: 'completed',
           result: { result: 'test' },
           completedAt: expect.any(Date),
-        }),
+        })
       );
     });
   });

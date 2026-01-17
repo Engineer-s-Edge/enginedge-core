@@ -27,7 +27,7 @@ export class OrchestrationController {
   constructor(
     private readonly orchestrateRequest: OrchestrateRequestUseCase,
     @Inject('IRequestRepository')
-    private readonly requestRepository: IRequestRepository,
+    private readonly requestRepository: IRequestRepository
   ) {}
 
   @Post()
@@ -35,8 +35,7 @@ export class OrchestrationController {
   @UseGuards(JwtAuthGuard)
   async orchestrate(@Body() body: OrchestrateRequestDto, @Req() req: any) {
     const userId = req.user?.sub || req.user?.userId || 'anonymous';
-    const correlationId =
-      body.correlationId || req.headers['x-correlation-id'] || uuidv4();
+    const correlationId = body.correlationId || req.headers['x-correlation-id'] || uuidv4();
 
     const request = await this.orchestrateRequest.execute({
       userId,

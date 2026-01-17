@@ -40,9 +40,7 @@ describe('Worker Entity', () => {
     // Allow for small time difference
     const timeDiff = worker.lastHealthCheck!.getTime() - before.getTime();
     expect(timeDiff).toBeGreaterThanOrEqual(0);
-    expect(worker.lastHealthCheck!.getTime()).toBeLessThanOrEqual(
-      after.getTime(),
-    );
+    expect(worker.lastHealthCheck!.getTime()).toBeLessThanOrEqual(after.getTime());
   });
 
   it('should check for capabilities correctly', () => {

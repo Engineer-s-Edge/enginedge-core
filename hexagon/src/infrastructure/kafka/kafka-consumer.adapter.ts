@@ -1,17 +1,10 @@
-import {
-  Injectable,
-  Logger,
-  OnModuleInit,
-  OnModuleDestroy,
-} from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Kafka, Consumer, EachMessagePayload } from 'kafkajs';
 import { IKafkaConsumer } from '@application/ports/kafka-consumer.port';
 
 @Injectable()
-export class KafkaConsumerAdapter
-  implements IKafkaConsumer, OnModuleInit, OnModuleDestroy
-{
+export class KafkaConsumerAdapter implements IKafkaConsumer, OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(KafkaConsumerAdapter.name);
   private kafka: Kafka;
   private consumer: Consumer;
@@ -20,17 +13,11 @@ export class KafkaConsumerAdapter
   private consumerRunning = false;
 
   constructor(private readonly configService: ConfigService) {
-    const brokers = (
-      this.configService.get<string>('KAFKA_BROKERS') || 'localhost:9092'
-    ).split(',');
-    const clientId = this.configService.get<string>(
-      'KAFKA_CLIENT_ID',
-      'enginedge-hexagon',
+    const brokers = (this.configService.get<string>('KAFKA_BROKERS') || 'localhost:9092').split(
+      ','
     );
-    const groupId = this.configService.get<string>(
-      'KAFKA_GROUP_ID',
-      'hexagon-orchestrator',
-    );
+    const clientId = this.configService.get<string>('KAFKA_CLIENT_ID', 'enginedge-hexagon');
+    const groupId = this.configService.get<string>('KAFKA_GROUP_ID', 'hexagon-orchestrator');
 
     this.kafka = new Kafka({
       clientId,
@@ -63,15 +50,9 @@ export class KafkaConsumerAdapter
       this.logger.log('Kafka consumer connected');
     } catch (error) {
       // Log connection failure but don't throw - allow app to start without Kafka
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      if (
-        errorMessage.includes('ECONNREFUSED') ||
-        errorMessage.includes('Connection')
-      ) {
-        this.logger.warn(
-          'Kafka consumer not available - will retry periodically',
-        );
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      if (errorMessage.includes('ECONNREFUSED') || errorMessage.includes('Connection')) {
+        this.logger.warn('Kafka consumer not available - will retry periodically');
         // Start periodic reconnection attempts
         this.startReconnectionAttempts();
       } else {
@@ -124,19 +105,14 @@ export class KafkaConsumerAdapter
     }
   }
 
-  async subscribe(
-    topic: string,
-    handler: (message: any) => Promise<void>,
-  ): Promise<void> {
+  async subscribe(topic: string, handler: (message: any) => Promise<void>): Promise<void> {
     if (this.subscriptions.has(topic)) {
       this.logger.warn(`Already subscribed to topic: ${topic}`);
       return;
     }
 
     if (!this.connected) {
-      this.logger.warn(
-        `Cannot subscribe to topic ${topic} - consumer not connected`,
-      );
+      this.logger.warn(`Cannot subscribe to topic ${topic} - consumer not connected`);
       return;
     }
 
@@ -144,7 +120,7 @@ export class KafkaConsumerAdapter
       // If consumer is already running, we cannot subscribe to new topics
       if (this.consumerRunning) {
         this.logger.error(
-          `Cannot subscribe to topic ${topic} - consumer is already running. All topics must be subscribed before starting the consumer.`,
+          `Cannot subscribe to topic ${topic} - consumer is already running. All topics must be subscribed before starting the consumer.`
         );
         // Store the handler anyway so if the consumer restarts, it will pick it up
         this.subscriptions.set(topic, handler);
@@ -185,10 +161,7 @@ export class KafkaConsumerAdapter
               const message = JSON.parse(payload.message.value.toString());
               await handler(message);
             } catch (error) {
-              this.logger.error(
-                `Error processing message from topic ${payload.topic}`,
-                error,
-              );
+              this.logger.error(`Error processing message from topic ${payload.topic}`, error);
             }
           }
         },

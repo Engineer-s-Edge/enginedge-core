@@ -34,9 +34,7 @@ describe('KubernetesObservabilityController', () => {
       ],
     }).compile();
 
-    controller = module.get<KubernetesObservabilityController>(
-      KubernetesObservabilityController,
-    );
+    controller = module.get<KubernetesObservabilityController>(KubernetesObservabilityController);
   });
 
   it('should be defined', () => {
@@ -45,40 +43,25 @@ describe('KubernetesObservabilityController', () => {
 
   describe('getPodLogs', () => {
     it('should return logs successfully', async () => {
-      const result = await controller.getPodLogs(
-        'resume',
-        'pod1',
-        'ns',
-        'c1',
-        '100',
-      );
+      const result = await controller.getPodLogs('resume', 'pod1', 'ns', 'c1', '100');
       expect(result).toEqual({ podName: 'pod1', logs: 'logs' });
-      expect(mockService.getPodLogs).toHaveBeenCalledWith(
-        'pod1',
-        'ns',
-        'c1',
-        100,
-      );
+      expect(mockService.getPodLogs).toHaveBeenCalledWith('pod1', 'ns', 'c1', 100);
       expect(mockMetrics.recordOperation).toHaveBeenCalledWith(
         'getPodLogs',
         'resume',
         expect.any(Number),
-        true,
+        true
       );
     });
 
     it('should handle errors', async () => {
-      (mockService.getPodLogs as jest.Mock).mockRejectedValue(
-        new Error('Failed'),
-      );
-      await expect(controller.getPodLogs('resume', 'pod1')).rejects.toThrow(
-        HttpException,
-      );
+      (mockService.getPodLogs as jest.Mock).mockRejectedValue(new Error('Failed'));
+      await expect(controller.getPodLogs('resume', 'pod1')).rejects.toThrow(HttpException);
       expect(mockMetrics.recordOperation).toHaveBeenCalledWith(
         'getPodLogs',
         'resume',
         expect.any(Number),
-        false,
+        false
       );
     });
   });
@@ -91,7 +74,7 @@ describe('KubernetesObservabilityController', () => {
         'getPodStatus',
         'resume',
         expect.any(Number),
-        true,
+        true
       );
     });
   });

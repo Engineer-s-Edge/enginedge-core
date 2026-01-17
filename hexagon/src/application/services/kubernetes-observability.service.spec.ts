@@ -23,9 +23,7 @@ describe('KubernetesObservabilityService', () => {
       ],
     }).compile();
 
-    service = module.get<KubernetesObservabilityService>(
-      KubernetesObservabilityService,
-    );
+    service = module.get<KubernetesObservabilityService>(KubernetesObservabilityService);
   });
 
   it('should be defined', () => {
@@ -34,12 +32,7 @@ describe('KubernetesObservabilityService', () => {
 
   it('should delegate getPodLogs to port', async () => {
     await service.getPodLogs('pod', 'ns', 'container', 10);
-    expect(mockPort.getPodLogs).toHaveBeenCalledWith(
-      'pod',
-      'ns',
-      'container',
-      10,
-    );
+    expect(mockPort.getPodLogs).toHaveBeenCalledWith('pod', 'ns', 'container', 10);
   });
 
   it('should delegate getPodStatus to port', async () => {

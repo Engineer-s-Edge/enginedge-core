@@ -7,12 +7,7 @@ import { DatabaseModule } from '../database/database.module';
 import { WorkerRegistryModule } from '../worker-registry/worker-registry.module';
 
 @Module({
-  imports: [
-    ApplicationModule,
-    KafkaModule,
-    DatabaseModule,
-    WorkerRegistryModule,
-  ],
+  imports: [ApplicationModule, KafkaModule, DatabaseModule, WorkerRegistryModule],
   controllers: [OrchestrationController],
   providers: [OrchestrationService],
 })

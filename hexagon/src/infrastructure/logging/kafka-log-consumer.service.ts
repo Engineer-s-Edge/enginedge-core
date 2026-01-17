@@ -5,13 +5,7 @@
  * Uses a concurrent worker pool (75% of CPU cores) for processing.
  */
 
-import {
-  Injectable,
-  OnModuleInit,
-  OnModuleDestroy,
-  Logger,
-  Inject,
-} from '@nestjs/common';
+import { Injectable, OnModuleInit, OnModuleDestroy, Logger, Inject } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { IKafkaConsumer } from '@application/ports/kafka-consumer.port';
 import { WinstonLoggerAdapter } from './shared/winston-logger.adapter';
@@ -36,13 +30,13 @@ export class KafkaLogConsumerService implements OnModuleInit, OnModuleDestroy {
     private readonly configService: ConfigService,
     @Inject('IKafkaConsumer:Logging')
     private readonly kafkaConsumer: IKafkaConsumer,
-    private readonly winstonLogger: WinstonLoggerAdapter,
+    private readonly winstonLogger: WinstonLoggerAdapter
   ) {
     // Use 75% of CPU cores, minimum 1
     const cpuCount = os.cpus().length;
     this.workerPoolSize = Math.max(1, Math.floor(cpuCount * 0.75));
     this.logger.log(
-      `Initializing log consumer with ${this.workerPoolSize} workers (${cpuCount} CPU cores available)`,
+      `Initializing log consumer with ${this.workerPoolSize} workers (${cpuCount} CPU cores available)`
     );
   }
 
@@ -67,7 +61,7 @@ export class KafkaLogConsumerService implements OnModuleInit, OnModuleDestroy {
     const workerTypes = this.configService
       .get<string>(
         'LOG_WORKER_TYPES',
-        'assistant-worker,agent-tool-worker,data-processing-worker,identity-worker,interview-worker,latex-worker,news-worker,resume-worker,scheduling-worker',
+        'assistant-worker,agent-tool-worker,data-processing-worker,identity-worker,interview-worker,latex-worker,news-worker,resume-worker,scheduling-worker'
       )
       .split(',');
 
@@ -114,9 +108,7 @@ export class KafkaLogConsumerService implements OnModuleInit, OnModuleDestroy {
           item.resolve();
         } catch (error) {
           this.logger.error(`Worker ${workerId} failed to process log`, error);
-          item.reject(
-            error instanceof Error ? error : new Error(String(error)),
-          );
+          item.reject(error instanceof Error ? error : new Error(String(error)));
         }
       } else {
         // No items in queue, wait a bit

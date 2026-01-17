@@ -45,12 +45,9 @@ describe('OrchestrationController', () => {
 
   describe('orchestrate', () => {
     it('should create orchestration request', async () => {
-      const mockRequest = new OrchestrationRequest(
-        'req-1',
-        'user-1',
-        WorkflowType.RESUME_BUILD,
-        { test: 'data' },
-      );
+      const mockRequest = new OrchestrationRequest('req-1', 'user-1', WorkflowType.RESUME_BUILD, {
+        test: 'data',
+      });
       mockRequest.correlationId = 'corr-1';
 
       orchestrateUseCase.execute.mockResolvedValue(mockRequest);
@@ -65,7 +62,7 @@ describe('OrchestrationController', () => {
           workflow: 'resume-build',
           data: { test: 'data' },
         },
-        req,
+        req
       );
 
       expect(result).toHaveProperty('requestId', 'req-1');
@@ -76,19 +73,16 @@ describe('OrchestrationController', () => {
           userId: 'user-1',
           workflow: 'resume-build',
           data: { test: 'data' },
-        }),
+        })
       );
     });
   });
 
   describe('getStatus', () => {
     it('should return request status', async () => {
-      const mockRequest = new OrchestrationRequest(
-        'req-1',
-        'user-1',
-        WorkflowType.RESUME_BUILD,
-        { test: 'data' },
-      );
+      const mockRequest = new OrchestrationRequest('req-1', 'user-1', WorkflowType.RESUME_BUILD, {
+        test: 'data',
+      });
 
       requestRepository.findById.mockResolvedValue(mockRequest);
 

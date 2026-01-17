@@ -31,9 +31,7 @@ describe('KubernetesWorkerRegistryAdapter', () => {
       makeApiClient: jest.fn().mockReturnValue(mockCoreV1ApiInstance),
     };
 
-    (KubeConfig as unknown as jest.Mock).mockImplementation(
-      () => mockKubeConfigInstance,
-    );
+    (KubeConfig as unknown as jest.Mock).mockImplementation(() => mockKubeConfigInstance);
     (CoreV1Api as unknown as jest.Mock).mockImplementation(() => ({}));
 
     // Default Config Mock behavior
@@ -53,9 +51,7 @@ describe('KubernetesWorkerRegistryAdapter', () => {
       ],
     }).compile();
 
-    adapter = module.get<KubernetesWorkerRegistryAdapter>(
-      KubernetesWorkerRegistryAdapter,
-    );
+    adapter = module.get<KubernetesWorkerRegistryAdapter>(KubernetesWorkerRegistryAdapter);
 
     // Silence logger during tests
     jest.spyOn(Logger.prototype, 'log').mockImplementation(() => {});
@@ -75,9 +71,7 @@ describe('KubernetesWorkerRegistryAdapter', () => {
     it('should initialize KubeConfig when mode is kubernetes', () => {
       expect(KubeConfig).toHaveBeenCalled();
       expect(mockKubeConfigInstance.loadFromDefault).toHaveBeenCalled();
-      expect(mockKubeConfigInstance.makeApiClient).toHaveBeenCalledWith(
-        CoreV1Api,
-      );
+      expect(mockKubeConfigInstance.makeApiClient).toHaveBeenCalledWith(CoreV1Api);
     });
 
     it('should NOT initialize KubeConfig when mode is NOT kubernetes', async () => {
@@ -96,7 +90,7 @@ describe('KubernetesWorkerRegistryAdapter', () => {
       }).compile();
 
       const staticAdapter = module.get<KubernetesWorkerRegistryAdapter>(
-        KubernetesWorkerRegistryAdapter,
+        KubernetesWorkerRegistryAdapter
       );
       expect(staticAdapter).toBeDefined();
       expect(KubeConfig).not.toHaveBeenCalled();
@@ -116,11 +110,11 @@ describe('KubernetesWorkerRegistryAdapter', () => {
       }).compile();
 
       const errorAdapter = module.get<KubernetesWorkerRegistryAdapter>(
-        KubernetesWorkerRegistryAdapter,
+        KubernetesWorkerRegistryAdapter
       );
       expect(errorAdapter).toBeDefined();
       expect(Logger.prototype.warn).toHaveBeenCalledWith(
-        expect.stringContaining('Kubernetes client not available'),
+        expect.stringContaining('Kubernetes client not available')
       );
     });
   });
@@ -149,15 +143,13 @@ describe('KubernetesWorkerRegistryAdapter', () => {
         spec: { ports: [{ port: 8080 }] },
       };
 
-      mockCoreV1ApiInstance.listNamespacedService.mockImplementation(
-        (opts: any) => {
-          const labelSelector = opts?.labelSelector;
-          if (labelSelector === 'app=assistant-worker') {
-            return Promise.resolve({ body: { items: [mockService] } });
-          }
-          return Promise.resolve({ body: { items: [] } });
-        },
-      );
+      mockCoreV1ApiInstance.listNamespacedService.mockImplementation((opts: any) => {
+        const labelSelector = opts?.labelSelector;
+        if (labelSelector === 'app=assistant-worker') {
+          return Promise.resolve({ body: { items: [mockService] } });
+        }
+        return Promise.resolve({ body: { items: [] } });
+      });
 
       await adapter.onModuleInit();
 
@@ -170,15 +162,13 @@ describe('KubernetesWorkerRegistryAdapter', () => {
     });
 
     it('should fallback to static workers if K8s discovery fails', async () => {
-      mockCoreV1ApiInstance.listNamespacedService.mockRejectedValue(
-        new Error('K8s Error'),
-      );
+      mockCoreV1ApiInstance.listNamespacedService.mockRejectedValue(new Error('K8s Error'));
 
       await adapter.onModuleInit();
 
       expect(Logger.prototype.error).toHaveBeenCalledWith(
         'Failed to discover workers from Kubernetes',
-        expect.any(Error),
+        expect.any(Error)
       );
 
       // Verification of static fallback
@@ -211,7 +201,7 @@ describe('KubernetesWorkerRegistryAdapter', () => {
         ],
       }).compile();
       const staticAdapter = module.get<KubernetesWorkerRegistryAdapter>(
-        KubernetesWorkerRegistryAdapter,
+        KubernetesWorkerRegistryAdapter
       );
 
       // Trigger manually or via onModuleInit
@@ -219,9 +209,7 @@ describe('KubernetesWorkerRegistryAdapter', () => {
       await staticAdapter.onModuleInit();
 
       const allWorkers = await staticAdapter.getAllWorkers();
-      const assistant = allWorkers.find(
-        (w) => (w.type as any) === 'assistant-worker',
-      );
+      const assistant = allWorkers.find((w) => (w.type as any) === 'assistant-worker');
       expect(assistant).toBeDefined();
       expect(assistant?.endpoint).toBe('http://localhost:4000');
     });

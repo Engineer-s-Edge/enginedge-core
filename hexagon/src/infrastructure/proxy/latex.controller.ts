@@ -8,13 +8,6 @@ export class LatexProxyController {
   @All('*')
   forward(@Req() req: any) {
     const path = req.params?.[0] || '';
-    return this.proxy.forward(
-      this.base,
-      path,
-      req.method,
-      req.body,
-      req.headers,
-      req.query,
-    );
+    return this.proxy.forward(this.base, path, req.method, req.body, req.headers, req.query);
   }
 }

@@ -60,9 +60,7 @@ describe('WorkerManagementService', () => {
 
     it('should throw error for missing worker', async () => {
       (mockRegistry.getAllWorkers as jest.Mock).mockResolvedValue([]);
-      await expect(service.checkWorkerHealth('999')).rejects.toThrow(
-        'Worker 999 not found',
-      );
+      await expect(service.checkWorkerHealth('999')).rejects.toThrow('Worker 999 not found');
     });
   });
 

@@ -28,9 +28,7 @@ describe('CoordinateMultiWorkerUseCase', () => {
       ],
     }).compile();
 
-    useCase = module.get<CoordinateMultiWorkerUseCase>(
-      CoordinateMultiWorkerUseCase,
-    );
+    useCase = module.get<CoordinateMultiWorkerUseCase>(CoordinateMultiWorkerUseCase);
   });
 
   it('should be defined', () => {
@@ -44,12 +42,7 @@ describe('CoordinateMultiWorkerUseCase', () => {
 
   it('should return early if not all workers complete', async () => {
     const req = new OrchestrationRequest('req1', 'u1', WorkflowType.CUSTOM, {});
-    const assignment = new WorkerAssignment(
-      'a1',
-      'w1',
-      WorkerType.RESUME,
-      'req1',
-    );
+    const assignment = new WorkerAssignment('a1', 'w1', WorkerType.RESUME, 'req1');
     // assignment status is PENDING by default
     req.addWorkerAssignment(assignment);
     (mockRepo.findById as jest.Mock).mockResolvedValue(req);
@@ -62,12 +55,7 @@ describe('CoordinateMultiWorkerUseCase', () => {
 
   it('should aggregate and complete if all workers successfully finished', async () => {
     const req = new OrchestrationRequest('req1', 'u1', WorkflowType.CUSTOM, {});
-    const assignment = new WorkerAssignment(
-      'a1',
-      'w1',
-      WorkerType.RESUME,
-      'req1',
-    );
+    const assignment = new WorkerAssignment('a1', 'w1', WorkerType.RESUME, 'req1');
     assignment.complete({ ok: true });
     req.addWorkerAssignment(assignment);
     (mockRepo.findById as jest.Mock).mockResolvedValue(req);
@@ -101,7 +89,7 @@ describe('CoordinateMultiWorkerUseCase', () => {
       'req1',
       'failed',
       null, // result is null on failure in the implementation?
-      'One or more workers failed',
+      'One or more workers failed'
     );
   });
 });

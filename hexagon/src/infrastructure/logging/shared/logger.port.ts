@@ -34,43 +34,23 @@ export interface LogMessage {
 }
 
 export interface ILoggerPort {
-  debug(
-    message: string,
-    context?: string | LogContext,
-    metadata?: Record<string, unknown>,
-  ): void;
-  info(
-    message: string,
-    context?: string | LogContext,
-    metadata?: Record<string, unknown>,
-  ): void;
-  warn(
-    message: string,
-    context?: string | LogContext,
-    metadata?: Record<string, unknown>,
-  ): void;
+  debug(message: string, context?: string | LogContext, metadata?: Record<string, unknown>): void;
+  info(message: string, context?: string | LogContext, metadata?: Record<string, unknown>): void;
+  warn(message: string, context?: string | LogContext, metadata?: Record<string, unknown>): void;
   error(
     message: string,
     error?: Error | unknown,
     context?: string | LogContext,
-    metadata?: Record<string, unknown>,
+    metadata?: Record<string, unknown>
   ): void;
   fatal(
     message: string,
     error?: Error | unknown,
     context?: string | LogContext,
-    metadata?: Record<string, unknown>,
+    metadata?: Record<string, unknown>
   ): void;
-  verbose(
-    message: string,
-    context?: string | LogContext,
-    metadata?: Record<string, unknown>,
-  ): void;
-  log(
-    message: string,
-    context?: string | LogContext,
-    metadata?: Record<string, unknown>,
-  ): void;
+  verbose(message: string, context?: string | LogContext, metadata?: Record<string, unknown>): void;
+  log(message: string, context?: string | LogContext, metadata?: Record<string, unknown>): void;
   setLevel(level: LogLevel): void;
   getLevel(): string;
 }

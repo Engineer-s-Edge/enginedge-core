@@ -103,25 +103,19 @@ describe('WinstonLoggerAdapter', () => {
         'test message',
         expect.objectContaining({
           context: expect.stringContaining('{"foo":"bar"}'),
-        }),
+        })
       );
     });
 
     it('should log debug', () => {
       adapter.debug('debug message');
-      expect(logger.debug).toHaveBeenCalledWith(
-        'debug message',
-        expect.any(Object),
-      );
+      expect(logger.debug).toHaveBeenCalledWith('debug message', expect.any(Object));
     });
 
     // Note: 'log' method delegates to 'info' level logic in implementation details
     it('should log generic', () => {
       adapter.log('generic message');
-      expect(logger.info).toHaveBeenCalledWith(
-        'generic message',
-        expect.any(Object),
-      );
+      expect(logger.info).toHaveBeenCalledWith('generic message', expect.any(Object));
     });
   });
 
@@ -134,7 +128,7 @@ describe('WinstonLoggerAdapter', () => {
         'msg',
         expect.objectContaining({
           context: expect.stringContaining('"requestId":"123"'),
-        }),
+        })
       );
     });
   });

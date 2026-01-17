@@ -11,12 +11,10 @@ describe('RequestRouter', () => {
 
   describe('route', () => {
     it('should route resume-build workflow to resume, assistant, and latex workers', () => {
-      const request = new OrchestrationRequest(
-        'req-1',
-        'user-1',
-        WorkflowType.RESUME_BUILD,
-        { experiences: [], jobDescription: 'test' },
-      );
+      const request = new OrchestrationRequest('req-1', 'user-1', WorkflowType.RESUME_BUILD, {
+        experiences: [],
+        jobDescription: 'test',
+      });
 
       const assignments = router.route(request);
 
@@ -27,12 +25,9 @@ describe('RequestRouter', () => {
     });
 
     it('should route expert-research workflow to agent-tool, data-processing, and assistant workers', () => {
-      const request = new OrchestrationRequest(
-        'req-2',
-        'user-1',
-        WorkflowType.EXPERT_RESEARCH,
-        { query: 'test query' },
-      );
+      const request = new OrchestrationRequest('req-2', 'user-1', WorkflowType.EXPERT_RESEARCH, {
+        query: 'test query',
+      });
 
       const assignments = router.route(request);
 
@@ -48,7 +43,7 @@ describe('RequestRouter', () => {
         'req-cc',
         'user-1',
         WorkflowType.CONVERSATION_CONTEXT,
-        { history: [] },
+        { history: [] }
       );
       const assignments = router.route(request);
       expect(assignments.length).toBe(1);
@@ -57,12 +52,9 @@ describe('RequestRouter', () => {
 
     // --- Single Worker Heuristics ---
     it('should route single-worker workflow to assistant when prompt is present', () => {
-      const request = new OrchestrationRequest(
-        'req-3',
-        'user-1',
-        WorkflowType.SINGLE_WORKER,
-        { prompt: 'test prompt' },
-      );
+      const request = new OrchestrationRequest('req-3', 'user-1', WorkflowType.SINGLE_WORKER, {
+        prompt: 'test prompt',
+      });
       const assignments = router.route(request);
       expect(assignments).toHaveLength(1);
       expect(assignments[0].workerType).toBe(WorkerType.ASSISTANT);
@@ -73,7 +65,7 @@ describe('RequestRouter', () => {
         'req-sm-resume',
         'user-1',
         WorkflowType.SINGLE_WORKER,
-        { experiences: [] },
+        { experiences: [] }
       );
       const assignments = router.route(request);
       expect(assignments).toHaveLength(1);
@@ -85,7 +77,7 @@ describe('RequestRouter', () => {
         'req-sm-latex',
         'user-1',
         WorkflowType.SINGLE_WORKER,
-        { latex: '\\begin...' },
+        { latex: '\\begin...' }
       );
       const assignments = router.route(request);
       expect(assignments).toHaveLength(1);
@@ -97,7 +89,7 @@ describe('RequestRouter', () => {
         'req-explicit',
         'user-1',
         WorkflowType.SINGLE_WORKER,
-        { workerType: 'interview' },
+        { workerType: 'interview' }
       );
       const assignments = router.route(request);
       expect(assignments).toHaveLength(1);
@@ -105,30 +97,22 @@ describe('RequestRouter', () => {
     });
 
     it('should return empty assigned for single worker if no match', () => {
-      const request = new OrchestrationRequest(
-        'req-empty',
-        'user-1',
-        WorkflowType.SINGLE_WORKER,
-        { foo: 'bar' },
-      );
+      const request = new OrchestrationRequest('req-empty', 'user-1', WorkflowType.SINGLE_WORKER, {
+        foo: 'bar',
+      });
       const assignments = router.route(request);
       expect(assignments).toHaveLength(0);
     });
 
     // --- Custom Workflow ---
     it('should detect custom workflow steps correctly', () => {
-      const request = new OrchestrationRequest(
-        'req-custom',
-        'user-1',
-        WorkflowType.CUSTOM,
-        {
-          assistant: true,
-          resume: true,
-          latex: true,
-          search: true, // triggers agent-tool
-          upload: true, // triggers data-processing
-        },
-      );
+      const request = new OrchestrationRequest('req-custom', 'user-1', WorkflowType.CUSTOM, {
+        assistant: true,
+        resume: true,
+        latex: true,
+        search: true, // triggers agent-tool
+        upload: true, // triggers data-processing
+      });
       const assignments = router.route(request);
       const types = assignments.map((a) => a.workerType);
 
@@ -146,7 +130,7 @@ describe('RequestRouter', () => {
         'req-unknown',
         'user-1',
         WorkflowType.SINGLE_WORKER,
-        { workerType: 'crazy-worker' },
+        { workerType: 'crazy-worker' }
       );
       const assignments = router.route(request);
       expect(assignments[0].workerType).toBe(WorkerType.ASSISTANT);

@@ -27,59 +27,29 @@ export class RequestRouter {
       case WorkflowType.RESUME_BUILD:
         // Resume → Assistant → LaTeX
         assignments.push(
-          new WorkerAssignment(
-            uuidv4(),
-            'resume-1',
-            WorkerType.RESUME,
-            request.id,
-          ),
-          new WorkerAssignment(
-            uuidv4(),
-            'assistant-1',
-            WorkerType.ASSISTANT,
-            request.id,
-          ),
-          new WorkerAssignment(
-            uuidv4(),
-            'latex-1',
-            WorkerType.LATEX,
-            request.id,
-          ),
+          new WorkerAssignment(uuidv4(), 'resume-1', WorkerType.RESUME, request.id),
+          new WorkerAssignment(uuidv4(), 'assistant-1', WorkerType.ASSISTANT, request.id),
+          new WorkerAssignment(uuidv4(), 'latex-1', WorkerType.LATEX, request.id)
         );
         break;
 
       case WorkflowType.EXPERT_RESEARCH:
         // Agent-tool → Data-processing → Assistant
         assignments.push(
-          new WorkerAssignment(
-            uuidv4(),
-            'agent-tool-1',
-            WorkerType.AGENT_TOOL,
-            request.id,
-          ),
+          new WorkerAssignment(uuidv4(), 'agent-tool-1', WorkerType.AGENT_TOOL, request.id),
           new WorkerAssignment(
             uuidv4(),
             'data-processing-1',
             WorkerType.DATA_PROCESSING,
-            request.id,
+            request.id
           ),
-          new WorkerAssignment(
-            uuidv4(),
-            'assistant-1',
-            WorkerType.ASSISTANT,
-            request.id,
-          ),
+          new WorkerAssignment(uuidv4(), 'assistant-1', WorkerType.ASSISTANT, request.id)
         );
         break;
 
       case WorkflowType.CONVERSATION_CONTEXT:
         assignments.push(
-          new WorkerAssignment(
-            uuidv4(),
-            'assistant-1',
-            WorkerType.ASSISTANT,
-            request.id,
-          ),
+          new WorkerAssignment(uuidv4(), 'assistant-1', WorkerType.ASSISTANT, request.id)
         );
         break;
 
@@ -88,12 +58,7 @@ export class RequestRouter {
         const workerType = this.detectSingleWorkerType(request.data);
         if (workerType) {
           assignments.push(
-            new WorkerAssignment(
-              uuidv4(),
-              `${workerType}-1`,
-              mapWorkerType(workerType),
-              request.id,
-            ),
+            new WorkerAssignment(uuidv4(), `${workerType}-1`, mapWorkerType(workerType), request.id)
           );
         }
         break;
@@ -107,8 +72,8 @@ export class RequestRouter {
               uuidv4(),
               `${workerTypeStr}-1`,
               mapWorkerType(workerTypeStr),
-              request.id,
-            ),
+              request.id
+            )
           );
         });
     }

@@ -48,9 +48,7 @@ describe('WorkflowOrchestrationService', () => {
       ],
     }).compile();
 
-    service = module.get<WorkflowOrchestrationService>(
-      WorkflowOrchestrationService,
-    );
+    service = module.get<WorkflowOrchestrationService>(WorkflowOrchestrationService);
   });
 
   describe('orchestrateWorkflow', () => {
@@ -65,11 +63,9 @@ describe('WorkflowOrchestrationService', () => {
       orchestrateUseCase.execute.mockResolvedValue(mockRequest);
       manageWorkflowState.createWorkflow.mockResolvedValue({} as any);
 
-      const requestId = await service.orchestrateWorkflow(
-        WorkflowType.RESUME_BUILD,
-        'user-1',
-        { test: 'data' },
-      );
+      const requestId = await service.orchestrateWorkflow(WorkflowType.RESUME_BUILD, 'user-1', {
+        test: 'data',
+      });
 
       expect(requestId).toBe('req-1');
       expect(orchestrateUseCase.execute).toHaveBeenCalledWith(
@@ -77,7 +73,7 @@ describe('WorkflowOrchestrationService', () => {
           userId: 'user-1',
           workflow: WorkflowType.RESUME_BUILD,
           data: { test: 'data' },
-        }),
+        })
       );
       expect(manageWorkflowState.createWorkflow).toHaveBeenCalledWith(
         'req-1',
@@ -86,7 +82,7 @@ describe('WorkflowOrchestrationService', () => {
           expect.objectContaining({ workerType: 'resume' }),
           expect.objectContaining({ workerType: 'assistant' }),
           expect.objectContaining({ workerType: 'latex' }),
-        ]),
+        ])
       );
     });
   });

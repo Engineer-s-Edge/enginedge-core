@@ -76,9 +76,7 @@ describe('Orchestration (e2e)', () => {
     });
 
     it('should return 404 when request not found', () => {
-      return request(app.getHttpServer())
-        .get('/api/orchestrate/non-existent')
-        .expect(500); // Will throw error which becomes 500
+      return request(app.getHttpServer()).get('/api/orchestrate/non-existent').expect(500); // Will throw error which becomes 500
     });
   });
 

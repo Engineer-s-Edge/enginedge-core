@@ -33,10 +33,7 @@ export function computeCallSite(skipUntil?: Function, hint?: string): CallSite {
 
   const isExcludedMain = (p: string) => {
     const n = p.replace(/\\/g, '/');
-    return (
-      /\/src\/main\.(t|j)s$/i.test(n) ||
-      /\/dist(\/src)?\/main\.(t|j)s$/i.test(n)
-    );
+    return /\/src\/main\.(t|j)s$/i.test(n) || /\/dist(\/src)?\/main\.(t|j)s$/i.test(n);
   };
 
   const isProjectFrame = (p: string) => {
@@ -51,16 +48,12 @@ export function computeCallSite(skipUntil?: Function, hint?: string): CallSite {
     const n = p.toLowerCase();
     const fnn = (fn || '').toLowerCase();
     const base = h.replace(/(service|controller|module|resolver)$/i, '');
-    return (
-      n.includes(h) || n.includes(base) || fnn.includes(h) || fnn.includes(base)
-    );
+    return n.includes(h) || n.includes(base) || fnn.includes(h) || fnn.includes(base);
   };
 
   const shouldPrefer = (p: string) => {
     const n = p.replace(/\\/g, '/');
-    return (
-      (n.includes('/src/') || n.includes('/dist/src/')) && !isExcludedMain(p)
-    );
+    return (n.includes('/src/') || n.includes('/dist/src/')) && !isExcludedMain(p);
   };
 
   let fallback: CallSite | undefined;
@@ -90,21 +83,13 @@ export function computeCallSite(skipUntil?: Function, hint?: string): CallSite {
       function: functionName,
     };
 
-    if (
-      !firstHintMatch &&
-      matchesHint(absPath, functionName) &&
-      !isExcludedMain(absPath)
-    ) {
+    if (!firstHintMatch && matchesHint(absPath, functionName) && !isExcludedMain(absPath)) {
       firstHintMatch = frame;
     }
     if (shouldPrefer(absPath)) {
       return frame;
     }
-    if (
-      !firstProjectFrame &&
-      isProjectFrame(absPath) &&
-      !isExcludedMain(absPath)
-    ) {
+    if (!firstProjectFrame && isProjectFrame(absPath) && !isExcludedMain(absPath)) {
       firstProjectFrame = frame;
     }
     if (!fallback) fallback = frame;
